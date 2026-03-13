@@ -24,7 +24,7 @@ import {
   removeAssignment,
   fetchCourses,
   fetchUserTeams,
-  fetchUsers,
+  fetchConsultants,
   type CourseAssignment,
 } from '@/api/client';
 
@@ -57,9 +57,9 @@ export function Assignments() {
     queryFn: fetchUserTeams,
   });
 
-  const { data: users } = useQuery({
-    queryKey: ['users'],
-    queryFn: fetchUsers,
+  const { data: consultants } = useQuery({
+    queryKey: ['consultants'],
+    queryFn: fetchConsultants,
   });
 
   const {
@@ -75,7 +75,7 @@ export function Assignments() {
 
   const selectedTeamId = watch('teamId');
 
-  const teamMembers = users?.filter((u) => u.teams.includes(selectedTeamId)) ?? [];
+  const teamMembers = consultants?.filter((c) => c.teamId === selectedTeamId) ?? [];
 
   const createMutation = useMutation({
     mutationFn: assignCourse,
@@ -139,7 +139,11 @@ export function Assignments() {
                 <td className="p-3 font-medium">{a.courseName}</td>
                 <td className="p-3 text-muted-foreground">
                   {a.userId
-                    ? `${t('assignments.member')}: ${a.userId}`
+                    ? (() => {
+                        const c = consultants?.find((c) => c.userId === a.userId);
+                        const name = c ? `${c.firstName} ${c.lastName}` : a.userId;
+                        return `${t('assignments.member')}: ${name}`;
+                      })()
                     : `${t('assignments.team')}: ${teams?.find((t) => t.id === a.teamId)?.name ?? a.teamId}`}
                 </td>
                 <td className="p-3">
@@ -240,9 +244,9 @@ export function Assignments() {
                       className="w-full rounded-md border px-3 py-2 text-sm"
                     >
                       <option value="">{t('assignments.wholeTeam')}</option>
-                      {teamMembers.map((u) => (
-                        <option key={u.id} value={u.id}>
-                          {u.firstName} {u.lastName}
+                      {teamMembers.map((c) => (
+                        <option key={c.userId} value={c.userId}>
+                          {c.firstName} {c.lastName}
                         </option>
                       ))}
                     </select>

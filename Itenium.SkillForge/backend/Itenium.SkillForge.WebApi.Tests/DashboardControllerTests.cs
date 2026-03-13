@@ -29,7 +29,7 @@ public class DashboardControllerTests
     {
         _dashboardService = Substitute.For<IDashboardService>();
         _currentUser = Substitute.For<ISkillForgeUser>();
-        _sut = new DashboardController(_dashboardService, _currentUser);
+        _sut = new DashboardController(_dashboardService, _currentUser, null!);
     }
 
     // GET /api/dashboard

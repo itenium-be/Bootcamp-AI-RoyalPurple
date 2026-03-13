@@ -343,3 +343,14 @@ export async function assignCourse(request: AssignCourseRequest): Promise<Course
 export async function removeAssignment(id: number): Promise<void> {
   await api.delete(`/api/assignment/${id}`);
 }
+
+export interface DashboardStats {
+  totalCourses: number;
+  activeLearners: number;
+  assignedCourses: number;
+}
+
+export async function fetchDashboardStats(): Promise<DashboardStats> {
+  const response = await api.get<DashboardStats>('/api/dashboard/stats');
+  return response.data;
+}
