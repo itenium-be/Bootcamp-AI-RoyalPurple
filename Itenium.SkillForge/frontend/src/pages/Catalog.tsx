@@ -295,7 +295,9 @@ function ResourceSheet({
         skillId: null,
         toLevel: null,
       };
-      return isEdit && resource ? updateCourseResource(courseId, resource.id, req) : createCourseResource(courseId, req);
+      return isEdit && resource
+        ? updateCourseResource(courseId, resource.id, req)
+        : createCourseResource(courseId, req);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] });
