@@ -2,3 +2,6 @@
 *.sh text eol=lf
 **/.husky/* text eol=lf
 Itenium.SkillForge/frontend/.husky/pre-commit text eol=lf
+
+# Force LF for C# files to avoid dotnet format WHITESPACE errors on WSL
+*.cs text eol=lf
