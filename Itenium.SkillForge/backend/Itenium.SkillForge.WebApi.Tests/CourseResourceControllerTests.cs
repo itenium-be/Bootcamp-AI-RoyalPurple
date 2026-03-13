@@ -1,7 +1,9 @@
 using Itenium.SkillForge.Entities;
+using Itenium.SkillForge.Services;
 using Itenium.SkillForge.WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
 
 namespace Itenium.SkillForge.WebApi.Tests;
 
@@ -14,7 +16,9 @@ public class CourseResourceControllerTests : DatabaseTestBase
     [SetUp]
     public async Task Setup()
     {
-        _sut = new CourseResourceController(Db);
+        var currentUser = Substitute.For<ISkillForgeUser>();
+        currentUser.UserId.Returns("test-user");
+        _sut = new CourseResourceController(Db, currentUser);
 
         _course = new CourseEntity { Name = "C# Fundamentals", Category = ".NET" };
         Db.Courses.Add(_course);
@@ -35,7 +39,7 @@ public class CourseResourceControllerTests : DatabaseTestBase
 
         var ok = result.Result as OkObjectResult;
         Assert.That(ok, Is.Not.Null);
-        var resources = ok!.Value as IList<CourseResourceEntity>;
+        var resources = ok!.Value as IList<CourseResourceDto>;
         Assert.That(resources, Has.Count.EqualTo(2));
         Assert.That(resources![0].Title, Is.EqualTo("Chapter 1"));
         Assert.That(resources[1].Title, Is.EqualTo("Chapter 2"));
@@ -64,7 +68,7 @@ public class CourseResourceControllerTests : DatabaseTestBase
         var result = await _sut.GetResources(_course.Id);
 
         var ok = result.Result as OkObjectResult;
-        var resources = ok!.Value as IList<CourseResourceEntity>;
+        var resources = ok!.Value as IList<CourseResourceDto>;
         Assert.That(resources, Has.Count.EqualTo(1));
         Assert.That(resources![0].Title, Is.EqualTo("Mine"));
     }

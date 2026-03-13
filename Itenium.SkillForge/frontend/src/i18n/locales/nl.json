@@ -189,7 +189,12 @@
     "resourceUpdated": "Leermateriaal bijgewerkt",
     "resourceUpdateError": "Kon leermateriaal niet bijwerken",
     "resourceDeleted": "Leermateriaal verwijderd",
-    "resourceDeleteError": "Kon leermateriaal niet verwijderen"
+    "resourceDeleteError": "Kon leermateriaal niet verwijderen",
+    "linkedSkill": "Gekoppelde Vaardigheid",
+    "noSkill": "Geen vaardigheid",
+    "toLevel": "Doelniveau",
+    "markComplete": "Markeer als voltooid",
+    "markIncomplete": "Markeer als niet voltooid"
   },
   "feedback": {
     "title": "Feedback",

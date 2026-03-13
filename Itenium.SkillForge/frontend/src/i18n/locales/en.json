@@ -189,7 +189,12 @@
     "resourceUpdated": "Resource updated",
     "resourceUpdateError": "Failed to update resource",
     "resourceDeleted": "Resource deleted",
-    "resourceDeleteError": "Failed to delete resource"
+    "resourceDeleteError": "Failed to delete resource",
+    "linkedSkill": "Linked Skill",
+    "noSkill": "No skill",
+    "toLevel": "Target Level",
+    "markComplete": "Mark as complete",
+    "markIncomplete": "Mark as incomplete"
   },
   "feedback": {
     "title": "Feedback",

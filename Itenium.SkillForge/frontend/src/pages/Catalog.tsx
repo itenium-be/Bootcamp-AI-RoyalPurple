@@ -19,6 +19,9 @@ import {
   Pencil,
   Trash2,
   MoreHorizontal,
+  CheckCircle2,
+  Circle,
+  Trophy,
 } from 'lucide-react';
 import {
   Button,
@@ -44,14 +47,18 @@ import {
 import {
   fetchCourses,
   fetchCourseResources,
+  fetchRoadmap,
   createCourse,
   updateCourse,
   deleteCourse,
   createCourseResource,
   updateCourseResource,
   deleteCourseResource,
+  markResourceComplete,
+  unmarkResourceComplete,
   type CourseResource,
   type CourseResourceType,
+  type RoadmapNode,
 } from '@/api/client';
 import { useAuthStore } from '@/stores';
 
@@ -96,6 +103,8 @@ const resourceSchema = z.object({
   description: z.string().max(2000, 'Max 2000 characters').nullable().optional(),
   durationMinutes: z.number().int().min(1, 'Must be at least 1').nullable().optional(),
   order: z.number().int().min(0),
+  skillId: z.number().int().nullable().optional(),
+  toLevel: z.number().int().min(1).nullable().optional(),
 });
 
 type ResourceFormValues = z.infer<typeof resourceSchema>;
@@ -271,6 +280,11 @@ function ResourceSheet({
   const queryClient = useQueryClient();
   const isEdit = !!resource;
 
+  const { data: skills = [] } = useQuery<RoadmapNode[]>({
+    queryKey: ['roadmap-all'],
+    queryFn: () => fetchRoadmap(true),
+  });
+
   const form = useForm<ResourceFormValues>({
     resolver: zodResolver(resourceSchema),
     defaultValues: {
@@ -280,6 +294,8 @@ function ResourceSheet({
       description: resource?.description ?? '',
       durationMinutes: resource?.durationMinutes ?? undefined,
       order: resource?.order ?? nextOrder,
+      skillId: resource?.skillId ?? null,
+      toLevel: resource?.toLevel ?? null,
     },
   });
 
@@ -292,8 +308,8 @@ function ResourceSheet({
         description: values.description || null,
         durationMinutes: values.durationMinutes || null,
         order: values.order,
-        skillId: null,
-        toLevel: null,
+        skillId: values.skillId ?? null,
+        toLevel: values.toLevel ?? null,
       };
       return isEdit
         ? updateCourseResource(courseId, resource!.id, req)
@@ -419,6 +435,53 @@ function ResourceSheet({
                 )}
               />
             </div>
+            {skills.length > 0 && (
+              <div className="grid grid-cols-2 gap-3">
+                <FormField
+                  control={form.control}
+                  name="skillId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('catalog.linkedSkill')}</FormLabel>
+                      <FormControl>
+                        <select
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                          className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        >
+                          <option value="">{t('catalog.noSkill')}</option>
+                          {skills.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.name}
+                            </option>
+                          ))}
+                        </select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="toLevel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('catalog.toLevel')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min={1}
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(e.target.value === '' ? null : Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
             <SheetFooter className="pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 {t('common.cancel')}
@@ -456,6 +519,13 @@ function ResourceList({ courseId, canEdit }: { courseId: number; canEdit: boolea
     onError: () => toast.error(t('catalog.resourceDeleteError')),
   });
 
+  const toggleComplete = useMutation({
+    mutationFn: (r: CourseResource) =>
+      r.isCompleted ? unmarkResourceComplete(courseId, r.id) : markResourceComplete(courseId, r.id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] }),
+    onError: () => toast.error(t('common.error')),
+  });
+
   if (isLoading) return <p className="text-sm text-muted-foreground px-1 py-2">{t('common.loading')}</p>;
 
   const nextOrder = resources.length > 0 ? Math.max(...resources.map((r) => r.order)) + 1 : 1;
@@ -467,17 +537,36 @@ function ResourceList({ courseId, canEdit }: { courseId: number; canEdit: boolea
       )}
       <ul className="mt-1 space-y-2">
         {resources.map((r: CourseResource) => (
-          <li key={r.id} className="flex items-start gap-3 rounded-md border px-3 py-2 text-sm">
-            <span className="mt-0.5 text-muted-foreground">{RESOURCE_ICONS[r.type]}</span>
-            <div className="min-w-0 flex-1">
-              {r.url ? (
-                <a href={r.url} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
-                  {r.title}
-                </a>
+          <li key={r.id} className={`flex items-start gap-3 rounded-md border px-3 py-2 text-sm ${r.isCompleted ? 'bg-muted/50' : ''}`}>
+            <button
+              onClick={() => toggleComplete.mutate(r)}
+              className="mt-0.5 shrink-0 text-muted-foreground hover:text-primary transition-colors"
+              title={r.isCompleted ? t('catalog.markIncomplete') : t('catalog.markComplete')}
+            >
+              {r.isCompleted ? (
+                <CheckCircle2 className="size-4 text-primary" />
               ) : (
-                <span className="font-medium">{r.title}</span>
+                <Circle className="size-4" />
               )}
+            </button>
+            <div className="min-w-0 flex-1">
+              <span className="flex items-center gap-1.5">
+                <span className="text-muted-foreground">{RESOURCE_ICONS[r.type]}</span>
+                {r.url ? (
+                  <a href={r.url} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
+                    {r.title}
+                  </a>
+                ) : (
+                  <span className="font-medium">{r.title}</span>
+                )}
+              </span>
               {r.description && <p className="text-muted-foreground mt-0.5">{r.description}</p>}
+              {r.skillName && (
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                  <Trophy className="size-3" />
+                  {r.skillName} {r.toLevel ? `→ L${r.toLevel}` : ''}
+                </span>
+              )}
             </div>
             {r.durationMinutes && (
               <span className="flex items-center gap-1 text-muted-foreground shrink-0">
