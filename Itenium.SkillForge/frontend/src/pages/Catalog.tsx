@@ -141,7 +141,7 @@ function CourseSheet({
         category: values.category || null,
         level: values.level || null,
       };
-      return isEdit ? updateCourse(course!.id, req) : createCourse(req);
+      return isEdit ? updateCourse(course?.id ?? 0, req) : createCourse(req);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['catalog-courses'] });
@@ -159,7 +159,7 @@ function CourseSheet({
       <SheetContent className="w-[420px] pl-4">
         <SheetHeader>
           <SheetTitle>{isEdit ? t('catalog.editCourse') : t('catalog.addCourse')}</SheetTitle>
-          <SheetDescription>{isEdit ? course!.name : t('catalog.addCourseDesc')}</SheetDescription>
+          <SheetDescription>{isEdit ? course?.name : t('catalog.addCourseDesc')}</SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="space-y-4 py-4">
@@ -295,9 +295,7 @@ function ResourceSheet({
         skillId: null,
         toLevel: null,
       };
-      return isEdit
-        ? updateCourseResource(courseId, resource!.id, req)
-        : createCourseResource(courseId, req);
+      return isEdit ? updateCourseResource(courseId, resource?.id ?? 0, req) : createCourseResource(courseId, req);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] });
@@ -315,7 +313,7 @@ function ResourceSheet({
       <SheetContent className="w-[420px] pl-4">
         <SheetHeader>
           <SheetTitle>{isEdit ? t('catalog.editResource') : t('catalog.addResource')}</SheetTitle>
-          <SheetDescription>{isEdit ? resource!.title : t('catalog.addResourceDesc')}</SheetDescription>
+          <SheetDescription>{isEdit ? resource?.title : t('catalog.addResourceDesc')}</SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="space-y-4 py-4">
@@ -462,9 +460,7 @@ function ResourceList({ courseId, canEdit }: { courseId: number; canEdit: boolea
 
   return (
     <div>
-      {resources.length === 0 && (
-        <p className="text-sm text-muted-foreground py-2">{t('catalog.noResources')}</p>
-      )}
+      {resources.length === 0 && <p className="text-sm text-muted-foreground py-2">{t('catalog.noResources')}</p>}
       <ul className="mt-1 space-y-2">
         {resources.map((r: CourseResource) => (
           <li key={r.id} className="flex items-start gap-3 rounded-md border px-3 py-2 text-sm">
@@ -519,14 +515,7 @@ function ResourceList({ courseId, canEdit }: { courseId: number; canEdit: boolea
         </Button>
       )}
 
-      {addOpen && (
-        <ResourceSheet
-          courseId={courseId}
-          nextOrder={nextOrder}
-          open={addOpen}
-          onOpenChange={setAddOpen}
-        />
-      )}
+      {addOpen && <ResourceSheet courseId={courseId} nextOrder={nextOrder} open={addOpen} onOpenChange={setAddOpen} />}
       {editingResource && (
         <ResourceSheet
           courseId={courseId}
@@ -575,9 +564,7 @@ function CourseCard({ course, canEdit }: { course: Course; canEdit: boolean }) {
                 </span>
               )}
               {course.level && (
-                <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                  {course.level}
-                </span>
+                <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{course.level}</span>
               )}
             </div>
             {canEdit && (
