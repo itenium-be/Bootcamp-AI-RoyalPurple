@@ -1,8 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import type { Enrollment } from '@/api/client';
-
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -18,8 +16,14 @@ vi.mock('@/api/client', () => ({
   fetchMyEnrollments: vi.fn(),
 }));
 
-// eslint-disable-next-line import-x/order -- must come after vi.mock calls
 import { Progress } from '../Progress';
+
+interface Enrollment {
+  id: number;
+  courseId: number;
+  courseName: string;
+  enrolledAt: string;
+}
 
 const enrollment = (overrides: Partial<Enrollment> = {}): Enrollment => ({
   id: 1,

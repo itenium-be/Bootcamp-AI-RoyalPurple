@@ -53,7 +53,9 @@ import {
   fetchMyEnrollments,
   enrollCourse,
   unenrollCourse,
+  type CourseRequest,
   type CourseResource,
+  type CourseResourceRequest,
   type CourseResourceType,
 } from '@/api/client';
 import { useAuthStore } from '@/stores';
@@ -138,7 +140,7 @@ function CourseSheet({
 
   const mutation = useMutation({
     mutationFn: (values: CourseFormValues) => {
-      const req = {
+      const req: CourseRequest = {
         name: values.name,
         description: values.description || null,
         category: values.category || null,
@@ -288,7 +290,7 @@ function ResourceSheet({
 
   const mutation = useMutation({
     mutationFn: (values: ResourceFormValues) => {
-      const req = {
+      const req: CourseResourceRequest = {
         title: values.title,
         type: values.type,
         url: values.url || null,

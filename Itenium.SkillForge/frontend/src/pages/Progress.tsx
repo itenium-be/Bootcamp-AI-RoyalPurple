@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { fetchMyEnrollments } from '@/api/client';
+import { fetchMyEnrollments, type Enrollment } from '@/api/client';
 
 export function Progress() {
   const { t } = useTranslation();
@@ -29,12 +29,10 @@ export function Progress() {
             </tr>
           </thead>
           <tbody>
-            {enrollments?.map((enrollment) => (
+            {enrollments?.map((enrollment: Enrollment) => (
               <tr key={enrollment.id} className="border-b">
                 <td className="p-3">{enrollment.courseName}</td>
-                <td className="p-3 text-muted-foreground">
-                  {new Date(enrollment.enrolledAt).toLocaleDateString()}
-                </td>
+                <td className="p-3 text-muted-foreground">{new Date(enrollment.enrolledAt).toLocaleDateString()}</td>
               </tr>
             ))}
             {enrollments?.length === 0 && (
