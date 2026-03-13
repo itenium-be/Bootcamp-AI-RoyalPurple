@@ -227,9 +227,10 @@ export function Layout() {
 
   // My Learning section - shown for learners and managers
   const myLearningNavItems = [
+    { path: '/my-profile', icon: Award, label: t('nav.myProfile') },
     { path: '/my-courses', icon: BookOpen, label: t('nav.myCourses') },
     { path: '/my-progress', icon: TrendingUp, label: t('nav.myProgress') },
-    { path: '/my-certificates', icon: Award, label: t('nav.myCertificates') },
+    { path: '/my-certificates', icon: GraduationCap, label: t('nav.myCertificates') },
     { path: '/roadmap', icon: TrendingUp, label: t('nav.myRoadmap') },
     { path: '/feedback', icon: MessageSquare, label: t('nav.feedback') },
   ];
@@ -244,6 +245,7 @@ export function Layout() {
     { path: '/team/progress', icon: BarChart3, label: t('nav.teamProgress') },
     { path: '/team/assignments', icon: ClipboardList, label: t('nav.assignments') },
     { path: '/feedback', icon: MessageSquare, label: t('nav.feedback') },
+    { path: '/team/profiles', icon: Award, label: t('nav.skillProfiles') },
   ];
 
   // Courses management - shown for managers

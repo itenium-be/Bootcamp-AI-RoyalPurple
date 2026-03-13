@@ -7,7 +7,7 @@ export function Courses() {
 
   const { data: courses, isLoading } = useQuery({
     queryKey: ['courses'],
-    queryFn: fetchCourses,
+    queryFn: () => fetchCourses(),
   });
 
   if (isLoading) {

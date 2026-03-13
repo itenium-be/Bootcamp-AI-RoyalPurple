@@ -80,10 +80,38 @@ interface Course {
   description: string | null;
   category: string | null;
   level: string | null;
+  teamId: number | null;
 }
 
-export async function fetchCourses(): Promise<Course[]> {
-  const response = await api.get<Course[]>('/api/course');
+export async function fetchCourses(teamId?: number): Promise<Course[]> {
+  const params = teamId !== undefined ? { teamId } : {};
+  const response = await api.get<Course[]>('/api/course', { params });
+  return response.data;
+}
+
+interface ConsultantProfile {
+  userId: string;
+  teamId: number | null;
+  teamName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+export async function fetchConsultants(): Promise<ConsultantProfile[]> {
+  const response = await api.get<ConsultantProfile[]>('/api/consultantprofile/consultants');
+  return response.data;
+}
+
+export async function assignProfile(userId: string, teamId: number): Promise<void> {
+  await api.put(`/api/consultantprofile/consultants/${encodeURIComponent(userId)}`, { teamId });
+}
+
+export async function removeProfile(userId: string): Promise<void> {
+  await api.delete(`/api/consultantprofile/consultants/${encodeURIComponent(userId)}`);
+}
+
+export async function fetchMyProfile(): Promise<ConsultantProfile> {
+  const response = await api.get<ConsultantProfile>('/api/consultantprofile/me');
   return response.data;
 }
 
