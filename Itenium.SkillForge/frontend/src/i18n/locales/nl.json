@@ -218,6 +218,26 @@
     "created": "Feedback ingediend",
     "createError": "Kon feedback niet indienen"
   },
+  "assignments": {
+    "assign": "Cursus Toewijzen",
+    "assignDesc": "Wijs een cursus als verplicht of optioneel toe aan een team of individueel lid.",
+    "course": "Cursus",
+    "team": "Team",
+    "member": "Lid",
+    "type": "Type",
+    "target": "Toegewezen aan",
+    "mandatory": "Verplicht",
+    "optional": "Optioneel",
+    "wholeTeam": "Heel team",
+    "selectCourse": "Selecteer een cursus",
+    "selectTeam": "Selecteer een team",
+    "noAssignments": "Nog geen toewijzingen",
+    "created": "Toewijzing aangemaakt",
+    "createError": "Kon toewijzing niet aanmaken",
+    "deleted": "Toewijzing verwijderd",
+    "deleteError": "Kon toewijzing niet verwijderen",
+    "confirmDelete": "Toewijzing verwijderen voor \"{{course}}\"?"
+  },
   "errors": {
     "sessionExpired": "Sessie verlopen!",
     "internalServerError": "Interne serverfout!"

@@ -312,3 +312,34 @@ export async function updateCourseResource(
 export async function deleteCourseResource(courseId: number, resourceId: number): Promise<void> {
   await api.delete(`/api/course/${courseId}/resource/${resourceId}`);
 }
+
+export interface CourseAssignment {
+  id: number;
+  courseId: number;
+  courseName: string;
+  teamId: number | null;
+  userId: string | null;
+  isRequired: boolean;
+  assignedAt: string;
+}
+
+export interface AssignCourseRequest {
+  courseId: number;
+  teamId: number;
+  userId: string | null;
+  isRequired: boolean;
+}
+
+export async function fetchAssignments(): Promise<CourseAssignment[]> {
+  const response = await api.get<CourseAssignment[]>('/api/assignment');
+  return response.data;
+}
+
+export async function assignCourse(request: AssignCourseRequest): Promise<CourseAssignment> {
+  const response = await api.post<CourseAssignment>('/api/assignment', request);
+  return response.data;
+}
+
+export async function removeAssignment(id: number): Promise<void> {
+  await api.delete(`/api/assignment/${id}`);
+}

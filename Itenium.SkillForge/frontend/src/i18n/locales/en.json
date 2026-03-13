@@ -218,6 +218,26 @@
     "created": "Feedback submitted",
     "createError": "Failed to submit feedback"
   },
+  "assignments": {
+    "assign": "Assign Course",
+    "assignDesc": "Assign a course as mandatory or optional to a team or individual member.",
+    "course": "Course",
+    "team": "Team",
+    "member": "Member",
+    "type": "Type",
+    "target": "Assigned To",
+    "mandatory": "Mandatory",
+    "optional": "Optional",
+    "wholeTeam": "Whole team",
+    "selectCourse": "Select a course",
+    "selectTeam": "Select a team",
+    "noAssignments": "No assignments yet",
+    "created": "Assignment created",
+    "createError": "Failed to create assignment",
+    "deleted": "Assignment removed",
+    "deleteError": "Failed to remove assignment",
+    "confirmDelete": "Remove assignment for \"{{course}}\"?"
+  },
   "errors": {
     "sessionExpired": "Session expired!",
     "internalServerError": "Internal Server Error!"

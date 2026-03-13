@@ -1,0 +1,285 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod/v4';
+import { toast } from 'sonner';
+import { Plus, Trash2 } from 'lucide-react';
+import {
+  Button,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+  Label,
+  FormItem,
+  FormMessage,
+} from '@itenium-forge/ui';
+import {
+  fetchAssignments,
+  assignCourse,
+  removeAssignment,
+  fetchCourses,
+  fetchUserTeams,
+  fetchUsers,
+  type CourseAssignment,
+} from '@/api/client';
+
+const assignSchema = z.object({
+  courseId: z.number().int().positive(),
+  teamId: z.number().int().positive(),
+  userId: z.string().nullable().optional(),
+  isRequired: z.boolean(),
+});
+
+type AssignFormValues = z.infer<typeof assignSchema>;
+
+export function Assignments() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const { data: assignments, isLoading } = useQuery({
+    queryKey: ['assignments'],
+    queryFn: fetchAssignments,
+  });
+
+  const { data: courses } = useQuery({
+    queryKey: ['courses'],
+    queryFn: () => fetchCourses(),
+  });
+
+  const { data: teams } = useQuery({
+    queryKey: ['teams'],
+    queryFn: fetchUserTeams,
+  });
+
+  const { data: users } = useQuery({
+    queryKey: ['users'],
+    queryFn: fetchUsers,
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<AssignFormValues>({
+    resolver: zodResolver(assignSchema),
+    defaultValues: { courseId: 0, teamId: 0, userId: null, isRequired: true },
+  });
+
+  const selectedTeamId = watch('teamId');
+
+  const teamMembers = users?.filter((u) => u.teams.includes(selectedTeamId)) ?? [];
+
+  const createMutation = useMutation({
+    mutationFn: assignCourse,
+    onSuccess: () => {
+      toast.success(t('assignments.created'));
+      queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      setSheetOpen(false);
+      reset();
+    },
+    onError: () => toast.error(t('assignments.createError')),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: removeAssignment,
+    onSuccess: () => {
+      toast.success(t('assignments.deleted'));
+      queryClient.invalidateQueries({ queryKey: ['assignments'] });
+    },
+    onError: () => toast.error(t('assignments.deleteError')),
+  });
+
+  const onSubmit = (values: AssignFormValues) => {
+    createMutation.mutate({
+      courseId: values.courseId,
+      teamId: values.teamId,
+      userId: values.userId || null,
+      isRequired: values.isRequired,
+    });
+  };
+
+  const handleDelete = (assignment: CourseAssignment) => {
+    if (!window.confirm(t('assignments.confirmDelete', { course: assignment.courseName }))) return;
+    deleteMutation.mutate(assignment.id);
+  };
+
+  if (isLoading) return <div>{t('common.loading')}</div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">{t('nav.assignments')}</h1>
+        <Button onClick={() => setSheetOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t('assignments.assign')}
+        </Button>
+      </div>
+
+      <div className="rounded-md border">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b bg-muted/50">
+              <th className="p-3 text-left font-medium">{t('assignments.course')}</th>
+              <th className="p-3 text-left font-medium">{t('assignments.target')}</th>
+              <th className="p-3 text-left font-medium">{t('assignments.type')}</th>
+              <th className="p-3 text-left font-medium">{t('common.actions')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {assignments?.map((a) => (
+              <tr key={a.id} className="border-b">
+                <td className="p-3 font-medium">{a.courseName}</td>
+                <td className="p-3 text-muted-foreground">
+                  {a.userId
+                    ? `${t('assignments.member')}: ${a.userId}`
+                    : `${t('assignments.team')}: ${teams?.find((t) => t.id === a.teamId)?.name ?? a.teamId}`}
+                </td>
+                <td className="p-3">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                      a.isRequired ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                    }`}
+                  >
+                    {a.isRequired ? t('assignments.mandatory') : t('assignments.optional')}
+                  </span>
+                </td>
+                <td className="p-3">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDelete(a)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+            {assignments?.length === 0 && (
+              <tr>
+                <td colSpan={4} className="p-3 text-center text-muted-foreground">
+                  {t('assignments.noAssignments')}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>{t('assignments.assign')}</SheetTitle>
+            <SheetDescription>{t('assignments.assignDesc')}</SheetDescription>
+          </SheetHeader>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
+            <FormItem>
+              <Label>{t('assignments.course')}</Label>
+              <Controller
+                control={control}
+                name="courseId"
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    className="w-full rounded-md border px-3 py-2 text-sm"
+                  >
+                    <option value={0}>{t('assignments.selectCourse')}</option>
+                    {courses?.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              />
+              {errors.courseId && <FormMessage>{errors.courseId.message}</FormMessage>}
+            </FormItem>
+
+            <FormItem>
+              <Label>{t('assignments.team')}</Label>
+              <Controller
+                control={control}
+                name="teamId"
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    className="w-full rounded-md border px-3 py-2 text-sm"
+                  >
+                    <option value={0}>{t('assignments.selectTeam')}</option>
+                    {teams?.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              />
+              {errors.teamId && <FormMessage>{errors.teamId.message}</FormMessage>}
+            </FormItem>
+
+            {selectedTeamId > 0 && teamMembers.length > 0 && (
+              <FormItem>
+                <Label>{t('assignments.member')}</Label>
+                <Controller
+                  control={control}
+                  name="userId"
+                  render={({ field }) => (
+                    <select
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value || null)}
+                      className="w-full rounded-md border px-3 py-2 text-sm"
+                    >
+                      <option value="">{t('assignments.wholeTeam')}</option>
+                      {teamMembers.map((u) => (
+                        <option key={u.id} value={u.id}>
+                          {u.firstName} {u.lastName}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                />
+              </FormItem>
+            )}
+
+            <FormItem>
+              <Label>{t('assignments.type')}</Label>
+              <Controller
+                control={control}
+                name="isRequired"
+                render={({ field }) => (
+                  <select
+                    value={field.value ? 'true' : 'false'}
+                    onChange={(e) => field.onChange(e.target.value === 'true')}
+                    className="w-full rounded-md border px-3 py-2 text-sm"
+                  >
+                    <option value="true">{t('assignments.mandatory')}</option>
+                    <option value="false">{t('assignments.optional')}</option>
+                  </select>
+                )}
+              />
+            </FormItem>
+
+            <SheetFooter>
+              <Button type="button" variant="outline" onClick={() => setSheetOpen(false)}>
+                {t('common.cancel')}
+              </Button>
+              <Button type="submit" disabled={createMutation.isPending}>
+                {createMutation.isPending ? t('common.saving') : t('common.create')}
+              </Button>
+            </SheetFooter>
+          </form>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
