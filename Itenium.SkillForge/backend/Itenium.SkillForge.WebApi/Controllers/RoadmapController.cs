@@ -30,7 +30,9 @@ public class RoadmapController : ControllerBase
     public async Task<ActionResult<List<SkillEntity>>> GetRoadmap([FromQuery] bool showAll = false)
     {
         var teamIds = _user.Teams.ToList();
-        var query = _db.Skills.Where(s => teamIds.Contains(s.TeamId));
+        var query = _db.Skills
+            .Include(s => s.Category)
+            .Where(s => s.Category.TeamId != null && teamIds.Contains(s.Category.TeamId.Value));
 
         if (!showAll)
             query = query.Where(s => s.Tier <= 2);

@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace Itenium.SkillForge.Entities;
 
 /// <summary>
-/// A skill in the competence centre roadmap.
-/// Tier 1 = Foundation, Tier 2 = Core, Tier 3 = Advanced, Tier 4 = Expert
+/// A skill in the catalogue. LevelCount 1 = checkbox (known/not known), 2-7 = progression levels.
+/// Tier is used by the roadmap feature for progressive disclosure (1=Foundation → 4=Expert).
 /// </summary>
 public class SkillEntity
 {
@@ -19,11 +19,22 @@ public class SkillEntity
     public string? Description { get; set; }
 
     /// <summary>
-    /// 1 = Foundation, 2 = Core, 3 = Advanced, 4 = Expert
+    /// Number of progression levels. 1 = checkbox, 2-7 = progression.
     /// </summary>
-    public int Tier { get; set; }
+    public int LevelCount { get; set; } = 1;
 
-    public int TeamId { get; set; }
+    /// <summary>
+    /// Roadmap tier for progressive disclosure. 1 = Foundation, 2 = Core, 3 = Advanced, 4 = Expert.
+    /// </summary>
+    public int Tier { get; set; } = 1;
 
-    public TeamEntity Team { get; set; } = null!;
+    public int CategoryId { get; set; }
+
+    public SkillCategoryEntity Category { get; set; } = null!;
+
+    public IList<SkillLevelEntity> Levels { get; set; } = [];
+
+    public IList<SkillPrerequisiteEntity> Prerequisites { get; set; } = [];
+
+    public override string ToString() => Name;
 }

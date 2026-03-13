@@ -15,10 +15,31 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<CourseEntity> Courses => Set<CourseEntity>();
 
+    public DbSet<SkillCategoryEntity> SkillCategories => Set<SkillCategoryEntity>();
+
     public DbSet<SkillEntity> Skills => Set<SkillEntity>();
+
+    public DbSet<SkillLevelEntity> SkillLevels => Set<SkillLevelEntity>();
+
+    public DbSet<SkillPrerequisiteEntity> SkillPrerequisites => Set<SkillPrerequisiteEntity>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<SkillPrerequisiteEntity>()
+            .HasKey(sp => new { sp.SkillId, sp.PrerequisiteSkillId });
+
+        builder.Entity<SkillPrerequisiteEntity>()
+            .HasOne(sp => sp.Skill)
+            .WithMany(s => s.Prerequisites)
+            .HasForeignKey(sp => sp.SkillId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<SkillPrerequisiteEntity>()
+            .HasOne(sp => sp.PrerequisiteSkill)
+            .WithMany()
+            .HasForeignKey(sp => sp.PrerequisiteSkillId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

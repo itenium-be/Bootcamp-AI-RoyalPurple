@@ -17,8 +17,14 @@ public static class SeedData
 
         await SeedTeams(db);
         await SeedCourses(db);
-        await SeedSkills(db);
+        await SeedSkillCatalogue(db);
         await app.SeedTestUsers();
+    }
+
+    public static async Task SeedDevelopmentData_ForTest(AppDbContext db)
+    {
+        await SeedTeams(db);
+        await SeedSkillCatalogue(db);
     }
 
     private static async Task SeedTeams(AppDbContext db)
@@ -47,70 +53,343 @@ public static class SeedData
         }
     }
 
-    private static async Task SeedSkills(AppDbContext db)
+    private static async Task SeedSkillCatalogue(AppDbContext db)
     {
-        if (await db.Skills.AnyAsync())
+        if (await db.SkillCategories.AnyAsync())
             return;
 
-        // Java team (id=1)
-        db.Skills.AddRange(
-            new SkillEntity { TeamId = 1, Tier = 1, Name = "Java Basics", Description = "Core Java syntax, types, and control flow" },
-            new SkillEntity { TeamId = 1, Tier = 1, Name = "OOP Fundamentals", Description = "Classes, inheritance, polymorphism, encapsulation" },
-            new SkillEntity { TeamId = 1, Tier = 1, Name = "Git & Version Control", Description = "Branching, merging, pull requests" },
-            new SkillEntity { TeamId = 1, Tier = 1, Name = "Linux Basics", Description = "Command line, file system, shell scripting" },
-            new SkillEntity { TeamId = 1, Tier = 2, Name = "Spring Boot", Description = "Building REST APIs with Spring Boot" },
-            new SkillEntity { TeamId = 1, Tier = 2, Name = "SQL & Databases", Description = "Relational databases, queries, transactions" },
-            new SkillEntity { TeamId = 1, Tier = 2, Name = "Unit Testing with JUnit", Description = "Writing and running unit tests" },
-            new SkillEntity { TeamId = 1, Tier = 2, Name = "Maven / Gradle", Description = "Build tools and dependency management" },
-            new SkillEntity { TeamId = 1, Tier = 3, Name = "Microservices", Description = "Designing and building microservice architectures" },
-            new SkillEntity { TeamId = 1, Tier = 3, Name = "Docker & Kubernetes", Description = "Containerisation and orchestration" },
-            new SkillEntity { TeamId = 1, Tier = 3, Name = "CI/CD Pipelines", Description = "Automated build, test, and deploy pipelines" },
-            new SkillEntity { TeamId = 1, Tier = 4, Name = "System Design", Description = "Designing scalable, reliable distributed systems" },
-            new SkillEntity { TeamId = 1, Tier = 4, Name = "Performance Tuning", Description = "Profiling and optimising JVM applications" });
+        // Universal categories (layer 1 - itenium-wide)
+        var generalSoftSkills = new SkillCategoryEntity { Id = 1, Name = "General Soft Skills" };
+        var productAnalyseSoftSkills = new SkillCategoryEntity { Id = 2, Name = "Product & Analyse Soft Skills" };
+        var generalSkills = new SkillCategoryEntity { Id = 3, Name = "General Skills" };
 
-        // .NET team (id=2)
-        db.Skills.AddRange(
-            new SkillEntity { TeamId = 2, Tier = 1, Name = "C# Fundamentals", Description = "Core C# syntax, types, and control flow" },
-            new SkillEntity { TeamId = 2, Tier = 1, Name = "OOP Fundamentals", Description = "Classes, inheritance, polymorphism, encapsulation" },
-            new SkillEntity { TeamId = 2, Tier = 1, Name = "Git & Version Control", Description = "Branching, merging, pull requests" },
-            new SkillEntity { TeamId = 2, Tier = 1, Name = "Linux Basics", Description = "Command line, file system, shell scripting" },
-            new SkillEntity { TeamId = 2, Tier = 2, Name = "ASP.NET Core", Description = "Building REST APIs with ASP.NET Core" },
-            new SkillEntity { TeamId = 2, Tier = 2, Name = "Entity Framework Core", Description = "ORM, migrations, and database querying" },
-            new SkillEntity { TeamId = 2, Tier = 2, Name = "Unit Testing with NUnit", Description = "Writing and running unit tests" },
-            new SkillEntity { TeamId = 2, Tier = 2, Name = "NuGet & MSBuild", Description = "Package management and build tooling" },
-            new SkillEntity { TeamId = 2, Tier = 3, Name = "Microservices", Description = "Designing and building microservice architectures" },
-            new SkillEntity { TeamId = 2, Tier = 3, Name = "Docker & Kubernetes", Description = "Containerisation and orchestration" },
-            new SkillEntity { TeamId = 2, Tier = 3, Name = "CI/CD Pipelines", Description = "Automated build, test, and deploy pipelines" },
-            new SkillEntity { TeamId = 2, Tier = 4, Name = "System Design", Description = "Designing scalable, reliable distributed systems" },
-            new SkillEntity { TeamId = 2, Tier = 4, Name = "Performance Tuning", Description = "Profiling and optimising .NET applications" });
+        // Developer CC-specific categories (layer 2 - team .NET = id 2, Java = id 1)
+        var backendDotNet = new SkillCategoryEntity { Id = 4, Name = "Backend .NET", TeamId = 2 };
+        var backendJava = new SkillCategoryEntity { Id = 5, Name = "Backend Java", TeamId = 1 };
+        var codeGeneral = new SkillCategoryEntity { Id = 6, Name = "Code Skills General", TeamId = 2 };
+        var database = new SkillCategoryEntity { Id = 7, Name = "Database", TeamId = 2 };
+        var versionControl = new SkillCategoryEntity { Id = 8, Name = "Version Control", TeamId = 2 };
+        var codeQuality = new SkillCategoryEntity { Id = 9, Name = "Code Quality", TeamId = 2 };
+        var architecture = new SkillCategoryEntity { Id = 10, Name = "Architecture", TeamId = 2 };
+        var testingQa = new SkillCategoryEntity { Id = 11, Name = "Testing & QA", TeamId = 2 };
+        var devops = new SkillCategoryEntity { Id = 12, Name = "DevOps/Cloud", TeamId = 2 };
 
-        // PO & Analysis team (id=3)
-        db.Skills.AddRange(
-            new SkillEntity { TeamId = 3, Tier = 1, Name = "Agile Fundamentals", Description = "Scrum, Kanban, and agile values" },
-            new SkillEntity { TeamId = 3, Tier = 1, Name = "User Story Writing", Description = "Writing clear, testable user stories" },
-            new SkillEntity { TeamId = 3, Tier = 1, Name = "Requirements Gathering", Description = "Eliciting and documenting requirements" },
-            new SkillEntity { TeamId = 3, Tier = 1, Name = "Stakeholder Management", Description = "Identifying and engaging stakeholders" },
-            new SkillEntity { TeamId = 3, Tier = 2, Name = "Product Backlog Management", Description = "Prioritisation, grooming, and refinement" },
-            new SkillEntity { TeamId = 3, Tier = 2, Name = "User Research", Description = "Interviews, surveys, and usability testing" },
-            new SkillEntity { TeamId = 3, Tier = 2, Name = "Process Modelling", Description = "BPMN, use cases, and flow diagrams" },
-            new SkillEntity { TeamId = 3, Tier = 2, Name = "Acceptance Criteria", Description = "BDD-style criteria and test scenarios" },
-            new SkillEntity { TeamId = 3, Tier = 3, Name = "Product Strategy", Description = "Vision, roadmap planning, and OKRs" },
-            new SkillEntity { TeamId = 3, Tier = 3, Name = "Data-Driven Decisions", Description = "Metrics, KPIs, and analytics" },
-            new SkillEntity { TeamId = 3, Tier = 4, Name = "Digital Transformation", Description = "Leading organisational change with technology" });
+        db.SkillCategories.AddRange(
+            generalSoftSkills, productAnalyseSoftSkills, generalSkills,
+            backendDotNet, backendJava, codeGeneral, database,
+            versionControl, codeQuality, architecture, testingQa, devops);
 
-        // QA team (id=4)
         db.Skills.AddRange(
-            new SkillEntity { TeamId = 4, Tier = 1, Name = "Testing Fundamentals", Description = "Testing principles, types, and techniques" },
-            new SkillEntity { TeamId = 4, Tier = 1, Name = "Test Case Design", Description = "Equivalence partitioning, boundary value analysis" },
-            new SkillEntity { TeamId = 4, Tier = 1, Name = "Bug Reporting", Description = "Writing clear, reproducible bug reports" },
-            new SkillEntity { TeamId = 4, Tier = 1, Name = "Agile Testing", Description = "Testing in sprint, shift-left testing" },
-            new SkillEntity { TeamId = 4, Tier = 2, Name = "Test Automation Basics", Description = "Introduction to automated testing frameworks" },
-            new SkillEntity { TeamId = 4, Tier = 2, Name = "Selenium / Playwright", Description = "Browser automation for end-to-end tests" },
-            new SkillEntity { TeamId = 4, Tier = 2, Name = "API Testing", Description = "REST API testing with Postman and code-based tools" },
-            new SkillEntity { TeamId = 4, Tier = 2, Name = "Performance Testing", Description = "Load and stress testing fundamentals" },
-            new SkillEntity { TeamId = 4, Tier = 3, Name = "CI/CD Testing Integration", Description = "Embedding tests in automated pipelines" },
-            new SkillEntity { TeamId = 4, Tier = 3, Name = "Security Testing", Description = "OWASP Top 10 and vulnerability scanning" },
-            new SkillEntity { TeamId = 4, Tier = 4, Name = "QA Architecture", Description = "Designing test strategies for large-scale systems" });
+            // General Soft Skills (universal, checkbox)
+            new SkillEntity { Id = 1, Name = "Active Listening", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 2, Name = "Adaptability", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 3, Name = "Agile", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 4, Name = "Business-minded", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 5, Name = "Collaboration", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 6, Name = "Communication", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 7, Name = "Critical Thinking", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 8, Name = "Innovation", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 9, Name = "Knowledge Sharing", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 10, Name = "Mentoring", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 11, Name = "Positivity", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 12, Name = "Presenting", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 13, Name = "Problem-Solving", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 14, Name = "Project Management", LevelCount = 1, CategoryId = 1 },
+            new SkillEntity { Id = 15, Name = "Teamwork", LevelCount = 1, CategoryId = 1 },
+
+            // Product & Analyse Soft Skills (universal, checkbox)
+            new SkillEntity { Id = 16, Name = "Decision Making", LevelCount = 1, CategoryId = 2 },
+            new SkillEntity { Id = 17, Name = "Interviewing", LevelCount = 1, CategoryId = 2 },
+            new SkillEntity { Id = 18, Name = "Negotiation", LevelCount = 1, CategoryId = 2 },
+            new SkillEntity { Id = 19, Name = "Prioritization", LevelCount = 1, CategoryId = 2 },
+            new SkillEntity { Id = 20, Name = "Stakeholder Management", LevelCount = 1, CategoryId = 2 },
+
+            // General Skills (universal, checkbox)
+            new SkillEntity { Id = 21, Name = "Cross Competence", LevelCount = 1, CategoryId = 3 },
+            new SkillEntity { Id = 22, Name = "AI and New Tech", LevelCount = 1, CategoryId = 3 },
+
+            // Backend .NET (CC-specific, 7 levels)
+            new SkillEntity
+            {
+                Id = 23,
+                Name = "C#",
+                LevelCount = 7,
+                CategoryId = 4,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Basic syntax, OOP" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "LINQ, Collections" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Async/await, Generics" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Delegates, Events" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Advanced features (Span<T>, TPL)" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Performance optimization" },
+                    new SkillLevelEntity { Level = 7, Descriptor = "Runtime internals, Framework design" },
+                ]
+            },
+            new SkillEntity
+            {
+                Id = 24,
+                Name = ".NET",
+                LevelCount = 6,
+                CategoryId = 4,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = ".NET 8-10 basics" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Framework libraries" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Configuration management" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Migration scenarios" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Framework extensibility" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Technology roadmap" },
+                ]
+            },
+            new SkillEntity
+            {
+                Id = 25,
+                Name = "Dependency Injection",
+                LevelCount = 7,
+                CategoryId = 4,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "DI concept" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "DI configuration" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Scopes" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Custom registrations" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "DI patterns" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Advanced DI patterns" },
+                    new SkillLevelEntity { Level = 7, Descriptor = "DI architecture" },
+                ]
+            },
+            new SkillEntity
+            {
+                Id = 26,
+                Name = "ASP.NET Core",
+                LevelCount = 6,
+                CategoryId = 4,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Controllers, Routing" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Model binding, Validation" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Filters, Middleware" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Custom model binders, Minimal APIs" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Performance tuning" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Framework architecture" },
+                ]
+            },
+
+            // Backend Java (CC-specific, 7 levels)
+            new SkillEntity
+            {
+                Id = 27,
+                Name = "Java & JVM",
+                LevelCount = 7,
+                CategoryId = 5,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Basic syntax, OOP" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Collections, streams, Generics, lambdas" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Dependency management" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Concurrency basics" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Advanced concurrency" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "JVM tuning" },
+                    new SkillLevelEntity { Level = 7, Descriptor = "JVM internals" },
+                ]
+            },
+            new SkillEntity
+            {
+                Id = 28,
+                Name = "Spring Boot",
+                LevelCount = 5,
+                CategoryId = 5,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Controllers" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Custom starters" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Performance tuning, Security" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Spring internals" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Framework design" },
+                ]
+            },
+
+            // Code Skills General (CC-specific)
+            new SkillEntity
+            {
+                Id = 29,
+                Name = "API Design",
+                LevelCount = 7,
+                CategoryId = 6,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "REST API basics" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "HTTP status codes" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "API versioning" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "OpenAPI/Swagger" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "API design patterns" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "GraphQL/gRPC" },
+                    new SkillLevelEntity { Level = 7, Descriptor = "API strategy & governance" },
+                ]
+            },
+            new SkillEntity
+            {
+                Id = 30,
+                Name = "Security",
+                LevelCount = 7,
+                CategoryId = 6,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Basic authentication and authorization" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Authorization policies" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Security best practices" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "OAuth2/OpenID Connect" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Security architecture" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Platform security" },
+                    new SkillLevelEntity { Level = 7, Descriptor = "Enterprise level security" },
+                ]
+            },
+
+            // Database (CC-specific)
+            new SkillEntity
+            {
+                Id = 31,
+                Name = "DBMS/SQL",
+                LevelCount = 6,
+                CategoryId = 7,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "SQL basics (SELECT, WHERE), Joins" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Basic indexing" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Query optimization, ORM, performance" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Complex queries, migrations, DDL" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Advanced EF patterns" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Database architecture strategy" },
+                ]
+            },
+
+            // Version Control (CC-specific)
+            new SkillEntity
+            {
+                Id = 32,
+                Name = "Version Control",
+                LevelCount = 6,
+                CategoryId = 8,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Git clone, commit, push" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Branching, merging, pull requests" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Pull request review, merge strategies, rebase" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Git flow/trunk-based" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Branching strategy" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Git governance" },
+                ]
+            },
+
+            // Code Quality (CC-specific)
+            new SkillEntity
+            {
+                Id = 33,
+                Name = "Clean Code",
+                LevelCount = 6,
+                CategoryId = 9,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Naming, formatting" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Functions, comments" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "SOLID principles, DRY, KISS, YAGNI" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Refactoring patterns" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Code smells recognition" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Code quality culture" },
+                ]
+            },
+            new SkillEntity
+            {
+                Id = 34,
+                Name = "Design Patterns",
+                LevelCount = 7,
+                CategoryId = 9,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Understanding design patterns" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Factory, Singleton" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Repository, Strategy" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Dependency Injection patterns" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "CQRS, Bounded contexts" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Domain-Driven Design" },
+                    new SkillLevelEntity { Level = 7, Descriptor = "Pattern selection strategy" },
+                ]
+            },
+
+            // Architecture (CC-specific)
+            new SkillEntity
+            {
+                Id = 35,
+                Name = "Architecture",
+                LevelCount = 6,
+                CategoryId = 10,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Layered architecture" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Microservices basics" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Clean architecture" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Hexagonal architecture" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Distributed systems" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Enterprise architecture" },
+                ]
+            },
+
+            // Testing & QA (CC-specific)
+            new SkillEntity
+            {
+                Id = 36,
+                Name = "Unit Testing",
+                LevelCount = 7,
+                CategoryId = 11,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "xUnit/NUnit basics" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "AAA/GWT pattern" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Mocking (Moq/NSubstitute)" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Test coverage 70%+" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "TDD practice" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Test architecture" },
+                    new SkillLevelEntity { Level = 7, Descriptor = "Testing strategy" },
+                ]
+            },
+            new SkillEntity
+            {
+                Id = 37,
+                Name = "Integration Testing",
+                LevelCount = 7,
+                CategoryId = 11,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Test setup understanding" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "API testing (REST)" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Database testing" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Testcontainers" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "E2E testing strategy" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Performance testing" },
+                    new SkillLevelEntity { Level = 7, Descriptor = "QA architecture" },
+                ]
+            },
+
+            // DevOps/Cloud (CC-specific)
+            new SkillEntity
+            {
+                Id = 38,
+                Name = "CI/CD",
+                LevelCount = 7,
+                CategoryId = 12,
+                Levels =
+                [
+                    new SkillLevelEntity { Level = 1, Descriptor = "Pipeline understanding" },
+                    new SkillLevelEntity { Level = 2, Descriptor = "Monitor pipeline runs" },
+                    new SkillLevelEntity { Level = 3, Descriptor = "Read YAML pipelines" },
+                    new SkillLevelEntity { Level = 4, Descriptor = "Configure pipelines" },
+                    new SkillLevelEntity { Level = 5, Descriptor = "Multi-stage pipelines" },
+                    new SkillLevelEntity { Level = 6, Descriptor = "Pipeline optimization" },
+                    new SkillLevelEntity { Level = 7, Descriptor = "CI/CD strategy" },
+                ]
+            }
+        );
 
         await db.SaveChangesAsync();
     }
