@@ -194,6 +194,55 @@ export async function fetchCoachDashboard(): Promise<ConsultantSummary[]> {
   return response.data;
 }
 
+export async function fetchAdmins(): Promise<UserDto[]> {
+  const response = await api.get<UserDto[]>('/api/user/admins');
+  return response.data;
+}
+
+export interface FeedbackItem {
+  id: number;
+  authorId: string;
+  recipientId: string;
+  courseId: number | null;
+  authorName: string | null;
+  recipientName: string | null;
+  courseName: string | null;
+  content: string;
+  createdAt: string;
+}
+
+export interface FeedbackComment {
+  id: number;
+  authorId: string;
+  authorName: string | null;
+  content: string;
+  createdAt: string;
+}
+
+export interface FeedbackDetail extends FeedbackItem {
+  comments: FeedbackComment[];
+}
+
+export async function fetchFeedback(): Promise<FeedbackItem[]> {
+  const response = await api.get<FeedbackItem[]>('/api/feedback');
+  return response.data;
+}
+
+export async function fetchFeedbackById(id: number): Promise<FeedbackDetail> {
+  const response = await api.get<FeedbackDetail>(`/api/feedback/${id}`);
+  return response.data;
+}
+
+export async function createFeedback(recipientId: string, content: string, courseId?: number): Promise<FeedbackItem> {
+  const response = await api.post<FeedbackItem>('/api/feedback', { recipientId, content, courseId: courseId ?? null });
+  return response.data;
+}
+
+export async function addFeedbackComment(feedbackId: number, content: string): Promise<FeedbackComment> {
+  const response = await api.post<FeedbackComment>(`/api/feedback/${feedbackId}/comments`, { content });
+  return response.data;
+}
+
 export type CourseResourceType = 'Video' | 'Article' | 'Exercise' | 'Book' | 'Link' | 'Other';
 
 export interface CourseResource {

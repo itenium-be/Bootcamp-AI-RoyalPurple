@@ -23,6 +23,7 @@ public interface IUserService
     Task<IList<UserDto>> GetAllUsersAsync();
     Task<IList<UserDto>> GetTeamMembersAsync(ICollection<int> teamIds);
     Task<IList<UserDto>> GetCoachesForTeamsAsync(ICollection<int> teamIds);
+    Task<IList<UserDto>> GetAdminUsersAsync();
     Task<UserDto?> GetUserByIdAsync(string userId);
     Task<CreateUserResult> CreateUserAsync(CreateUserRequest request);
     Task<bool> AssignRoleAsync(string userId, string role);

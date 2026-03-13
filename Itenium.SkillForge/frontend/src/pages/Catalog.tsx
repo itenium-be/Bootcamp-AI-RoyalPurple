@@ -76,8 +76,8 @@ const COURSE_LEVELS = ['Beginner', 'Intermediate', 'Advanced'] as const;
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const courseSchema = z.object({
-  name: z.string().min(1, 'Required'),
-  description: z.string().nullable().optional(),
+  name: z.string().min(1, 'Required').max(200, 'Max 200 characters'),
+  description: z.string().max(2000, 'Max 2000 characters').nullable().optional(),
   category: z.string().nullable().optional(),
   level: z.string().nullable().optional(),
 });
@@ -85,11 +85,16 @@ const courseSchema = z.object({
 type CourseFormValues = z.infer<typeof courseSchema>;
 
 const resourceSchema = z.object({
-  title: z.string().min(1, 'Required'),
+  title: z.string().min(1, 'Required').max(200, 'Max 200 characters'),
   type: z.enum(['Video', 'Article', 'Exercise', 'Book', 'Link', 'Other']),
-  url: z.string().nullable().optional(),
-  description: z.string().nullable().optional(),
-  durationMinutes: z.number().int().positive().nullable().optional(),
+  url: z
+    .string()
+    .url('Must be a valid URL')
+    .nullable()
+    .optional()
+    .or(z.literal('').transform(() => null)),
+  description: z.string().max(2000, 'Max 2000 characters').nullable().optional(),
+  durationMinutes: z.number().int().min(1, 'Must be at least 1').nullable().optional(),
   order: z.number().int().min(0),
 });
 
@@ -495,7 +500,7 @@ function ResourceList({ courseId, canEdit }: { courseId: number; canEdit: boolea
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-destructive focus:text-destructive"
-                    onClick={() => deleteMutation.mutate(r.id)}
+                    onClick={() => window.confirm('Delete this resource?') && deleteMutation.mutate(r.id)}
                   >
                     <Trash2 className="mr-2 size-4" />
                     {t('common.delete')}
@@ -590,7 +595,7 @@ function CourseCard({ course, canEdit }: { course: Course; canEdit: boolean }) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-destructive focus:text-destructive"
-                    onClick={() => deleteMutation.mutate()}
+                    onClick={() => window.confirm(`Delete course "${course.name}"?`) && deleteMutation.mutate()}
                     disabled={deleteMutation.isPending}
                   >
                     <Trash2 className="mr-2 size-4" />

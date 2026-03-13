@@ -191,6 +191,33 @@
     "resourceDeleted": "Leermateriaal verwijderd",
     "resourceDeleteError": "Kon leermateriaal niet verwijderen"
   },
+  "feedback": {
+    "title": "Feedback",
+    "new": "Nieuwe Feedback",
+    "allFeedback": "Alle Feedback",
+    "noFeedback": "Nog geen feedback",
+    "selectItem": "Selecteer een item om de details te bekijken",
+    "detail": "Feedback Detail",
+    "sent": "Verzonden",
+    "received": "Ontvangen",
+    "you": "Jij",
+    "comments": "Reacties",
+    "addComment": "Voeg een reactie toe…",
+    "commentError": "Kon reactie niet toevoegen",
+    "courseContext": "Cursus",
+    "createTitle": "Feedback Indienen",
+    "createDescManager": "Dien feedback in bij een admin.",
+    "createDescLearner": "Dien feedback in bij je coach.",
+    "recipientAdmin": "Admin",
+    "recipientCoach": "Coach",
+    "selectRecipient": "Selecteer ontvanger",
+    "course": "Cursus (optioneel)",
+    "selectCourse": "Selecteer een cursus",
+    "content": "Feedback",
+    "contentPlaceholder": "Schrijf je feedback…",
+    "created": "Feedback ingediend",
+    "createError": "Kon feedback niet indienen"
+  },
   "errors": {
     "sessionExpired": "Sessie verlopen!",
     "internalServerError": "Interne serverfout!"

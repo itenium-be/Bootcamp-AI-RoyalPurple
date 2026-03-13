@@ -75,6 +75,18 @@ public class UserService : IUserService
         return result;
     }
 
+    public async Task<IList<UserDto>> GetAdminUsersAsync()
+    {
+        var users = await _userManager.GetUsersInRoleAsync("backoffice");
+        var result = new List<UserDto>();
+        foreach (var user in users)
+        {
+            result.Add(await ToDto(user));
+        }
+
+        return result;
+    }
+
     public async Task<UserDto?> GetUserByIdAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);

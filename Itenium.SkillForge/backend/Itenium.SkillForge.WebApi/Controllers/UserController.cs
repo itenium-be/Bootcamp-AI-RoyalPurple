@@ -75,6 +75,16 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
+    /// Get all backoffice users (for feedback recipient selection).
+    /// </summary>
+    [HttpGet("admins")]
+    [Authorize(Roles = "manager,backoffice")]
+    public async Task<ActionResult<IList<UserDto>>> GetAdmins()
+    {
+        return Ok(await _userService.GetAdminUsersAsync());
+    }
+
+    /// <summary>
     /// Create a new user account with role and team assignment (Admin only).
     /// </summary>
     [HttpPost]
