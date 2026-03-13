@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticated/roadmap'
 import { Route as AuthenticatedCoursesRouteImport } from './routes/_authenticated/courses'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
@@ -28,6 +29,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRoadmapRoute = AuthenticatedRoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCoursesRoute = AuthenticatedCoursesRouteImport.update({
@@ -49,6 +55,7 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
 export interface FileRoutesByFullPath {
   '/sign-in': typeof authSignInRoute
   '/courses': typeof AuthenticatedCoursesRoute
+  '/roadmap': typeof AuthenticatedRoadmapRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -56,6 +63,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/sign-in': typeof authSignInRoute
   '/courses': typeof AuthenticatedCoursesRoute
+  '/roadmap': typeof AuthenticatedRoadmapRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -65,20 +73,28 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/(auth)/sign-in': typeof authSignInRoute
   '/_authenticated/courses': typeof AuthenticatedCoursesRoute
+  '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/sign-in' | '/courses' | '/settings' | '/' | '/admin/users'
+  fullPaths:
+    | '/sign-in'
+    | '/courses'
+    | '/roadmap'
+    | '/settings'
+    | '/'
+    | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sign-in' | '/courses' | '/settings' | '/' | '/admin/users'
+  to: '/sign-in' | '/courses' | '/roadmap' | '/settings' | '/' | '/admin/users'
   id:
     | '__root__'
     | '/_authenticated'
     | '/(auth)/sign-in'
     | '/_authenticated/courses'
+    | '/_authenticated/roadmap'
     | '/_authenticated/settings'
     | '/_authenticated/'
     | '/_authenticated/admin/users'
@@ -112,6 +128,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/roadmap': {
+      id: '/_authenticated/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof AuthenticatedRoadmapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/courses': {
       id: '/_authenticated/courses'
       path: '/courses'
@@ -138,6 +161,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCoursesRoute: typeof AuthenticatedCoursesRoute
+  AuthenticatedRoadmapRoute: typeof AuthenticatedRoadmapRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -145,6 +169,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCoursesRoute: AuthenticatedCoursesRoute,
+  AuthenticatedRoadmapRoute: AuthenticatedRoadmapRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,

@@ -120,3 +120,16 @@ export async function updateUserRole(userId: string, role: string): Promise<void
 export async function updateUserTeams(userId: string, teamIds: number[]): Promise<void> {
   await api.put(`/api/user/${userId}/teams`, { teamIds });
 }
+
+export interface RoadmapNode {
+  id: number;
+  name: string;
+  description: string | null;
+  tier: number;
+  teamId: number;
+}
+
+export async function fetchRoadmap(showAll = false): Promise<RoadmapNode[]> {
+  const response = await api.get<RoadmapNode[]>(`/api/roadmap?showAll=${showAll}`);
+  return response.data;
+}

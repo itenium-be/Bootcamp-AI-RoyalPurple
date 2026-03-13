@@ -23,6 +23,7 @@
     "myCourses": "Mijn Cursussen",
     "myProgress": "Mijn Voortgang",
     "myCertificates": "Mijn Certificaten",
+    "myRoadmap": "Mijn Roadmap",
     "catalogSection": "Catalogus",
     "catalog": "Cursussen Bekijken",
     "team": "Team",
@@ -104,6 +105,15 @@
     "noResults": "Geen resultaten gevonden",
     "active": "Actief",
     "user": "Gebruiker"
+  },
+  "roadmap": {
+    "title": "Mijn Roadmap",
+    "tier1": "Fundament",
+    "tier2": "Kern",
+    "tier3": "Gevorderd",
+    "tier4": "Expert",
+    "showAll": "Alles tonen",
+    "noRoadmap": "Geen roadmap beschikbaar voor jouw profiel"
   },
   "errors": {
     "sessionExpired": "Sessie verlopen!",
