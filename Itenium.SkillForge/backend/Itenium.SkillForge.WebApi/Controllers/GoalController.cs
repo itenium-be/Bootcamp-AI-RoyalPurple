@@ -68,6 +68,11 @@ public class GoalController : ControllerBase
             return Forbid();
         }
 
+        if (string.IsNullOrEmpty(_user.UserId))
+        {
+            return Unauthorized();
+        }
+
         var goal = new GoalEntity
         {
             ConsultantUserId = request.ConsultantUserId,
@@ -76,7 +81,7 @@ public class GoalController : ControllerBase
             TargetNiveau = request.TargetNiveau,
             Deadline = request.Deadline,
             LinkedResources = request.LinkedResources,
-            CreatedByCoachId = _user.UserId ?? string.Empty,
+            CreatedByCoachId = _user.UserId,
         };
 
         _db.Goals.Add(goal);

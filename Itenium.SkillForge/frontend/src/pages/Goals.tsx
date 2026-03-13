@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { useTeamStore, useGoalStore } from '@/stores';
+import { useTeamStore } from '@/stores';
 import { fetchGoals, createGoal, type CreateGoalRequest } from '@/api/client';
 
 interface AssignGoalForm {
@@ -17,24 +17,18 @@ interface AssignGoalForm {
 export function Goals() {
   const { t } = useTranslation();
   const { mode } = useTeamStore();
-  const { setGoals, addGoal } = useGoalStore();
   const queryClient = useQueryClient();
   const isManager = mode === 'manager';
   const [showForm, setShowForm] = useState(false);
 
   const { data: goals, isLoading } = useQuery({
     queryKey: ['goals'],
-    queryFn: async () => {
-      const data = await fetchGoals();
-      setGoals(data);
-      return data;
-    },
+    queryFn: fetchGoals,
   });
 
   const { mutate, isPending } = useMutation({
     mutationFn: (request: CreateGoalRequest) => createGoal(request),
-    onSuccess: (newGoal) => {
-      addGoal(newGoal);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
       setShowForm(false);
       reset();
@@ -88,7 +82,7 @@ export function Goals() {
             </label>
             <input
               id="consultantUserId"
-              {...register('consultantUserId')}
+              {...register('consultantUserId', { required: true })}
               className="w-full rounded border px-3 py-2 text-sm"
             />
             {errors.consultantUserId && <p className="text-xs text-destructive">{errors.consultantUserId.message}</p>}
@@ -98,7 +92,11 @@ export function Goals() {
             <label htmlFor="skillName" className="text-sm font-medium">
               {t('goals.skillName')}
             </label>
-            <input id="skillName" {...register('skillName')} className="w-full rounded border px-3 py-2 text-sm" />
+            <input
+              id="skillName"
+              {...register('skillName', { required: true })}
+              className="w-full rounded border px-3 py-2 text-sm"
+            />
             {errors.skillName && <p className="text-xs text-destructive">{errors.skillName.message}</p>}
           </div>
 
@@ -112,7 +110,7 @@ export function Goals() {
                 type="number"
                 min={1}
                 max={7}
-                {...register('currentNiveau')}
+                {...register('currentNiveau', { required: true, min: 1, max: 7 })}
                 className="w-full rounded border px-3 py-2 text-sm"
               />
               {errors.currentNiveau && <p className="text-xs text-destructive">{errors.currentNiveau.message}</p>}
@@ -127,7 +125,7 @@ export function Goals() {
                 type="number"
                 min={1}
                 max={7}
-                {...register('targetNiveau')}
+                {...register('targetNiveau', { required: true, min: 1, max: 7 })}
                 className="w-full rounded border px-3 py-2 text-sm"
               />
               {errors.targetNiveau && <p className="text-xs text-destructive">{errors.targetNiveau.message}</p>}
@@ -141,7 +139,7 @@ export function Goals() {
             <input
               id="deadline"
               type="date"
-              {...register('deadline')}
+              {...register('deadline', { required: true })}
               className="w-full rounded border px-3 py-2 text-sm"
             />
             {errors.deadline && <p className="text-xs text-destructive">{errors.deadline.message}</p>}

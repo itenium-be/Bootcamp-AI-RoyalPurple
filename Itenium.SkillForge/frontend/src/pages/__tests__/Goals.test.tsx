@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import { useGoalStore } from '@/stores/goalStore';
 import type { Goal } from '@/stores/goalStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useTeamStore } from '@/stores/teamStore';
@@ -77,7 +76,6 @@ function setupStores(isManager = false) {
 
 beforeEach(() => {
   localStorage.clear();
-  useGoalStore.setState({ goals: [] });
   useAuthStore.setState({ accessToken: null, user: null, isAuthenticated: false });
   useTeamStore.setState({ mode: 'backoffice', selectedTeam: null, teams: [] });
   mockUseQuery.mockReturnValue({ data: [], isLoading: false });
