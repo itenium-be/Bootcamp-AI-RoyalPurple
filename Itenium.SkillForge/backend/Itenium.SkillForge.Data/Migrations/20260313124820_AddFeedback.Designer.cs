@@ -3,6 +3,7 @@ using System;
 using Itenium.SkillForge.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Itenium.SkillForge.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260313124820_AddFeedback")]
+    partial class AddFeedback
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,32 +95,6 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("Itenium.SkillForge.Entities.ConsultantProfileEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("TeamId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("ConsultantProfiles");
-                });
-
             modelBuilder.Entity("Itenium.SkillForge.Entities.CourseEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -146,62 +123,9 @@ namespace Itenium.SkillForge.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TeamId");
 
                     b.ToTable("Courses");
-                });
-
-            modelBuilder.Entity("Itenium.SkillForge.Entities.CourseResourceEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<int?>("DurationMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("SkillId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int?>("ToLevel")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("SkillId");
-
-                    b.ToTable("CourseResources");
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.FeedbackCommentEntity", b =>
@@ -740,43 +664,6 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Itenium.SkillForge.Entities.ConsultantProfileEntity", b =>
-                {
-                    b.HasOne("Itenium.SkillForge.Entities.TeamEntity", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("Itenium.SkillForge.Entities.CourseEntity", b =>
-                {
-                    b.HasOne("Itenium.SkillForge.Entities.TeamEntity", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId");
-
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("Itenium.SkillForge.Entities.CourseResourceEntity", b =>
-                {
-                    b.HasOne("Itenium.SkillForge.Entities.CourseEntity", "Course")
-                        .WithMany("Resources")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Itenium.SkillForge.Entities.SkillEntity", "Skill")
-                        .WithMany()
-                        .HasForeignKey("SkillId");
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Skill");
-                });
-
             modelBuilder.Entity("Itenium.SkillForge.Entities.FeedbackCommentEntity", b =>
                 {
                     b.HasOne("Itenium.SkillForge.Entities.FeedbackEntity", "Feedback")
@@ -798,7 +685,6 @@ namespace Itenium.SkillForge.Data.Migrations
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
-
                 {
                     b.HasOne("Itenium.SkillForge.Entities.TeamEntity", "Team")
                         .WithMany()
@@ -847,7 +733,6 @@ namespace Itenium.SkillForge.Data.Migrations
 
                     b.Navigation("Skill");
                 });
-
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
@@ -922,11 +807,6 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.Navigation("Application");
 
                     b.Navigation("Authorization");
-                });
-
-            modelBuilder.Entity("Itenium.SkillForge.Entities.CourseEntity", b =>
-                {
-                    b.Navigation("Resources");
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.FeedbackEntity", b =>

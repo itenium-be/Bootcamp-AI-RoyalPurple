@@ -158,6 +158,33 @@
     "noRoadmap": "No roadmap available for your profile",
     "prerequisites": "Prerequisites"
   },
+  "feedback": {
+    "title": "Feedback",
+    "new": "New Feedback",
+    "allFeedback": "All Feedback",
+    "noFeedback": "No feedback yet",
+    "selectItem": "Select an item to view details",
+    "detail": "Feedback Detail",
+    "sent": "Sent",
+    "received": "Received",
+    "you": "You",
+    "comments": "Comments",
+    "addComment": "Add a comment…",
+    "commentError": "Failed to add comment",
+    "courseContext": "Course",
+    "createTitle": "Submit Feedback",
+    "createDescManager": "Submit feedback to an admin.",
+    "createDescLearner": "Submit feedback to your coach.",
+    "recipientAdmin": "Admin",
+    "recipientCoach": "Coach",
+    "selectRecipient": "Select recipient",
+    "course": "Course (optional)",
+    "selectCourse": "Select a course",
+    "content": "Feedback",
+    "contentPlaceholder": "Write your feedback…",
+    "created": "Feedback submitted",
+    "createError": "Failed to submit feedback"
+  },
   "errors": {
     "sessionExpired": "Session expired!",
     "internalServerError": "Internal Server Error!"
