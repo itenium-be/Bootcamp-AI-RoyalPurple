@@ -118,7 +118,19 @@ function CreateUserSheet({
       form.reset();
       onOpenChange(false);
     },
-    onError: () => toast.error(t('users.createError', 'Failed to create user')),
+    onError: (error: unknown) => {
+      const data = (error as { response?: { data?: unknown } })?.response?.data;
+      let detail = '';
+      if (Array.isArray(data)) {
+        detail = (data as { description?: string; code?: string }[])
+          .map((e) => e.description ?? e.code ?? '')
+          .filter(Boolean)
+          .join('\n');
+      } else if (typeof data === 'string') {
+        detail = data;
+      }
+      toast.error(t('users.createError', 'Failed to create user'), { description: detail || undefined });
+    },
   });
 
   const selectedTeams = form.watch('teams');
