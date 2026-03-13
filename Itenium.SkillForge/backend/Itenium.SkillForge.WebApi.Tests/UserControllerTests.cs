@@ -218,9 +218,10 @@ public class UserControllerTests
     [Test]
     public async Task AssignTeams_WhenSucceeds_ReturnsNoContent()
     {
-        _userService.AssignTeamsAsync("id1", [1, 2]).Returns(true);
+        var teams = new int[] { 1, 2 };
+        _userService.AssignTeamsAsync("id1", teams).Returns(true);
 
-        var result = await _sut.AssignTeams("id1", new AssignTeamsRequest([1, 2]));
+        var result = await _sut.AssignTeams("id1", new AssignTeamsRequest(teams));
 
         Assert.That(result, Is.TypeOf<NoContentResult>());
     }
@@ -228,9 +229,10 @@ public class UserControllerTests
     [Test]
     public async Task AssignTeams_WhenUserNotFound_ReturnsNotFound()
     {
-        _userService.AssignTeamsAsync("missing", []).Returns(false);
+        var teams = Array.Empty<int>();
+        _userService.AssignTeamsAsync("missing", teams).Returns(false);
 
-        var result = await _sut.AssignTeams("missing", new AssignTeamsRequest([]));
+        var result = await _sut.AssignTeams("missing", new AssignTeamsRequest(teams));
 
         Assert.That(result, Is.TypeOf<NotFoundResult>());
     }

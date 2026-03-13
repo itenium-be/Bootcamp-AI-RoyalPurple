@@ -17,6 +17,8 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<SkillEntity> Skills => Set<SkillEntity>();
 
+    public DbSet<UserActivityEntity> UserActivities => Set<UserActivityEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

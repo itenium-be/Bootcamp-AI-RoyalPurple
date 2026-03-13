@@ -41,7 +41,7 @@ public class RoadmapControllerTests : DatabaseTestBase
 
         var okResult = result.Result as OkObjectResult;
         Assert.That(okResult, Is.Not.Null);
-        var skills = okResult!.Value as List<SkillEntity>;
+        var skills = okResult!.Value as List<SkillDto>;
         Assert.That(skills, Has.Count.EqualTo(2));
         Assert.That(skills!.Select(s => s.Name), Does.Not.Contain("Microservices"));
     }
@@ -61,7 +61,7 @@ public class RoadmapControllerTests : DatabaseTestBase
 
         var okResult = result.Result as OkObjectResult;
         Assert.That(okResult, Is.Not.Null);
-        var skills = okResult!.Value as List<SkillEntity>;
+        var skills = okResult!.Value as List<SkillDto>;
         Assert.That(skills, Has.Count.EqualTo(3));
     }
 
@@ -78,7 +78,7 @@ public class RoadmapControllerTests : DatabaseTestBase
         var result = await _sut.GetRoadmap();
 
         var okResult = result.Result as OkObjectResult;
-        var skills = okResult!.Value as List<SkillEntity>;
+        var skills = okResult!.Value as List<SkillDto>;
         Assert.That(skills, Has.Count.EqualTo(1));
         Assert.That(skills![0].Name, Is.EqualTo("Java Basics"));
     }
@@ -94,7 +94,7 @@ public class RoadmapControllerTests : DatabaseTestBase
         var result = await _sut.GetRoadmap();
 
         var okResult = result.Result as OkObjectResult;
-        var skills = okResult!.Value as List<SkillEntity>;
+        var skills = okResult!.Value as List<SkillDto>;
         Assert.That(skills, Is.Empty);
     }
 
@@ -114,7 +114,7 @@ public class RoadmapControllerTests : DatabaseTestBase
         var result = await _sut.GetRoadmap(showAll: false);
 
         var okResult = result.Result as OkObjectResult;
-        var skills = okResult!.Value as List<SkillEntity>;
+        var skills = okResult!.Value as List<SkillDto>;
         Assert.That(skills!.Count, Is.InRange(8, 12));
     }
 
@@ -132,7 +132,7 @@ public class RoadmapControllerTests : DatabaseTestBase
         var result = await _sut.GetRoadmap(showAll: true);
 
         var okResult = result.Result as OkObjectResult;
-        var skills = okResult!.Value as List<SkillEntity>;
+        var skills = okResult!.Value as List<SkillDto>;
         Assert.That(skills![0].Name, Is.EqualTo("Git"));
         Assert.That(skills[1].Name, Is.EqualTo("Java Basics"));
         Assert.That(skills[2].Name, Is.EqualTo("Spring Boot"));
