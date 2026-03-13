@@ -40,7 +40,10 @@
     "settingsSection": "Settings",
     "certificateTemplates": "Certificate Templates",
     "skillProfiles": "Skill Profiles",
-    "myProfile": "My Profile"
+    "myProfile": "My Profile",
+    "theme": "Theme",
+    "classic": "Classic",
+    "wouter": "Wouter"
   },
   "auth": {
     "signIn": "Sign In",
@@ -55,7 +58,11 @@
     "invalidCredentials": "Invalid username or password",
     "usernameRequired": "Username is required",
     "passwordRequired": "Password is required",
-    "loginBackground": "Login background"
+    "loginBackground": "Login background",
+    "quote": "Empower your team with continuous learning. Track progress, manage courses, and build skills together.",
+    "quoteAuthor": "Steven Robijns",
+    "testUsers": "Test users:",
+    "testPasswords": "Passwords: AdminPassword123! (backoffice) / UserPassword123! (others)"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -98,7 +105,8 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System",
-    "save": "Save"
+    "save": "Save",
+    "comingSoon": "Settings page coming soon..."
   },
   "profile": {
     "title": "Skill Profiles",
@@ -130,6 +138,16 @@
     "active": "Active",
     "user": "User"
   },
+  "roles": {
+    "admin": "Admin",
+    "coach": "Coach",
+    "consultant": "Consultant"
+  },
+  "validation": {
+    "required": "Required",
+    "invalidEmail": "Invalid email",
+    "minChars": "Min {{count}} characters"
+  },
   "teams": {
     "title": "Teams",
     "myTeams": "My Teams",
@@ -146,7 +164,45 @@
     "updated": "Team updated",
     "updateError": "Failed to update team",
     "deleted": "Team deleted",
-    "deleteError": "Failed to delete team"
+    "deleteError": "Failed to delete team",
+    "members": "Members",
+    "noMembers": "No members yet",
+    "teamsCount": "{{count}} teams"
+  },
+  "users": {
+    "title": "Users",
+    "createTitle": "Create User",
+    "createDesc": "Add a new user to the platform.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "role": "Role",
+    "teams": "Teams",
+    "created": "User created",
+    "createError": "Failed to create user",
+    "updated": "User updated",
+    "updateError": "Failed to update user",
+    "addUser": "Add Consultant",
+    "addCoach": "Add Coach",
+    "coaches": "Coaches",
+    "noCoaches": "No coaches yet",
+    "consultants": "Consultants",
+    "noConsultants": "No consultants yet",
+    "myTeams": "My Teams",
+    "myProfile": "My Profile",
+    "learnerSubtitle": "Your profile and assigned coach",
+    "you": "You",
+    "yourCoach": "Your Coach",
+    "coach": "Coach",
+    "noCoach": "No coach assigned yet",
+    "noMembers": "No members in this team",
+    "editRoleAndTeams": "Edit role & teams",
+    "totalUsers": "{{count}} total users",
+    "membersAcrossTeams": "{{count}} members across your teams",
+    "membersCount": "{{count}} members",
+    "teamFallback": "Team {{id}}"
   },
   "roadmap": {
     "title": "My Roadmap",

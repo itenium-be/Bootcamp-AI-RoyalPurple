@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { BookOpen, Users, Award } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@itenium-forge/ui';
-import { useTeamStore } from '@/stores';
+import { useTeamStore, useSkinStore } from '@/stores';
 
 export function Dashboard() {
   const { t } = useTranslation();
   const { mode, selectedTeam } = useTeamStore();
+  const { skin } = useSkinStore();
 
   return (
     <div className="space-y-6">
@@ -51,6 +52,8 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {skin === 'wouter' && <img src="/memew.png" alt="Wouter" className="mx-auto mt-6 max-w-full" />}
     </div>
   );
 }

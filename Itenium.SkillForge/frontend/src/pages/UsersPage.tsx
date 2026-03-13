@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod/v4';
@@ -62,34 +63,50 @@ interface Team {
 
 // ─── Role badge ───────────────────────────────────────────────────────────────
 
-const roleMeta: Record<string, { label: string; className: string }> = {
-  backoffice: { label: 'Admin', className: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
-  manager: { label: 'Coach', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-  learner: { label: 'Consultant', className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
+const roleClassName: Record<string, string> = {
+  backoffice: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+  manager: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  learner: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
 };
 
 function RoleBadge({ role }: { role: string }) {
-  const meta = roleMeta[role] ?? { label: role, className: 'bg-gray-100 text-gray-800' };
+  const { t } = useTranslation();
+  const roleKey: Record<string, string> = {
+    backoffice: 'roles.admin',
+    manager: 'roles.coach',
+    learner: 'roles.consultant',
+  };
+  const label = roleKey[role] ? t(roleKey[role]) : role;
+  const className = roleClassName[role] ?? 'bg-gray-100 text-gray-800';
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${meta.className}`}>
-      {meta.label}
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${className}`}>
+      {label}
     </span>
   );
 }
 
 // ─── Create user sheet ────────────────────────────────────────────────────────
 
-const createUserSchema = z.object({
-  firstName: z.string().min(1, 'Required'),
-  lastName: z.string().min(1, 'Required'),
-  userName: z.string().min(1, 'Required'),
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Min 8 characters'),
-  role: z.enum(['learner', 'manager', 'backoffice']),
-  teams: z.array(z.number()),
-});
+const createUserSchema = (t: TFunction) =>
+  z.object({
+    firstName: z.string().min(1, t('validation.required')),
+    lastName: z.string().min(1, t('validation.required')),
+    userName: z.string().min(1, t('validation.required')),
+    email: z.string().email(t('validation.invalidEmail')),
+    password: z.string().min(8, t('validation.minChars', { count: 8 })),
+    role: z.enum(['learner', 'manager', 'backoffice']),
+    teams: z.array(z.number()),
+  });
 
-type CreateUserFormValues = z.infer<typeof createUserSchema>;
+interface CreateUserFormValues {
+  firstName: string;
+  lastName: string;
+  userName: string;
+  email: string;
+  password: string;
+  role: 'learner' | 'manager' | 'backoffice';
+  teams: number[];
+}
 
 function CreateUserSheet({
   open,
@@ -106,7 +123,7 @@ function CreateUserSheet({
   const queryClient = useQueryClient();
 
   const form = useForm<CreateUserFormValues>({
-    resolver: zodResolver(createUserSchema),
+    resolver: zodResolver(createUserSchema(t)),
     defaultValues: { firstName: '', lastName: '', userName: '', email: '', password: '', role: defaultRole, teams: [] },
   });
 
@@ -134,7 +151,6 @@ function CreateUserSheet({
   });
 
   const selectedTeams = form.watch('teams');
-  const selectedRole = form.watch('role');
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -217,30 +233,7 @@ function CreateUserSheet({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('users.role', 'Role')}</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="learner">Consultant</SelectItem>
-                      <SelectItem value="manager">Coach</SelectItem>
-                      <SelectItem value="backoffice">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {(selectedRole === 'manager' || selectedRole === 'learner') && teams.length > 0 && (
+            {teams.length > 0 && (
               <FormField
                 control={form.control}
                 name="teams"
@@ -326,11 +319,9 @@ function EditUserSheet({
 
   const onSubmit = async (values: EditUserFormValues) => {
     try {
-      await Promise.all([
-        roleMutation.mutateAsync({ role: values.role }),
-        teamsMutation.mutateAsync({ teamIds: values.teams }),
-      ]);
-      queryClient.invalidateQueries({ queryKey: ['users'] });
+      await roleMutation.mutateAsync({ role: values.role });
+      await teamsMutation.mutateAsync({ teamIds: values.teams });
+      await queryClient.refetchQueries({ queryKey: ['users'] });
       toast.success(t('users.updated', 'User updated'));
       onOpenChange(false);
     } catch {
@@ -367,9 +358,9 @@ function EditUserSheet({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="learner">Consultant</SelectItem>
-                      <SelectItem value="manager">Coach</SelectItem>
-                      <SelectItem value="backoffice">Admin</SelectItem>
+                      <SelectItem value="learner">{t('roles.consultant')}</SelectItem>
+                      <SelectItem value="manager">{t('roles.coach')}</SelectItem>
+                      <SelectItem value="backoffice">{t('roles.admin')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -438,9 +429,10 @@ function UserRow({
   teams: Team[];
   showActions: boolean;
 }) {
+  const { t } = useTranslation();
   const [editOpen, setEditOpen] = useState(false);
   const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
-  const teamLabels = user.teams.map((id) => teamNames.get(id) ?? `Team ${id}`).join(', ');
+  const teamLabels = user.teams.map((id) => teamNames.get(id) ?? t('users.teamFallback', { id })).join(', ');
 
   return (
     <>
@@ -465,11 +457,11 @@ function UserRow({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setEditOpen(true)}>
                   <Pencil className="size-4 mr-2" />
-                  Edit role & teams
+                  {t('users.editRoleAndTeams')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -496,11 +488,6 @@ function AdminView() {
   const coaches = users.filter((u) => u.role === 'manager');
   const consultants = users.filter((u) => u.role === 'learner');
 
-  const openCreate = (role: 'learner' | 'manager') => {
-    setCreateRole(role);
-    setCreateOpen(true);
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
@@ -510,17 +497,30 @@ function AdminView() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">{t('users.title', 'Users')}</h1>
-            <p className="text-sm text-muted-foreground">{isLoading ? '…' : `${users.length} total users`}</p>
+            <p className="text-sm text-muted-foreground">
+              {isLoading ? '…' : t('users.totalUsers', { count: users.length })}
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => openCreate('manager')}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setCreateRole('manager');
+              setCreateOpen(true);
+            }}
+          >
             <UserCheck className="size-4 mr-2" />
-            {t('users.addCoach', 'Add Coach')}
+            {t('users.addCoach')}
           </Button>
-          <Button onClick={() => openCreate('learner')}>
+          <Button
+            onClick={() => {
+              setCreateRole('learner');
+              setCreateOpen(true);
+            }}
+          >
             <Plus className="size-4 mr-2" />
-            {t('users.addUser', 'Add User')}
+            {t('users.addUser')}
           </Button>
         </div>
       </div>
@@ -590,7 +590,7 @@ function CoachView() {
         </div>
         <div>
           <h1 className="text-2xl font-bold">{t('users.myTeams', 'My Teams')}</h1>
-          <p className="text-sm text-muted-foreground">{`${users.length} members across your teams`}</p>
+          <p className="text-sm text-muted-foreground">{t('users.membersAcrossTeams', { count: users.length })}</p>
         </div>
       </div>
 
@@ -605,7 +605,9 @@ function CoachView() {
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Component className="size-4" />
                   {team.name}
-                  <span className="ml-auto text-xs font-normal text-muted-foreground">{members.length} members</span>
+                  <span className="ml-auto text-xs font-normal text-muted-foreground">
+                    {t('users.membersCount', { count: members.length })}
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -630,8 +632,9 @@ function CoachView() {
 // ─── Learner view ─────────────────────────────────────────────────────────────
 
 function ProfileCard({ user, teamNames, label }: { user: UserDto; teamNames: Map<number, string>; label: string }) {
+  const { t } = useTranslation();
   const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
-  const teamLabels = user.teams.map((id) => teamNames.get(id) ?? `Team ${id}`).join(', ');
+  const teamLabels = user.teams.map((id) => teamNames.get(id) ?? t('users.teamFallback', { id })).join(', ');
 
   return (
     <Card>

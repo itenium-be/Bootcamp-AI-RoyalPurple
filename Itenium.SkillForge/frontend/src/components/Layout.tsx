@@ -422,7 +422,7 @@ export function Layout() {
                     className={skin === 'classic' ? 'bg-sidebar-accent' : ''}
                   >
                     <span>🎨</span>
-                    <span>Classic</span>
+                    <span>{t('nav.classic')}</span>
                     {skin === 'classic' && (
                       <span className="ml-auto text-xs text-sidebar-accent-foreground">{t('common.active', '✓')}</span>
                     )}
@@ -434,7 +434,7 @@ export function Layout() {
                     className={skin === 'wouter' ? 'bg-sidebar-accent' : ''}
                   >
                     <img src="/wouter.jpg" alt="Wouter" className="size-4 rounded-full object-cover object-top" />
-                    <span>Wouter</span>
+                    <span>{t('nav.wouter')}</span>
                     {skin === 'wouter' && (
                       <span className="ml-auto text-xs text-sidebar-accent-foreground">{t('common.active', '✓')}</span>
                     )}
