@@ -41,6 +41,7 @@ public static class SeedData
                 new TeamEntity { Id = 3, Name = "PO & Analysis" },
                 new TeamEntity { Id = 4, Name = "QA" });
             await db.SaveChangesAsync();
+            await db.Database.ExecuteSqlRawAsync("SELECT setval('\"Teams_Id_seq\"', (SELECT MAX(\"Id\") FROM \"Teams\"))");
         }
     }
 
@@ -56,6 +57,7 @@ public static class SeedData
                 new CourseEntity { Id = 5, Name = "Spring Boot Fundamentals", Description = "Build Java applications with Spring Boot", Category = "Development", Level = "Intermediate", TeamId = 1 }, // Java
                 new CourseEntity { Id = 6, Name = "Test Automation", Description = "Automate tests with Selenium and Playwright", Category = "Quality", Level = "Intermediate", TeamId = 4 });           // QA
             await db.SaveChangesAsync();
+            await db.Database.ExecuteSqlRawAsync("SELECT setval('\"Courses_Id_seq\"', (SELECT MAX(\"Id\") FROM \"Courses\"))");
         }
     }
 
@@ -992,6 +994,8 @@ public static class SeedData
         );
 
         await db.SaveChangesAsync();
+        await db.Database.ExecuteSqlRawAsync("SELECT setval('\"SkillCategories_Id_seq\"', (SELECT MAX(\"Id\") FROM \"SkillCategories\"))");
+        await db.Database.ExecuteSqlRawAsync("SELECT setval('\"Skills_Id_seq\"', (SELECT MAX(\"Id\") FROM \"Skills\"))");
 
         // Skill prerequisites
         db.SkillPrerequisites.AddRange(
