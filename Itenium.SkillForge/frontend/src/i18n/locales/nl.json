@@ -40,7 +40,10 @@
     "settingsSection": "Instellingen",
     "certificateTemplates": "Certificaat Sjablonen",
     "skillProfiles": "Vaardigheidsprofielen",
-    "myProfile": "Mijn Profiel"
+    "myProfile": "Mijn Profiel",
+    "theme": "Thema",
+    "classic": "Klassiek",
+    "wouter": "Wouter"
   },
   "auth": {
     "signIn": "Inloggen",
@@ -55,7 +58,11 @@
     "invalidCredentials": "Ongeldige gebruikersnaam of wachtwoord",
     "usernameRequired": "Gebruikersnaam is verplicht",
     "passwordRequired": "Wachtwoord is verplicht",
-    "loginBackground": "Login achtergrond"
+    "loginBackground": "Login achtergrond",
+    "quote": "Versterk uw team met continu leren. Volg de voortgang, beheer cursussen en bouw samen vaardigheden op.",
+    "quoteAuthor": "Steven Robijns",
+    "testUsers": "Testgebruikers:",
+    "testPasswords": "Wachtwoorden: AdminPassword123! (backoffice) / UserPassword123! (anderen)"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -99,7 +106,8 @@
     "light": "Licht",
     "dark": "Donker",
     "system": "Systeem",
-    "save": "Opslaan"
+    "save": "Opslaan",
+    "comingSoon": "Instellingenpagina komt binnenkort beschikbaar..."
   },
   "profile": {
     "title": "Vaardigheidsprofielen",
@@ -131,6 +139,16 @@
     "active": "Actief",
     "user": "Gebruiker"
   },
+  "roles": {
+    "admin": "Admin",
+    "coach": "Coach",
+    "consultant": "Consultant"
+  },
+  "validation": {
+    "required": "Verplicht",
+    "invalidEmail": "Ongeldig e-mailadres",
+    "minChars": "Min {{count}} tekens"
+  },
   "teams": {
     "title": "Teams",
     "myTeams": "Mijn Teams",
@@ -147,7 +165,45 @@
     "updated": "Team bijgewerkt",
     "updateError": "Kon team niet bijwerken",
     "deleted": "Team verwijderd",
-    "deleteError": "Kon team niet verwijderen"
+    "deleteError": "Kon team niet verwijderen",
+    "members": "Leden",
+    "noMembers": "Nog geen leden",
+    "teamsCount": "{{count}} teams"
+  },
+  "users": {
+    "title": "Gebruikers",
+    "createTitle": "Gebruiker Aanmaken",
+    "createDesc": "Voeg een nieuwe gebruiker toe aan het platform.",
+    "firstName": "Voornaam",
+    "lastName": "Achternaam",
+    "username": "Gebruikersnaam",
+    "email": "E-mail",
+    "password": "Wachtwoord",
+    "role": "Rol",
+    "teams": "Teams",
+    "created": "Gebruiker aangemaakt",
+    "createError": "Kon gebruiker niet aanmaken",
+    "updated": "Gebruiker bijgewerkt",
+    "updateError": "Kon gebruiker niet bijwerken",
+    "addUser": "Consultant Toevoegen",
+    "addCoach": "Coach Toevoegen",
+    "coaches": "Coaches",
+    "noCoaches": "Nog geen coaches",
+    "consultants": "Consultants",
+    "noConsultants": "Nog geen consultants",
+    "myTeams": "Mijn Teams",
+    "myProfile": "Mijn Profiel",
+    "learnerSubtitle": "Uw profiel en toegewezen coach",
+    "you": "U",
+    "yourCoach": "Uw Coach",
+    "coach": "Coach",
+    "noCoach": "Nog geen coach toegewezen",
+    "noMembers": "Geen leden in dit team",
+    "editRoleAndTeams": "Rol & teams bewerken",
+    "totalUsers": "{{count}} gebruikers in totaal",
+    "membersAcrossTeams": "{{count}} leden verspreid over uw teams",
+    "membersCount": "{{count}} leden",
+    "teamFallback": "Team {{id}}"
   },
   "roadmap": {
     "title": "Mijn Roadmap",

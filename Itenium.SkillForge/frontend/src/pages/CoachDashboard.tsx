@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { fetchCoachDashboard, type ConsultantSummary } from '@/api/client';
+import { useSkinStore } from '@/stores';
 
 function ConsultantCard({ consultant }: { consultant: ConsultantSummary }) {
   const { t } = useTranslation();
@@ -37,6 +38,7 @@ function ConsultantCard({ consultant }: { consultant: ConsultantSummary }) {
 
 export default function CoachDashboard() {
   const { t } = useTranslation();
+  const { skin } = useSkinStore();
 
   const { data: consultants = [], isLoading } = useQuery({
     queryKey: ['coach-dashboard'],
@@ -60,6 +62,8 @@ export default function CoachDashboard() {
           ))}
         </div>
       )}
+
+      {skin === 'wouter' && <img src="/memew.png" alt="Wouter" className="mx-auto mt-6 max-w-full" />}
     </div>
   );
 }

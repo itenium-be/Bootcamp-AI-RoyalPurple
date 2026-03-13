@@ -8,7 +8,7 @@
   --radius: 0.625rem;
 
   /* Itenium Brand Colors - Light Mode */
-  --background: #fffaf8; /* Soap - warm white */
+  --background: #ffffff; /* White - matches itenium.be */
   --foreground: #2d2a28; /* Dune - dark brown */
   --card: #ffffff;
   --card-foreground: #2d2a28;
@@ -93,16 +93,6 @@
 }
 
 /* ─── Wouter skin ─────────────────────────────────────────────────────────── */
-html.skin-wouter button:not([data-sidebar='menu-button']):not(:disabled),
-html.skin-wouter [role='button']:not([data-sidebar='menu-button']):not(:disabled) {
-  background-image: url('/wouter.jpg') !important;
-  background-size: cover !important;
-  background-position: center top !important;
-  background-color: transparent !important;
-  color: white !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85) !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
-}
 
 @layer base {
   * {
@@ -115,6 +105,21 @@ html.skin-wouter [role='button']:not([data-sidebar='menu-button']):not(:disabled
   }
   body {
     @apply min-h-svh w-full bg-background text-foreground has-[div[data-variant='inset']]:bg-sidebar;
+    font-family: Inter, sans-serif;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: Rubik, sans-serif;
+  }
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: 'IBM Plex Mono', monospace;
   }
   button:not(:disabled),
   [role='button']:not(:disabled) {
