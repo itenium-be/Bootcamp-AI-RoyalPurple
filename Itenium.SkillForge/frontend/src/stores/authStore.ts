@@ -85,9 +85,14 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       onRehydrateStorage: () => (state) => {
-        // Check if token is expired on rehydration
-        if (state?.accessToken && isTokenExpired(state.accessToken)) {
+        if (!state?.accessToken) return;
+        if (isTokenExpired(state.accessToken)) {
           state.logout();
+          return;
+        }
+        // Re-parse user from token if role field is missing (schema migration)
+        if (!state.user?.role) {
+          state.setToken(state.accessToken);
         }
       },
     },
