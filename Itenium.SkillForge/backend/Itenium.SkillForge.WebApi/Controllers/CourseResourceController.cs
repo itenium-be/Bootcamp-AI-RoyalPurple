@@ -30,8 +30,11 @@ public class CourseResourceController : ControllerBase
             return NotFound();
 
         var userId = _currentUser.UserId!;
+        var courseResourceIds = _db.CourseResources
+            .Where(r => r.CourseId == courseId)
+            .Select(r => r.Id);
         var completedIds = await _db.ResourceCompletions
-            .Where(c => c.UserId == userId)
+            .Where(c => c.UserId == userId && courseResourceIds.Contains(c.ResourceId))
             .Select(c => c.ResourceId)
             .ToHashSetAsync();
 

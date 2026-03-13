@@ -53,5 +53,9 @@ public class AppDbContext : ForgeIdentityDbContext
             .WithMany()
             .HasForeignKey(sp => sp.PrerequisiteSkillId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ResourceCompletionEntity>()
+            .HasIndex(r => new { r.UserId, r.ResourceId })
+            .IsUnique();
     }
 }
