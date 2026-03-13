@@ -69,7 +69,7 @@ describe('ConsultantProfiles', () => {
   it('renders consultant list with assigned profile', () => {
     mockUseQuery
       .mockReturnValueOnce({
-        data: [{ userId: 'user-1', teamId: 2, teamName: '.NET' }],
+        data: [{ userId: 'user-1', teamId: 2, teamName: '.NET', firstName: 'John', lastName: 'Doe' }],
         isLoading: false,
       })
       .mockReturnValueOnce({
@@ -80,7 +80,7 @@ describe('ConsultantProfiles', () => {
     render(<ConsultantProfiles />);
 
     expect(screen.getByText('profile.title')).toBeInTheDocument();
-    expect(screen.getByText('user-1')).toBeInTheDocument();
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('.NET')).toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe('ConsultantProfiles', () => {
   it('shows no profile text when consultant has no assignment', () => {
     mockUseQuery
       .mockReturnValueOnce({
-        data: [{ userId: 'user-2', teamId: null, teamName: null }],
+        data: [{ userId: 'user-2', teamId: null, teamName: null, firstName: 'Jane', lastName: 'Smith' }],
         isLoading: false,
       })
       .mockReturnValueOnce({ data: [], isLoading: false });
