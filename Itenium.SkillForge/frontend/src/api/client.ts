@@ -323,7 +323,7 @@ export interface CourseAssignment {
   assignedAt: string;
 }
 
-export interface AssignCourseRequest {
+interface AssignCourseRequest {
   courseId: number;
   teamId: number;
   userId: string | null;
@@ -344,7 +344,7 @@ export async function removeAssignment(id: number): Promise<void> {
   await api.delete(`/api/assignment/${id}`);
 }
 
-export interface DashboardStats {
+interface DashboardStats {
   totalCourses: number;
   activeLearners: number;
   assignedCourses: number;
