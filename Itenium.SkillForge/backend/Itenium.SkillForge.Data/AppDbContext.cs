@@ -33,6 +33,7 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<CourseResourceEntity> CourseResources => Set<CourseResourceEntity>();
 
+    public DbSet<CourseAssignmentEntity> CourseAssignments => Set<CourseAssignmentEntity>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
