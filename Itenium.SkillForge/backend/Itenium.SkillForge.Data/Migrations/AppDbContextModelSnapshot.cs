@@ -156,6 +156,121 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.ToTable("Courses");
                 });
 
+            modelBuilder.Entity("Itenium.SkillForge.Entities.CourseResourceEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int?>("DurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SkillId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("ToLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("CourseResources");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.FeedbackCommentEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FeedbackId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeedbackId");
+
+                    b.ToTable("FeedbackComments");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.FeedbackEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RecipientId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Feedbacks");
+                });
+
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -269,6 +384,20 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.UserActivityEntity", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<DateTime>("LastActivityAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserActivities");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -631,6 +760,44 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("Itenium.SkillForge.Entities.CourseResourceEntity", b =>
+                {
+                    b.HasOne("Itenium.SkillForge.Entities.CourseEntity", "Course")
+                        .WithMany("Resources")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Itenium.SkillForge.Entities.SkillEntity", "Skill")
+                        .WithMany()
+                        .HasForeignKey("SkillId");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Skill");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.FeedbackCommentEntity", b =>
+                {
+                    b.HasOne("Itenium.SkillForge.Entities.FeedbackEntity", "Feedback")
+                        .WithMany("Comments")
+                        .HasForeignKey("FeedbackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Feedback");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.FeedbackEntity", b =>
+                {
+                    b.HasOne("Itenium.SkillForge.Entities.CourseEntity", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId");
+
+                    b.Navigation("Course");
+                });
+
+
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
 
                 {
@@ -756,6 +923,16 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.Navigation("Application");
 
                     b.Navigation("Authorization");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.CourseEntity", b =>
+                {
+                    b.Navigation("Resources");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.FeedbackEntity", b =>
+                {
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>

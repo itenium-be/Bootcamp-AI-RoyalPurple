@@ -17,6 +17,7 @@ public static class SeedData
 
         await SeedTeams(db);
         await SeedCourses(db);
+        await SeedCourseResources(db);
         await SeedSkillCatalogue(db);
         await app.SeedTestUsers();
         await SeedConsultantProfiles(db);
@@ -25,6 +26,8 @@ public static class SeedData
     public static async Task SeedDevelopmentData_ForTest(AppDbContext db)
     {
         await SeedTeams(db);
+        await SeedCourses(db);
+        await SeedCourseResources(db);
         await SeedSkillCatalogue(db);
     }
 
@@ -56,57 +59,97 @@ public static class SeedData
         }
     }
 
+    private static async Task SeedCourseResources(AppDbContext db)
+    {
+        if (await db.CourseResources.AnyAsync())
+            return;
+
+        var courseIds = await db.Courses.OrderBy(c => c.Id).Select(c => c.Id).ToListAsync();
+        if (courseIds.Count == 0)
+            return;
+
+        var resources = new List<CourseResourceEntity>();
+        var definitions = new[]
+        {
+            (Title: "Programming Basics Video Series", Type: CourseResourceType.Video, Url: (string?)"https://example.com/prog-basics", DurationMinutes: (int?)120, Order: 1, Description: (string?)"Introduction to core programming concepts"),
+            (Title: "Hello World Exercises", Type: CourseResourceType.Exercise, Url: (string?)null, DurationMinutes: (int?)null, Order: 2, Description: (string?)"Hands-on exercises to get started"),
+            (Title: "Clean Code Book", Type: CourseResourceType.Book, Url: (string?)null, DurationMinutes: (int?)null, Order: 3, Description: (string?)"Robert C. Martin's classic on writing clean code"),
+            (Title: "Async/Await Deep Dive", Type: CourseResourceType.Article, Url: (string?)"https://example.com/async-await", DurationMinutes: (int?)null, Order: 1, Description: (string?)"Understanding async programming in .NET"),
+            (Title: "LINQ Mastery Workshop", Type: CourseResourceType.Exercise, Url: (string?)null, DurationMinutes: (int?)90, Order: 2, Description: (string?)"Advanced LINQ query exercises"),
+            (Title: "Microservices Architecture Patterns", Type: CourseResourceType.Video, Url: (string?)"https://example.com/microservices", DurationMinutes: (int?)180, Order: 1, Description: (string?)null),
+            (Title: "Scrum Guide", Type: CourseResourceType.Article, Url: (string?)"https://scrumguides.org", DurationMinutes: (int?)null, Order: 1, Description: (string?)"The official Scrum Guide"),
+        };
+
+        for (var i = 0; i < Math.Min(courseIds.Count, definitions.Length); i++)
+        {
+            var def = definitions[i];
+            resources.Add(new CourseResourceEntity
+            {
+                CourseId = courseIds[i % courseIds.Count],
+                Title = def.Title,
+                Type = def.Type,
+                Url = def.Url,
+                DurationMinutes = def.DurationMinutes,
+                Order = def.Order,
+                Description = def.Description,
+            });
+        }
+
+        db.CourseResources.AddRange(resources);
+        await db.SaveChangesAsync();
+    }
+
     private static async Task SeedSkillCatalogue(AppDbContext db)
     {
         if (await db.SkillCategories.AnyAsync()) return;
 
         // ── Skill Categories ────────────────────────────────────────────────
         // Universal (no TeamId) — from Skill_Matrix_Itenium.xlsx Developer sheet
-        var cat1  = new SkillCategoryEntity { Id = 1,  Name = "General Soft Skills",           TeamId = null };
-        var cat2  = new SkillCategoryEntity { Id = 2,  Name = "Code Skills",                   TeamId = null };
-        var cat3  = new SkillCategoryEntity { Id = 3,  Name = "Competence Soft Skills",         TeamId = null };
-        var cat4  = new SkillCategoryEntity { Id = 4,  Name = "Quality & QA",                  TeamId = null };
-        var cat5  = new SkillCategoryEntity { Id = 5,  Name = "DevOps",                        TeamId = null };
-        var cat6  = new SkillCategoryEntity { Id = 6,  Name = "Specialisaties",                TeamId = null };
-        var cat7  = new SkillCategoryEntity { Id = 7,  Name = "Cross Competence",              TeamId = null };
-        var cat8  = new SkillCategoryEntity { Id = 8,  Name = "Full Stack",                    TeamId = null };
+        var cat1 = new SkillCategoryEntity { Id = 1, Name = "General Soft Skills", TeamId = null };
+        var cat2 = new SkillCategoryEntity { Id = 2, Name = "Code Skills", TeamId = null };
+        var cat3 = new SkillCategoryEntity { Id = 3, Name = "Competence Soft Skills", TeamId = null };
+        var cat4 = new SkillCategoryEntity { Id = 4, Name = "Quality & QA", TeamId = null };
+        var cat5 = new SkillCategoryEntity { Id = 5, Name = "DevOps", TeamId = null };
+        var cat6 = new SkillCategoryEntity { Id = 6, Name = "Specialisaties", TeamId = null };
+        var cat7 = new SkillCategoryEntity { Id = 7, Name = "Cross Competence", TeamId = null };
+        var cat8 = new SkillCategoryEntity { Id = 8, Name = "Full Stack", TeamId = null };
 
         // QA (TeamId=4) — from Skill_Matrix_Itenium.xlsx QA sheet
-        var cat9  = new SkillCategoryEntity { Id = 9,  Name = "General Soft Skills",           TeamId = 4 };
-        var cat10 = new SkillCategoryEntity { Id = 10, Name = "Soft Skills",                   TeamId = 4 };
-        var cat11 = new SkillCategoryEntity { Id = 11, Name = "Manual Testing",                TeamId = 4 };
-        var cat12 = new SkillCategoryEntity { Id = 12, Name = "Automated Testing",             TeamId = 4 };
-        var cat13 = new SkillCategoryEntity { Id = 13, Name = "Specialisaties",                TeamId = 4 };
-        var cat14 = new SkillCategoryEntity { Id = 14, Name = "Cross Competence",              TeamId = 4 };
+        var cat9 = new SkillCategoryEntity { Id = 9, Name = "General Soft Skills", TeamId = 4 };
+        var cat10 = new SkillCategoryEntity { Id = 10, Name = "Soft Skills", TeamId = 4 };
+        var cat11 = new SkillCategoryEntity { Id = 11, Name = "Manual Testing", TeamId = 4 };
+        var cat12 = new SkillCategoryEntity { Id = 12, Name = "Automated Testing", TeamId = 4 };
+        var cat13 = new SkillCategoryEntity { Id = 13, Name = "Specialisaties", TeamId = 4 };
+        var cat14 = new SkillCategoryEntity { Id = 14, Name = "Cross Competence", TeamId = 4 };
 
         // PO & Analysis (TeamId=3) — from Skill_Matrix_Itenium.xlsx BA/FA and PO sheets
-        var cat15 = new SkillCategoryEntity { Id = 15, Name = "General Soft Skills",           TeamId = 3 };
+        var cat15 = new SkillCategoryEntity { Id = 15, Name = "General Soft Skills", TeamId = 3 };
         var cat16 = new SkillCategoryEntity { Id = 16, Name = "Product & Analyse Soft Skills", TeamId = 3 };
-        var cat17 = new SkillCategoryEntity { Id = 17, Name = "Business Analyst",              TeamId = 3 };
-        var cat18 = new SkillCategoryEntity { Id = 18, Name = "Functional Analyst",            TeamId = 3 };
-        var cat19 = new SkillCategoryEntity { Id = 19, Name = "Specialisaties",                TeamId = 3 };
-        var cat20 = new SkillCategoryEntity { Id = 20, Name = "Cross Competence",              TeamId = 3 };
-        var cat21 = new SkillCategoryEntity { Id = 21, Name = "Product Owner",                 TeamId = 3 };
+        var cat17 = new SkillCategoryEntity { Id = 17, Name = "Business Analyst", TeamId = 3 };
+        var cat18 = new SkillCategoryEntity { Id = 18, Name = "Functional Analyst", TeamId = 3 };
+        var cat19 = new SkillCategoryEntity { Id = 19, Name = "Specialisaties", TeamId = 3 };
+        var cat20 = new SkillCategoryEntity { Id = 20, Name = "Cross Competence", TeamId = 3 };
+        var cat21 = new SkillCategoryEntity { Id = 21, Name = "Product Owner", TeamId = 3 };
 
         // .NET (TeamId=2) — from Developer_Skill_Experience_Matrix.xlsx
-        var cat22 = new SkillCategoryEntity { Id = 22, Name = "Code Skills Backend .NET",      TeamId = 2 };
+        var cat22 = new SkillCategoryEntity { Id = 22, Name = "Code Skills Backend .NET", TeamId = 2 };
 
         // Java (TeamId=1) — from Developer_Skill_Experience_Matrix.xlsx
-        var cat23 = new SkillCategoryEntity { Id = 23, Name = "Code Skills Backend Java",      TeamId = 1 };
+        var cat23 = new SkillCategoryEntity { Id = 23, Name = "Code Skills Backend Java", TeamId = 1 };
 
         // Universal developer technical categories — from Developer_Skill_Experience_Matrix.xlsx
-        var cat24 = new SkillCategoryEntity { Id = 24, Name = "Code Skills General",           TeamId = null };
-        var cat25 = new SkillCategoryEntity { Id = 25, Name = "Database",                      TeamId = null };
-        var cat26 = new SkillCategoryEntity { Id = 26, Name = "Version Control",               TeamId = null };
-        var cat27 = new SkillCategoryEntity { Id = 27, Name = "Code Quality",                  TeamId = null };
-        var cat28 = new SkillCategoryEntity { Id = 28, Name = "Architecture",                  TeamId = null };
-        var cat29 = new SkillCategoryEntity { Id = 29, Name = "Testing & QA",                  TeamId = null };
-        var cat30 = new SkillCategoryEntity { Id = 30, Name = "DevOps/Cloud",                  TeamId = null };
-        var cat31 = new SkillCategoryEntity { Id = 31, Name = "Soft Skills",                   TeamId = null };
-        var cat32 = new SkillCategoryEntity { Id = 32, Name = "Frontend",                      TeamId = null };
-        var cat33 = new SkillCategoryEntity { Id = 33, Name = "Security",                      TeamId = null };
-        var cat34 = new SkillCategoryEntity { Id = 34, Name = "AI & New Tech",                 TeamId = null };
-        var cat35 = new SkillCategoryEntity { Id = 35, Name = "Verantwoordelijkheden",         TeamId = null };
+        var cat24 = new SkillCategoryEntity { Id = 24, Name = "Code Skills General", TeamId = null };
+        var cat25 = new SkillCategoryEntity { Id = 25, Name = "Database", TeamId = null };
+        var cat26 = new SkillCategoryEntity { Id = 26, Name = "Version Control", TeamId = null };
+        var cat27 = new SkillCategoryEntity { Id = 27, Name = "Code Quality", TeamId = null };
+        var cat28 = new SkillCategoryEntity { Id = 28, Name = "Architecture", TeamId = null };
+        var cat29 = new SkillCategoryEntity { Id = 29, Name = "Testing & QA", TeamId = null };
+        var cat30 = new SkillCategoryEntity { Id = 30, Name = "DevOps/Cloud", TeamId = null };
+        var cat31 = new SkillCategoryEntity { Id = 31, Name = "Soft Skills", TeamId = null };
+        var cat32 = new SkillCategoryEntity { Id = 32, Name = "Frontend", TeamId = null };
+        var cat33 = new SkillCategoryEntity { Id = 33, Name = "Security", TeamId = null };
+        var cat34 = new SkillCategoryEntity { Id = 34, Name = "AI & New Tech", TeamId = null };
+        var cat35 = new SkillCategoryEntity { Id = 35, Name = "Verantwoordelijkheden", TeamId = null };
 
         db.SkillCategories.AddRange(
             cat1, cat2, cat3, cat4, cat5, cat6, cat7, cat8,
@@ -118,245 +161,248 @@ public static class SeedData
 
         // ── Skills ──────────────────────────────────────────────────────────
         // General Soft Skills (universal, cat1)
-        var skill1  = new SkillEntity { Id = 1,  Name = "Active Listening",   LevelCount = 0, CategoryId = 1 };
-        var skill2  = new SkillEntity { Id = 2,  Name = "Communication",      LevelCount = 0, CategoryId = 1 };
-        var skill3  = new SkillEntity { Id = 3,  Name = "Knowledge Sharing",  LevelCount = 0, CategoryId = 1 };
-        var skill4  = new SkillEntity { Id = 4,  Name = "Presenting",         LevelCount = 0, CategoryId = 1 };
-        var skill5  = new SkillEntity { Id = 5,  Name = "Teamwork",           LevelCount = 0, CategoryId = 1 };
-        var skill6  = new SkillEntity { Id = 6,  Name = "Eagerness to Learn", LevelCount = 0, CategoryId = 1 };
-        var skill7  = new SkillEntity { Id = 7,  Name = "Logical Thinking",   LevelCount = 0, CategoryId = 1 };
-        var skill8  = new SkillEntity { Id = 8,  Name = "Empathy",            LevelCount = 0, CategoryId = 1 };
-        var skill9  = new SkillEntity { Id = 9,  Name = "Collaboration",      LevelCount = 0, CategoryId = 1 };
-        var skill10 = new SkillEntity { Id = 10, Name = "Adaptability",       LevelCount = 0, CategoryId = 1 };
-        var skill11 = new SkillEntity { Id = 11, Name = "Eye for Detail",     LevelCount = 0, CategoryId = 1 };
-        var skill12 = new SkillEntity { Id = 12, Name = "Critical Thinking",  LevelCount = 0, CategoryId = 1 };
-        var skill13 = new SkillEntity { Id = 13, Name = "Story Telling",      LevelCount = 0, CategoryId = 1 };
-        var skill14 = new SkillEntity { Id = 14, Name = "Time Management",    LevelCount = 0, CategoryId = 1 };
-        var skill15 = new SkillEntity { Id = 15, Name = "Problem-Solving",    LevelCount = 0, CategoryId = 1 };
-        var skill16 = new SkillEntity { Id = 16, Name = "Business-Minded",    LevelCount = 0, CategoryId = 1 };
-        var skill17 = new SkillEntity { Id = 17, Name = "Mentoring",          LevelCount = 0, CategoryId = 1 };
-        var skill18 = new SkillEntity { Id = 18, Name = "Leadership",         LevelCount = 0, CategoryId = 1 };
-        var skill19 = new SkillEntity { Id = 19, Name = "Coaching",           LevelCount = 0, CategoryId = 1 };
+        var skill1 = new SkillEntity { Id = 1, Name = "Active Listening", LevelCount = 0, CategoryId = 1 };
+        var skill2 = new SkillEntity { Id = 2, Name = "Communication", LevelCount = 0, CategoryId = 1 };
+        var skill3 = new SkillEntity { Id = 3, Name = "Knowledge Sharing", LevelCount = 0, CategoryId = 1 };
+        var skill4 = new SkillEntity { Id = 4, Name = "Presenting", LevelCount = 0, CategoryId = 1 };
+        var skill5 = new SkillEntity { Id = 5, Name = "Teamwork", LevelCount = 0, CategoryId = 1 };
+        var skill6 = new SkillEntity { Id = 6, Name = "Eagerness to Learn", LevelCount = 0, CategoryId = 1 };
+        var skill7 = new SkillEntity { Id = 7, Name = "Logical Thinking", LevelCount = 0, CategoryId = 1 };
+        var skill8 = new SkillEntity { Id = 8, Name = "Empathy", LevelCount = 0, CategoryId = 1 };
+        var skill9 = new SkillEntity { Id = 9, Name = "Collaboration", LevelCount = 0, CategoryId = 1 };
+        var skill10 = new SkillEntity { Id = 10, Name = "Adaptability", LevelCount = 0, CategoryId = 1 };
+        var skill11 = new SkillEntity { Id = 11, Name = "Eye for Detail", LevelCount = 0, CategoryId = 1 };
+        var skill12 = new SkillEntity { Id = 12, Name = "Critical Thinking", LevelCount = 0, CategoryId = 1 };
+        var skill13 = new SkillEntity { Id = 13, Name = "Story Telling", LevelCount = 0, CategoryId = 1 };
+        var skill14 = new SkillEntity { Id = 14, Name = "Time Management", LevelCount = 0, CategoryId = 1 };
+        var skill15 = new SkillEntity { Id = 15, Name = "Problem-Solving", LevelCount = 0, CategoryId = 1 };
+        var skill16 = new SkillEntity { Id = 16, Name = "Business-Minded", LevelCount = 0, CategoryId = 1 };
+        var skill17 = new SkillEntity { Id = 17, Name = "Mentoring", LevelCount = 0, CategoryId = 1 };
+        var skill18 = new SkillEntity { Id = 18, Name = "Leadership", LevelCount = 0, CategoryId = 1 };
+        var skill19 = new SkillEntity { Id = 19, Name = "Coaching", LevelCount = 0, CategoryId = 1 };
 
         // Code Skills — universal developer (cat2)
-        var skill20 = new SkillEntity { Id = 20, Name = "# Coding Language(s)",       LevelCount = 0, CategoryId = 2 };
-        var skill21 = new SkillEntity { Id = 21, Name = "Version Control",            LevelCount = 0, CategoryId = 2 };
-        var skill22 = new SkillEntity { Id = 22, Name = "Git",                        LevelCount = 0, CategoryId = 2 };
-        var skill23 = new SkillEntity { Id = 23, Name = "SQL",                        LevelCount = 0, CategoryId = 2 };
-        var skill24 = new SkillEntity { Id = 24, Name = "TDD",                        LevelCount = 0, CategoryId = 2 };
-        var skill25 = new SkillEntity { Id = 25, Name = "Architecture Knowledge",     LevelCount = 0, CategoryId = 2 };
-        var skill26 = new SkillEntity { Id = 26, Name = "Design Patterns",            LevelCount = 0, CategoryId = 2 };
-        var skill27 = new SkillEntity { Id = 27, Name = "Technical Communication",    LevelCount = 0, CategoryId = 2 };
-        var skill28 = new SkillEntity { Id = 28, Name = "Technical Leadership",       LevelCount = 0, CategoryId = 2 };
-        var skill29 = new SkillEntity { Id = 29, Name = "Code Review",                LevelCount = 0, CategoryId = 2 };
-        var skill30 = new SkillEntity { Id = 30, Name = "Performance",                LevelCount = 0, CategoryId = 2 };
+        var skill20 = new SkillEntity { Id = 20, Name = "# Coding Language(s)", LevelCount = 0, CategoryId = 2 };
+        var skill21 = new SkillEntity { Id = 21, Name = "Version Control", LevelCount = 0, CategoryId = 2 };
+        var skill22 = new SkillEntity { Id = 22, Name = "Git", LevelCount = 0, CategoryId = 2 };
+        var skill23 = new SkillEntity { Id = 23, Name = "SQL", LevelCount = 0, CategoryId = 2 };
+        var skill24 = new SkillEntity { Id = 24, Name = "TDD", LevelCount = 0, CategoryId = 2 };
+        var skill25 = new SkillEntity { Id = 25, Name = "Architecture Knowledge", LevelCount = 0, CategoryId = 2 };
+        var skill26 = new SkillEntity { Id = 26, Name = "Design Patterns", LevelCount = 0, CategoryId = 2 };
+        var skill27 = new SkillEntity { Id = 27, Name = "Technical Communication", LevelCount = 0, CategoryId = 2 };
+        var skill28 = new SkillEntity { Id = 28, Name = "Technical Leadership", LevelCount = 0, CategoryId = 2 };
+        var skill29 = new SkillEntity { Id = 29, Name = "Code Review", LevelCount = 0, CategoryId = 2 };
+        var skill30 = new SkillEntity { Id = 30, Name = "Performance", LevelCount = 0, CategoryId = 2 };
 
         // Competence Soft Skills — universal developer (cat3)
-        var skill31 = new SkillEntity { Id = 31, Name = "Scrum",            LevelCount = 0, CategoryId = 3 };
-        var skill32 = new SkillEntity { Id = 32, Name = "Agile",            LevelCount = 0, CategoryId = 3 };
+        var skill31 = new SkillEntity { Id = 31, Name = "Scrum", LevelCount = 0, CategoryId = 3 };
+        var skill32 = new SkillEntity { Id = 32, Name = "Agile", LevelCount = 0, CategoryId = 3 };
         var skill33 = new SkillEntity { Id = 33, Name = "Knowledge Sharing", LevelCount = 0, CategoryId = 3 };
-        var skill34 = new SkillEntity { Id = 34, Name = "Cross Competence",  LevelCount = 0, CategoryId = 3 };
-        var skill35 = new SkillEntity { Id = 35, Name = "Mentoring",        LevelCount = 0, CategoryId = 3 };
+        var skill34 = new SkillEntity { Id = 34, Name = "Cross Competence", LevelCount = 0, CategoryId = 3 };
+        var skill35 = new SkillEntity { Id = 35, Name = "Mentoring", LevelCount = 0, CategoryId = 3 };
 
         // Quality & QA — universal developer (cat4)
         var skill36 = new SkillEntity { Id = 36, Name = "# Testing Frameworks", LevelCount = 0, CategoryId = 4 };
-        var skill37 = new SkillEntity { Id = 37, Name = "Test Technieken",       LevelCount = 0, CategoryId = 4 };
-        var skill38 = new SkillEntity { Id = 38, Name = "Unit Testing",          LevelCount = 0, CategoryId = 4 };
-        var skill39 = new SkillEntity { Id = 39, Name = "Code Quality",          LevelCount = 0, CategoryId = 4 };
-        var skill40 = new SkillEntity { Id = 40, Name = "Clean Code",            LevelCount = 0, CategoryId = 4 };
-        var skill41 = new SkillEntity { Id = 41, Name = "TDD",                   LevelCount = 0, CategoryId = 4 };
-        var skill42 = new SkillEntity { Id = 42, Name = "Coding Standards",      LevelCount = 0, CategoryId = 4 };
+        var skill37 = new SkillEntity { Id = 37, Name = "Test Technieken", LevelCount = 0, CategoryId = 4 };
+        var skill38 = new SkillEntity { Id = 38, Name = "Unit Testing", LevelCount = 0, CategoryId = 4 };
+        var skill39 = new SkillEntity { Id = 39, Name = "Code Quality", LevelCount = 0, CategoryId = 4 };
+        var skill40 = new SkillEntity { Id = 40, Name = "Clean Code", LevelCount = 0, CategoryId = 4 };
+        var skill41 = new SkillEntity { Id = 41, Name = "TDD", LevelCount = 0, CategoryId = 4 };
+        var skill42 = new SkillEntity { Id = 42, Name = "Coding Standards", LevelCount = 0, CategoryId = 4 };
 
         // DevOps — universal developer (cat5)
         var skill43 = new SkillEntity { Id = 43, Name = "Pipeline Integration", LevelCount = 0, CategoryId = 5 };
-        var skill44 = new SkillEntity { Id = 44, Name = "CI/CD",                LevelCount = 0, CategoryId = 5 };
+        var skill44 = new SkillEntity { Id = 44, Name = "CI/CD", LevelCount = 0, CategoryId = 5 };
 
         // Specialisaties — universal developer (cat6)
-        var skill45 = new SkillEntity { Id = 45, Name = "Stay Relevant",   LevelCount = 0, CategoryId = 6 };
-        var skill46 = new SkillEntity { Id = 46, Name = "Load Testing",    LevelCount = 0, CategoryId = 6 };
+        var skill45 = new SkillEntity { Id = 45, Name = "Stay Relevant", LevelCount = 0, CategoryId = 6 };
+        var skill46 = new SkillEntity { Id = 46, Name = "Load Testing", LevelCount = 0, CategoryId = 6 };
         var skill47 = new SkillEntity { Id = 47, Name = "AI and New Tech", LevelCount = 0, CategoryId = 6 };
-        var skill48 = new SkillEntity { Id = 48, Name = "Security",        LevelCount = 0, CategoryId = 6 };
-        var skill49 = new SkillEntity { Id = 49, Name = "UI/UX",           LevelCount = 0, CategoryId = 6 };
+        var skill48 = new SkillEntity { Id = 48, Name = "Security", LevelCount = 0, CategoryId = 6 };
+        var skill49 = new SkillEntity { Id = 49, Name = "UI/UX", LevelCount = 0, CategoryId = 6 };
         var skill50 = new SkillEntity { Id = 50, Name = "Management/Lead", LevelCount = 0, CategoryId = 6 };
 
         // Cross Competence — universal developer (cat7)
-        var skill51 = new SkillEntity { Id = 51, Name = ".NET",                     LevelCount = 0, CategoryId = 7 };
-        var skill52 = new SkillEntity { Id = 52, Name = "Java",                     LevelCount = 0, CategoryId = 7 };
-        var skill53 = new SkillEntity { Id = 53, Name = "Unit Testing",             LevelCount = 0, CategoryId = 7 };
-        var skill54 = new SkillEntity { Id = 54, Name = "Bug Fixing",               LevelCount = 0, CategoryId = 7 };
+        var skill51 = new SkillEntity { Id = 51, Name = ".NET", LevelCount = 0, CategoryId = 7 };
+        var skill52 = new SkillEntity { Id = 52, Name = "Java", LevelCount = 0, CategoryId = 7 };
+        var skill53 = new SkillEntity { Id = 53, Name = "Unit Testing", LevelCount = 0, CategoryId = 7 };
+        var skill54 = new SkillEntity { Id = 54, Name = "Bug Fixing", LevelCount = 0, CategoryId = 7 };
         var skill55 = new SkillEntity { Id = 55, Name = "Code Complete/Clean Code", LevelCount = 0, CategoryId = 7 };
-        var skill56 = new SkillEntity { Id = 56, Name = "Code Conventions",         LevelCount = 0, CategoryId = 7 };
-        var skill57 = new SkillEntity { Id = 57, Name = "Analyse",                  LevelCount = 0, CategoryId = 7 };
-        var skill58 = new SkillEntity { Id = 58, Name = "Giving Feedback",          LevelCount = 0, CategoryId = 7 };
-        var skill59 = new SkillEntity { Id = 59, Name = "Give Technical Training",  LevelCount = 0, CategoryId = 7 };
+        var skill56 = new SkillEntity { Id = 56, Name = "Code Conventions", LevelCount = 0, CategoryId = 7 };
+        var skill57 = new SkillEntity { Id = 57, Name = "Analyse", LevelCount = 0, CategoryId = 7 };
+        var skill58 = new SkillEntity { Id = 58, Name = "Giving Feedback", LevelCount = 0, CategoryId = 7 };
+        var skill59 = new SkillEntity { Id = 59, Name = "Give Technical Training", LevelCount = 0, CategoryId = 7 };
 
         // Full Stack — universal developer (cat8)
-        var skill60 = new SkillEntity { Id = 60, Name = "Frontend Framework",          LevelCount = 0, CategoryId = 8 };
-        var skill61 = new SkillEntity { Id = 61, Name = "CSS/HTML",                    LevelCount = 0, CategoryId = 8 };
-        var skill62 = new SkillEntity { Id = 62, Name = "Unit Testing",                LevelCount = 0, CategoryId = 8 };
-        var skill63 = new SkillEntity { Id = 63, Name = "Mobile First",                LevelCount = 0, CategoryId = 8 };
-        var skill64 = new SkillEntity { Id = 64, Name = "E2E",                         LevelCount = 0, CategoryId = 8 };
-        var skill65 = new SkillEntity { Id = 65, Name = "Component Testing",           LevelCount = 0, CategoryId = 8 };
-        var skill66 = new SkillEntity { Id = 66, Name = "Architecture Knowledge",      LevelCount = 0, CategoryId = 8 };
-        var skill67 = new SkillEntity { Id = 67, Name = "UI/UX",                       LevelCount = 0, CategoryId = 8 };
-        var skill68 = new SkillEntity { Id = 68, Name = "Security",                    LevelCount = 0, CategoryId = 8 };
-        var skill69 = new SkillEntity { Id = 69, Name = "Performance",                 LevelCount = 0, CategoryId = 8 };
-        var skill70 = new SkillEntity { Id = 70, Name = "TDD",                         LevelCount = 0, CategoryId = 8 };
+        var skill60 = new SkillEntity { Id = 60, Name = "Frontend Framework", LevelCount = 0, CategoryId = 8 };
+        var skill61 = new SkillEntity { Id = 61, Name = "CSS/HTML", LevelCount = 0, CategoryId = 8 };
+        var skill62 = new SkillEntity { Id = 62, Name = "Unit Testing", LevelCount = 0, CategoryId = 8 };
+        var skill63 = new SkillEntity { Id = 63, Name = "Mobile First", LevelCount = 0, CategoryId = 8 };
+        var skill64 = new SkillEntity { Id = 64, Name = "E2E", LevelCount = 0, CategoryId = 8 };
+        var skill65 = new SkillEntity { Id = 65, Name = "Component Testing", LevelCount = 0, CategoryId = 8 };
+        var skill66 = new SkillEntity { Id = 66, Name = "Architecture Knowledge", LevelCount = 0, CategoryId = 8 };
+        var skill67 = new SkillEntity { Id = 67, Name = "UI/UX", LevelCount = 0, CategoryId = 8 };
+        var skill68 = new SkillEntity { Id = 68, Name = "Security", LevelCount = 0, CategoryId = 8 };
+        var skill69 = new SkillEntity { Id = 69, Name = "Performance", LevelCount = 0, CategoryId = 8 };
+        var skill70 = new SkillEntity { Id = 70, Name = "TDD", LevelCount = 0, CategoryId = 8 };
         var skill71 = new SkillEntity { Id = 71, Name = "Frontend Testing Frameworks", LevelCount = 0, CategoryId = 8 };
 
         // QA — General Soft Skills (cat9)
-        var skill72 = new SkillEntity { Id = 72, Name = "Adaptability",      LevelCount = 0, CategoryId = 9 };
-        var skill73 = new SkillEntity { Id = 73, Name = "Active Listening",  LevelCount = 0, CategoryId = 9 };
+        var skill72 = new SkillEntity { Id = 72, Name = "Adaptability", LevelCount = 0, CategoryId = 9 };
+        var skill73 = new SkillEntity { Id = 73, Name = "Active Listening", LevelCount = 0, CategoryId = 9 };
         var skill74 = new SkillEntity { Id = 74, Name = "Critical Thinking", LevelCount = 0, CategoryId = 9 };
-        var skill75 = new SkillEntity { Id = 75, Name = "Collaboration",     LevelCount = 0, CategoryId = 9 };
-        var skill76 = new SkillEntity { Id = 76, Name = "Communication",     LevelCount = 0, CategoryId = 9 };
-        var skill77 = new SkillEntity { Id = 77, Name = "Agile",             LevelCount = 0, CategoryId = 9 };
-        var skill78 = new SkillEntity { Id = 78, Name = "Cross Competence",  LevelCount = 0, CategoryId = 9 };
-        var skill79 = new SkillEntity { Id = 79, Name = "Presenting",        LevelCount = 0, CategoryId = 9 };
+        var skill75 = new SkillEntity { Id = 75, Name = "Collaboration", LevelCount = 0, CategoryId = 9 };
+        var skill76 = new SkillEntity { Id = 76, Name = "Communication", LevelCount = 0, CategoryId = 9 };
+        var skill77 = new SkillEntity { Id = 77, Name = "Agile", LevelCount = 0, CategoryId = 9 };
+        var skill78 = new SkillEntity { Id = 78, Name = "Cross Competence", LevelCount = 0, CategoryId = 9 };
+        var skill79 = new SkillEntity { Id = 79, Name = "Presenting", LevelCount = 0, CategoryId = 9 };
 
         // QA — Manual Testing (cat11)
-        var skill80 = new SkillEntity { Id = 80, Name = "Test Technieken",          LevelCount = 0, CategoryId = 11 };
-        var skill81 = new SkillEntity { Id = 81, Name = "# Testing Tools",          LevelCount = 0, CategoryId = 11 };
-        var skill82 = new SkillEntity { Id = 82, Name = "# Test Management Tool",   LevelCount = 0, CategoryId = 11 };
-        var skill83 = new SkillEntity { Id = 83, Name = "ISTQB Level Testing",      LevelCount = 0, CategoryId = 11 };
+        var skill80 = new SkillEntity { Id = 80, Name = "Test Technieken", LevelCount = 0, CategoryId = 11 };
+        var skill81 = new SkillEntity { Id = 81, Name = "# Testing Tools", LevelCount = 0, CategoryId = 11 };
+        var skill82 = new SkillEntity { Id = 82, Name = "# Test Management Tool", LevelCount = 0, CategoryId = 11 };
+        var skill83 = new SkillEntity { Id = 83, Name = "ISTQB Level Testing", LevelCount = 0, CategoryId = 11 };
         var skill84 = new SkillEntity { Id = 84, Name = "Test Plan en Methodologie", LevelCount = 0, CategoryId = 11 };
-        var skill85 = new SkillEntity { Id = 85, Name = "Reporting",                LevelCount = 0, CategoryId = 11 };
-        var skill86 = new SkillEntity { Id = 86, Name = "Coverage",                 LevelCount = 0, CategoryId = 11 };
-        var skill87 = new SkillEntity { Id = 87, Name = "Project Management",       LevelCount = 0, CategoryId = 11 };
+        var skill85 = new SkillEntity { Id = 85, Name = "Reporting", LevelCount = 0, CategoryId = 11 };
+        var skill86 = new SkillEntity { Id = 86, Name = "Coverage", LevelCount = 0, CategoryId = 11 };
+        var skill87 = new SkillEntity { Id = 87, Name = "Project Management", LevelCount = 0, CategoryId = 11 };
 
         // QA — Automated Testing (cat12)
-        var skill88 = new SkillEntity { Id = 88, Name = "# Coding Language(s)",   LevelCount = 0, CategoryId = 12 };
-        var skill89 = new SkillEntity { Id = 89, Name = "# Automation Tool(s)",   LevelCount = 0, CategoryId = 12 };
-        var skill90 = new SkillEntity { Id = 90, Name = "Front End",              LevelCount = 0, CategoryId = 12 };
-        var skill91 = new SkillEntity { Id = 91, Name = "Low Code",               LevelCount = 0, CategoryId = 12 };
+        var skill88 = new SkillEntity { Id = 88, Name = "# Coding Language(s)", LevelCount = 0, CategoryId = 12 };
+        var skill89 = new SkillEntity { Id = 89, Name = "# Automation Tool(s)", LevelCount = 0, CategoryId = 12 };
+        var skill90 = new SkillEntity { Id = 90, Name = "Front End", LevelCount = 0, CategoryId = 12 };
+        var skill91 = new SkillEntity { Id = 91, Name = "Low Code", LevelCount = 0, CategoryId = 12 };
         var skill92 = new SkillEntity { Id = 92, Name = "ISTQB Level Automation", LevelCount = 0, CategoryId = 12 };
-        var skill93 = new SkillEntity { Id = 93, Name = "Data Driven",            LevelCount = 0, CategoryId = 12 };
-        var skill94 = new SkillEntity { Id = 94, Name = "Continues Integration",  LevelCount = 0, CategoryId = 12 };
-        var skill95 = new SkillEntity { Id = 95, Name = "Back End",               LevelCount = 0, CategoryId = 12 };
+        var skill93 = new SkillEntity { Id = 93, Name = "Data Driven", LevelCount = 0, CategoryId = 12 };
+        var skill94 = new SkillEntity { Id = 94, Name = "Continues Integration", LevelCount = 0, CategoryId = 12 };
+        var skill95 = new SkillEntity { Id = 95, Name = "Back End", LevelCount = 0, CategoryId = 12 };
 
         // QA — Specialisaties (cat13)
-        var skill96  = new SkillEntity { Id = 96,  Name = "UI/UX",           LevelCount = 0, CategoryId = 13 };
-        var skill97  = new SkillEntity { Id = 97,  Name = "Load Testing",    LevelCount = 0, CategoryId = 13 };
-        var skill98  = new SkillEntity { Id = 98,  Name = "Security",        LevelCount = 0, CategoryId = 13 };
-        var skill99  = new SkillEntity { Id = 99,  Name = "AI and New Tech", LevelCount = 0, CategoryId = 13 };
-        var skill100 = new SkillEntity { Id = 100, Name = "Stay Relevant",   LevelCount = 0, CategoryId = 13 };
+        var skill96 = new SkillEntity { Id = 96, Name = "UI/UX", LevelCount = 0, CategoryId = 13 };
+        var skill97 = new SkillEntity { Id = 97, Name = "Load Testing", LevelCount = 0, CategoryId = 13 };
+        var skill98 = new SkillEntity { Id = 98, Name = "Security", LevelCount = 0, CategoryId = 13 };
+        var skill99 = new SkillEntity { Id = 99, Name = "AI and New Tech", LevelCount = 0, CategoryId = 13 };
+        var skill100 = new SkillEntity { Id = 100, Name = "Stay Relevant", LevelCount = 0, CategoryId = 13 };
         var skill101 = new SkillEntity { Id = 101, Name = "Management/Lead", LevelCount = 0, CategoryId = 13 };
 
         // QA — Cross Competence (cat14)
-        var skill102 = new SkillEntity { Id = 102, Name = "Analyse",          LevelCount = 0, CategoryId = 14 };
-        var skill103 = new SkillEntity { Id = 103, Name = "Java",             LevelCount = 0, CategoryId = 14 };
-        var skill104 = new SkillEntity { Id = 104, Name = ".NET",             LevelCount = 0, CategoryId = 14 };
+        var skill102 = new SkillEntity { Id = 102, Name = "Analyse", LevelCount = 0, CategoryId = 14 };
+        var skill103 = new SkillEntity { Id = 103, Name = "Java", LevelCount = 0, CategoryId = 14 };
+        var skill104 = new SkillEntity { Id = 104, Name = ".NET", LevelCount = 0, CategoryId = 14 };
         var skill105 = new SkillEntity { Id = 105, Name = "Code Conventions", LevelCount = 0, CategoryId = 14 };
-        var skill106 = new SkillEntity { Id = 106, Name = "Code Complete",    LevelCount = 0, CategoryId = 14 };
-        var skill107 = new SkillEntity { Id = 107, Name = "Giving Feedback",  LevelCount = 0, CategoryId = 14 };
-        var skill108 = new SkillEntity { Id = 108, Name = "Bug Reporting",    LevelCount = 0, CategoryId = 14 };
-        var skill109 = new SkillEntity { Id = 109, Name = "Bug Fixing",       LevelCount = 0, CategoryId = 14 };
-        var skill110 = new SkillEntity { Id = 110, Name = "Unit Testing",     LevelCount = 0, CategoryId = 14 };
+        var skill106 = new SkillEntity { Id = 106, Name = "Code Complete", LevelCount = 0, CategoryId = 14 };
+        var skill107 = new SkillEntity { Id = 107, Name = "Giving Feedback", LevelCount = 0, CategoryId = 14 };
+        var skill108 = new SkillEntity { Id = 108, Name = "Bug Reporting", LevelCount = 0, CategoryId = 14 };
+        var skill109 = new SkillEntity { Id = 109, Name = "Bug Fixing", LevelCount = 0, CategoryId = 14 };
+        var skill110 = new SkillEntity { Id = 110, Name = "Unit Testing", LevelCount = 0, CategoryId = 14 };
 
         // PO & Analysis — General Soft Skills (cat15)
-        var skill111 = new SkillEntity { Id = 111, Name = "Active Listening",   LevelCount = 0, CategoryId = 15 };
-        var skill112 = new SkillEntity { Id = 112, Name = "Communication",      LevelCount = 0, CategoryId = 15 };
-        var skill113 = new SkillEntity { Id = 113, Name = "Knowledge Sharing",  LevelCount = 0, CategoryId = 15 };
-        var skill114 = new SkillEntity { Id = 114, Name = "Presenting",         LevelCount = 0, CategoryId = 15 };
-        var skill115 = new SkillEntity { Id = 115, Name = "Teamwork",           LevelCount = 0, CategoryId = 15 };
+        var skill111 = new SkillEntity { Id = 111, Name = "Active Listening", LevelCount = 0, CategoryId = 15 };
+        var skill112 = new SkillEntity { Id = 112, Name = "Communication", LevelCount = 0, CategoryId = 15 };
+        var skill113 = new SkillEntity { Id = 113, Name = "Knowledge Sharing", LevelCount = 0, CategoryId = 15 };
+        var skill114 = new SkillEntity { Id = 114, Name = "Presenting", LevelCount = 0, CategoryId = 15 };
+        var skill115 = new SkillEntity { Id = 115, Name = "Teamwork", LevelCount = 0, CategoryId = 15 };
         var skill116 = new SkillEntity { Id = 116, Name = "Eagerness to Learn", LevelCount = 0, CategoryId = 15 };
-        var skill117 = new SkillEntity { Id = 117, Name = "Logical Thinking",   LevelCount = 0, CategoryId = 15 };
-        var skill118 = new SkillEntity { Id = 118, Name = "Empathy",            LevelCount = 0, CategoryId = 15 };
-        var skill119 = new SkillEntity { Id = 119, Name = "Collaboration",      LevelCount = 0, CategoryId = 15 };
-        var skill120 = new SkillEntity { Id = 120, Name = "Adaptability",       LevelCount = 0, CategoryId = 15 };
-        var skill121 = new SkillEntity { Id = 121, Name = "Eye for Detail",     LevelCount = 0, CategoryId = 15 };
-        var skill122 = new SkillEntity { Id = 122, Name = "Critical Thinking",  LevelCount = 0, CategoryId = 15 };
-        var skill123 = new SkillEntity { Id = 123, Name = "Story Telling",      LevelCount = 0, CategoryId = 15 };
-        var skill124 = new SkillEntity { Id = 124, Name = "Problem-Solving",    LevelCount = 0, CategoryId = 15 };
-        var skill125 = new SkillEntity { Id = 125, Name = "Business-Minded",    LevelCount = 0, CategoryId = 15 };
-        var skill126 = new SkillEntity { Id = 126, Name = "Mentoring",          LevelCount = 0, CategoryId = 15 };
-        var skill127 = new SkillEntity { Id = 127, Name = "Leadership",         LevelCount = 0, CategoryId = 15 };
-        var skill128 = new SkillEntity { Id = 128, Name = "Coaching",           LevelCount = 0, CategoryId = 15 };
-        var skill129 = new SkillEntity { Id = 129, Name = "Negotiation",        LevelCount = 0, CategoryId = 15 };
+        var skill117 = new SkillEntity { Id = 117, Name = "Logical Thinking", LevelCount = 0, CategoryId = 15 };
+        var skill118 = new SkillEntity { Id = 118, Name = "Empathy", LevelCount = 0, CategoryId = 15 };
+        var skill119 = new SkillEntity { Id = 119, Name = "Collaboration", LevelCount = 0, CategoryId = 15 };
+        var skill120 = new SkillEntity { Id = 120, Name = "Adaptability", LevelCount = 0, CategoryId = 15 };
+        var skill121 = new SkillEntity { Id = 121, Name = "Eye for Detail", LevelCount = 0, CategoryId = 15 };
+        var skill122 = new SkillEntity { Id = 122, Name = "Critical Thinking", LevelCount = 0, CategoryId = 15 };
+        var skill123 = new SkillEntity { Id = 123, Name = "Story Telling", LevelCount = 0, CategoryId = 15 };
+        var skill124 = new SkillEntity { Id = 124, Name = "Problem-Solving", LevelCount = 0, CategoryId = 15 };
+        var skill125 = new SkillEntity { Id = 125, Name = "Business-Minded", LevelCount = 0, CategoryId = 15 };
+        var skill126 = new SkillEntity { Id = 126, Name = "Mentoring", LevelCount = 0, CategoryId = 15 };
+        var skill127 = new SkillEntity { Id = 127, Name = "Leadership", LevelCount = 0, CategoryId = 15 };
+        var skill128 = new SkillEntity { Id = 128, Name = "Coaching", LevelCount = 0, CategoryId = 15 };
+        var skill129 = new SkillEntity { Id = 129, Name = "Negotiation", LevelCount = 0, CategoryId = 15 };
         var skill130 = new SkillEntity { Id = 130, Name = "Conflict Resolution", LevelCount = 0, CategoryId = 15 };
 
         // PO & Analysis — Product & Analyse Soft Skills (cat16)
-        var skill131 = new SkillEntity { Id = 131, Name = "Agile",                  LevelCount = 0, CategoryId = 16 };
-        var skill132 = new SkillEntity { Id = 132, Name = "Waterfall",              LevelCount = 0, CategoryId = 16 };
+        var skill131 = new SkillEntity { Id = 131, Name = "Agile", LevelCount = 0, CategoryId = 16 };
+        var skill132 = new SkillEntity { Id = 132, Name = "Waterfall", LevelCount = 0, CategoryId = 16 };
         var skill133 = new SkillEntity { Id = 133, Name = "Stakeholder Management", LevelCount = 0, CategoryId = 16 };
-        var skill134 = new SkillEntity { Id = 134, Name = "V-Model",                LevelCount = 0, CategoryId = 16 };
-        var skill135 = new SkillEntity { Id = 135, Name = "Project Management",     LevelCount = 0, CategoryId = 16 };
-        var skill136 = new SkillEntity { Id = 136, Name = "Scrum",                  LevelCount = 0, CategoryId = 16 };
-        var skill137 = new SkillEntity { Id = 137, Name = "Interviewing",           LevelCount = 0, CategoryId = 16 };
-        var skill138 = new SkillEntity { Id = 138, Name = "Decision Making",        LevelCount = 0, CategoryId = 16 };
-        var skill139 = new SkillEntity { Id = 139, Name = "Negotiation",            LevelCount = 0, CategoryId = 16 };
-        var skill140 = new SkillEntity { Id = 140, Name = "Prioritization",         LevelCount = 0, CategoryId = 16 };
-        var skill141 = new SkillEntity { Id = 141, Name = "Innovation",             LevelCount = 0, CategoryId = 16 };
-        var skill142 = new SkillEntity { Id = 142, Name = "Change Management",      LevelCount = 0, CategoryId = 16 };
+        var skill134 = new SkillEntity { Id = 134, Name = "V-Model", LevelCount = 0, CategoryId = 16 };
+        var skill135 = new SkillEntity { Id = 135, Name = "Project Management", LevelCount = 0, CategoryId = 16 };
+        var skill136 = new SkillEntity { Id = 136, Name = "Scrum", LevelCount = 0, CategoryId = 16 };
+        var skill137 = new SkillEntity { Id = 137, Name = "Interviewing", LevelCount = 0, CategoryId = 16 };
+        var skill138 = new SkillEntity { Id = 138, Name = "Decision Making", LevelCount = 0, CategoryId = 16 };
+        var skill139 = new SkillEntity { Id = 139, Name = "Negotiation", LevelCount = 0, CategoryId = 16 };
+        var skill140 = new SkillEntity { Id = 140, Name = "Prioritization", LevelCount = 0, CategoryId = 16 };
+        var skill141 = new SkillEntity { Id = 141, Name = "Innovation", LevelCount = 0, CategoryId = 16 };
+        var skill142 = new SkillEntity { Id = 142, Name = "Change Management", LevelCount = 0, CategoryId = 16 };
 
         // Business Analyst (cat17)
-        var skill143 = new SkillEntity { Id = 143, Name = "UML",                                    LevelCount = 0, CategoryId = 17 };
-        var skill144 = new SkillEntity { Id = 144, Name = "Basic Data Analysis (Excel)",             LevelCount = 0, CategoryId = 17 };
-        var skill145 = new SkillEntity { Id = 145, Name = "Basic SQL",                              LevelCount = 0, CategoryId = 17 };
+        var skill143 = new SkillEntity { Id = 143, Name = "UML", LevelCount = 0, CategoryId = 17 };
+        var skill144 = new SkillEntity { Id = 144, Name = "Basic Data Analysis (Excel)", LevelCount = 0, CategoryId = 17 };
+        var skill145 = new SkillEntity { Id = 145, Name = "Basic SQL", LevelCount = 0, CategoryId = 17 };
         var skill146 = new SkillEntity { Id = 146, Name = "Collaboration Tools (Jira, Confluence)", LevelCount = 0, CategoryId = 17 };
-        var skill147 = new SkillEntity { Id = 147, Name = "Documentation",                          LevelCount = 0, CategoryId = 17 };
-        var skill148 = new SkillEntity { Id = 148, Name = "Business Rule Writing",                  LevelCount = 0, CategoryId = 17 };
-        var skill149 = new SkillEntity { Id = 149, Name = "BPMN",                                   LevelCount = 0, CategoryId = 17 };
-        var skill150 = new SkillEntity { Id = 150, Name = "Process Optimisation",                   LevelCount = 0, CategoryId = 17 };
-        var skill151 = new SkillEntity { Id = 151, Name = "Data Modeling",                          LevelCount = 0, CategoryId = 17 };
-        var skill152 = new SkillEntity { Id = 152, Name = "Facilitating Workshops",                 LevelCount = 0, CategoryId = 17 };
-        var skill153 = new SkillEntity { Id = 153, Name = "Writing User Stories",                   LevelCount = 0, CategoryId = 17 };
-        var skill154 = new SkillEntity { Id = 154, Name = "Requirements Gathering",                 LevelCount = 0, CategoryId = 17 };
-        var skill155 = new SkillEntity { Id = 155, Name = "Test Case Writing",                      LevelCount = 0, CategoryId = 17 };
-        var skill156 = new SkillEntity { Id = 156, Name = "Advanced Knowledge of SQL",              LevelCount = 0, CategoryId = 17 };
-        var skill157 = new SkillEntity { Id = 157, Name = "Knowledge of BI-Tools",                  LevelCount = 0, CategoryId = 17 };
-        var skill158 = new SkillEntity { Id = 158, Name = "IT Architecture",                        LevelCount = 0, CategoryId = 17 };
-        var skill159 = new SkillEntity { Id = 159, Name = "Roadmapping",                            LevelCount = 0, CategoryId = 17 };
-        var skill160 = new SkillEntity { Id = 160, Name = "Enterprise Architecture",                LevelCount = 0, CategoryId = 17 };
+        var skill147 = new SkillEntity { Id = 147, Name = "Documentation", LevelCount = 0, CategoryId = 17 };
+        var skill148 = new SkillEntity { Id = 148, Name = "Business Rule Writing", LevelCount = 0, CategoryId = 17 };
+        var skill149 = new SkillEntity { Id = 149, Name = "BPMN", LevelCount = 0, CategoryId = 17 };
+        var skill150 = new SkillEntity { Id = 150, Name = "Process Optimisation", LevelCount = 0, CategoryId = 17 };
+        var skill151 = new SkillEntity { Id = 151, Name = "Data Modeling", LevelCount = 0, CategoryId = 17 };
+        var skill152 = new SkillEntity { Id = 152, Name = "Facilitating Workshops", LevelCount = 0, CategoryId = 17 };
+        var skill153 = new SkillEntity { Id = 153, Name = "Writing User Stories", LevelCount = 0, CategoryId = 17 };
+        var skill154 = new SkillEntity { Id = 154, Name = "Requirements Gathering", LevelCount = 0, CategoryId = 17 };
+        var skill155 = new SkillEntity { Id = 155, Name = "Test Case Writing", LevelCount = 0, CategoryId = 17 };
+        var skill156 = new SkillEntity { Id = 156, Name = "Advanced Knowledge of SQL", LevelCount = 0, CategoryId = 17 };
+        var skill157 = new SkillEntity { Id = 157, Name = "Knowledge of BI-Tools", LevelCount = 0, CategoryId = 17 };
+        var skill158 = new SkillEntity { Id = 158, Name = "IT Architecture", LevelCount = 0, CategoryId = 17 };
+        var skill159 = new SkillEntity { Id = 159, Name = "Roadmapping", LevelCount = 0, CategoryId = 17 };
+        var skill160 = new SkillEntity { Id = 160, Name = "Enterprise Architecture", LevelCount = 0, CategoryId = 17 };
 
         // Functional Analyst (cat18)
-        var skill161 = new SkillEntity { Id = 161, Name = "UML",                                    LevelCount = 0, CategoryId = 18 };
-        var skill162 = new SkillEntity { Id = 162, Name = "Basic Data Analysis (Excel)",             LevelCount = 0, CategoryId = 18 };
-        var skill163 = new SkillEntity { Id = 163, Name = "Basic SQL",                              LevelCount = 0, CategoryId = 18 };
+        var skill161 = new SkillEntity { Id = 161, Name = "UML", LevelCount = 0, CategoryId = 18 };
+        var skill162 = new SkillEntity { Id = 162, Name = "Basic Data Analysis (Excel)", LevelCount = 0, CategoryId = 18 };
+        var skill163 = new SkillEntity { Id = 163, Name = "Basic SQL", LevelCount = 0, CategoryId = 18 };
         var skill164 = new SkillEntity { Id = 164, Name = "Collaboration Tools (Jira, Confluence)", LevelCount = 0, CategoryId = 18 };
-        var skill165 = new SkillEntity { Id = 165, Name = "IT Architecture",                        LevelCount = 0, CategoryId = 18 };
-        var skill166 = new SkillEntity { Id = 166, Name = "BPMN",                                   LevelCount = 0, CategoryId = 18 };
-        var skill167 = new SkillEntity { Id = 167, Name = "Technical Documentation",                LevelCount = 0, CategoryId = 18 };
-        var skill168 = new SkillEntity { Id = 168, Name = "Process Optimisation",                   LevelCount = 0, CategoryId = 18 };
-        var skill169 = new SkillEntity { Id = 169, Name = "Data Modeling",                          LevelCount = 0, CategoryId = 18 };
-        var skill170 = new SkillEntity { Id = 170, Name = "Facilitating Workshops",                 LevelCount = 0, CategoryId = 18 };
-        var skill171 = new SkillEntity { Id = 171, Name = "Writing User Stories",                   LevelCount = 0, CategoryId = 18 };
-        var skill172 = new SkillEntity { Id = 172, Name = "Test Case Writing",                      LevelCount = 0, CategoryId = 18 };
-        var skill173 = new SkillEntity { Id = 173, Name = "System Config",                          LevelCount = 0, CategoryId = 18 };
-        var skill174 = new SkillEntity { Id = 174, Name = "UAT Testing",                            LevelCount = 0, CategoryId = 18 };
-        var skill175 = new SkillEntity { Id = 175, Name = "Advanced Knowledge of SQL",              LevelCount = 0, CategoryId = 18 };
-        var skill176 = new SkillEntity { Id = 176, Name = "Roadmapping",                            LevelCount = 0, CategoryId = 18 };
-        var skill177 = new SkillEntity { Id = 177, Name = "Release Management",                     LevelCount = 0, CategoryId = 18 };
-        var skill178 = new SkillEntity { Id = 178, Name = "CI/CD",                                  LevelCount = 0, CategoryId = 18 };
-        var skill179 = new SkillEntity { Id = 179, Name = "Enterprise Planning",                    LevelCount = 0, CategoryId = 18 };
+        var skill165 = new SkillEntity { Id = 165, Name = "IT Architecture", LevelCount = 0, CategoryId = 18 };
+        var skill166 = new SkillEntity { Id = 166, Name = "BPMN", LevelCount = 0, CategoryId = 18 };
+        var skill167 = new SkillEntity { Id = 167, Name = "Technical Documentation", LevelCount = 0, CategoryId = 18 };
+        var skill168 = new SkillEntity { Id = 168, Name = "Process Optimisation", LevelCount = 0, CategoryId = 18 };
+        var skill169 = new SkillEntity { Id = 169, Name = "Data Modeling", LevelCount = 0, CategoryId = 18 };
+        var skill170 = new SkillEntity { Id = 170, Name = "Facilitating Workshops", LevelCount = 0, CategoryId = 18 };
+        var skill171 = new SkillEntity { Id = 171, Name = "Writing User Stories", LevelCount = 0, CategoryId = 18 };
+        var skill172 = new SkillEntity { Id = 172, Name = "Test Case Writing", LevelCount = 0, CategoryId = 18 };
+        var skill173 = new SkillEntity { Id = 173, Name = "System Config", LevelCount = 0, CategoryId = 18 };
+        var skill174 = new SkillEntity { Id = 174, Name = "UAT Testing", LevelCount = 0, CategoryId = 18 };
+        var skill175 = new SkillEntity { Id = 175, Name = "Advanced Knowledge of SQL", LevelCount = 0, CategoryId = 18 };
+        var skill176 = new SkillEntity { Id = 176, Name = "Roadmapping", LevelCount = 0, CategoryId = 18 };
+        var skill177 = new SkillEntity { Id = 177, Name = "Release Management", LevelCount = 0, CategoryId = 18 };
+        var skill178 = new SkillEntity { Id = 178, Name = "CI/CD", LevelCount = 0, CategoryId = 18 };
+        var skill179 = new SkillEntity { Id = 179, Name = "Enterprise Planning", LevelCount = 0, CategoryId = 18 };
 
         // PO & Analysis — Cross Competence (cat20)
-        var skill180 = new SkillEntity { Id = 180, Name = "Manual Testing",                       LevelCount = 0, CategoryId = 20 };
-        var skill181 = new SkillEntity { Id = 181, Name = "Bug Logging",                          LevelCount = 0, CategoryId = 20 };
-        var skill182 = new SkillEntity { Id = 182, Name = "Mock-ups",                             LevelCount = 0, CategoryId = 20 };
+        var skill180 = new SkillEntity { Id = 180, Name = "Manual Testing", LevelCount = 0, CategoryId = 20 };
+        var skill181 = new SkillEntity { Id = 181, Name = "Bug Logging", LevelCount = 0, CategoryId = 20 };
+        var skill182 = new SkillEntity { Id = 182, Name = "Mock-ups", LevelCount = 0, CategoryId = 20 };
         var skill183 = new SkillEntity { Id = 183, Name = "Knowledge of Integrations/Interfaces", LevelCount = 0, CategoryId = 20 };
-        var skill184 = new SkillEntity { Id = 184, Name = "DevOps",                               LevelCount = 0, CategoryId = 20 };
-        var skill185 = new SkillEntity { Id = 185, Name = "Product Backlog",                      LevelCount = 0, CategoryId = 20 };
+        var skill184 = new SkillEntity { Id = 184, Name = "DevOps", LevelCount = 0, CategoryId = 20 };
+        var skill185 = new SkillEntity { Id = 185, Name = "Product Backlog", LevelCount = 0, CategoryId = 20 };
 
         // Product Owner (cat21)
-        var skill186 = new SkillEntity { Id = 186, Name = "User Story Writing",          LevelCount = 0, CategoryId = 21 };
-        var skill187 = new SkillEntity { Id = 187, Name = "Backlog Refinement",          LevelCount = 0, CategoryId = 21 };
-        var skill188 = new SkillEntity { Id = 188, Name = "Roadmapping",                 LevelCount = 0, CategoryId = 21 };
-        var skill189 = new SkillEntity { Id = 189, Name = "Prioritization",              LevelCount = 0, CategoryId = 21 };
-        var skill190 = new SkillEntity { Id = 190, Name = "Resource Planning",           LevelCount = 0, CategoryId = 21 };
-        var skill191 = new SkillEntity { Id = 191, Name = "KPI and Reporting",           LevelCount = 0, CategoryId = 21 };
-        var skill192 = new SkillEntity { Id = 192, Name = "Risk Management",             LevelCount = 0, CategoryId = 21 };
-        var skill193 = new SkillEntity { Id = 193, Name = "Release Management",          LevelCount = 0, CategoryId = 21 };
-        var skill194 = new SkillEntity { Id = 194, Name = "Team Alignment",              LevelCount = 0, CategoryId = 21 };
-        var skill195 = new SkillEntity { Id = 195, Name = "Product Strategy",            LevelCount = 0, CategoryId = 21 };
-        var skill196 = new SkillEntity { Id = 196, Name = "Product Vision",              LevelCount = 0, CategoryId = 21 };
-        var skill197 = new SkillEntity { Id = 197, Name = "Portfolio Management",        LevelCount = 0, CategoryId = 21 };
+        var skill186 = new SkillEntity { Id = 186, Name = "User Story Writing", LevelCount = 0, CategoryId = 21 };
+        var skill187 = new SkillEntity { Id = 187, Name = "Backlog Refinement", LevelCount = 0, CategoryId = 21 };
+        var skill188 = new SkillEntity { Id = 188, Name = "Roadmapping", LevelCount = 0, CategoryId = 21 };
+        var skill189 = new SkillEntity { Id = 189, Name = "Prioritization", LevelCount = 0, CategoryId = 21 };
+        var skill190 = new SkillEntity { Id = 190, Name = "Resource Planning", LevelCount = 0, CategoryId = 21 };
+        var skill191 = new SkillEntity { Id = 191, Name = "KPI and Reporting", LevelCount = 0, CategoryId = 21 };
+        var skill192 = new SkillEntity { Id = 192, Name = "Risk Management", LevelCount = 0, CategoryId = 21 };
+        var skill193 = new SkillEntity { Id = 193, Name = "Release Management", LevelCount = 0, CategoryId = 21 };
+        var skill194 = new SkillEntity { Id = 194, Name = "Team Alignment", LevelCount = 0, CategoryId = 21 };
+        var skill195 = new SkillEntity { Id = 195, Name = "Product Strategy", LevelCount = 0, CategoryId = 21 };
+        var skill196 = new SkillEntity { Id = 196, Name = "Product Vision", LevelCount = 0, CategoryId = 21 };
+        var skill197 = new SkillEntity { Id = 197, Name = "Portfolio Management", LevelCount = 0, CategoryId = 21 };
         var skill198 = new SkillEntity { Id = 198, Name = "Product Development Strategy", LevelCount = 0, CategoryId = 21 };
 
         // .NET Backend — with 7-niveau level descriptors (cat22)
         var skill199 = new SkillEntity
         {
-            Id = 199, Name = "C#", LevelCount = 7, CategoryId = 22,
+            Id = 199,
+            Name = "C#",
+            LevelCount = 7,
+            CategoryId = 22,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Basis syntax, OOP" },
@@ -370,7 +416,10 @@ public static class SeedData
         };
         var skill200 = new SkillEntity
         {
-            Id = 200, Name = ".NET", LevelCount = 6, CategoryId = 22,
+            Id = 200,
+            Name = ".NET",
+            LevelCount = 6,
+            CategoryId = 22,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = ".NET 8-10 basics" },
@@ -383,7 +432,10 @@ public static class SeedData
         };
         var skill201 = new SkillEntity
         {
-            Id = 201, Name = "Dependency Injection", LevelCount = 7, CategoryId = 22,
+            Id = 201,
+            Name = "Dependency Injection",
+            LevelCount = 7,
+            CategoryId = 22,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "DI concept" },
@@ -397,7 +449,10 @@ public static class SeedData
         };
         var skill202 = new SkillEntity
         {
-            Id = 202, Name = "ASP.NET Core", LevelCount = 6, CategoryId = 22,
+            Id = 202,
+            Name = "ASP.NET Core",
+            LevelCount = 6,
+            CategoryId = 22,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Controllers, Routing" },
@@ -412,7 +467,10 @@ public static class SeedData
         // Java Backend — with 7-niveau level descriptors (cat23)
         var skill203 = new SkillEntity
         {
-            Id = 203, Name = "Java & JVM", LevelCount = 7, CategoryId = 23,
+            Id = 203,
+            Name = "Java & JVM",
+            LevelCount = 7,
+            CategoryId = 23,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Basis syntax, OOP" },
@@ -426,7 +484,10 @@ public static class SeedData
         };
         var skill204 = new SkillEntity
         {
-            Id = 204, Name = "Java Platform", LevelCount = 7, CategoryId = 23,
+            Id = 204,
+            Name = "Java Platform",
+            LevelCount = 7,
+            CategoryId = 23,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "JDK basics, Maven/Gradle" },
@@ -440,7 +501,10 @@ public static class SeedData
         };
         var skill205 = new SkillEntity
         {
-            Id = 205, Name = "Dependency Injection", LevelCount = 7, CategoryId = 23,
+            Id = 205,
+            Name = "Dependency Injection",
+            LevelCount = 7,
+            CategoryId = 23,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "DI concept" },
@@ -454,7 +518,10 @@ public static class SeedData
         };
         var skill206 = new SkillEntity
         {
-            Id = 206, Name = "Spring Boot", LevelCount = 5, CategoryId = 23,
+            Id = 206,
+            Name = "Spring Boot",
+            LevelCount = 5,
+            CategoryId = 23,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Controllers" },
@@ -468,7 +535,10 @@ public static class SeedData
         // Code Skills General — universal (cat24)
         var skill207 = new SkillEntity
         {
-            Id = 207, Name = "API Design", LevelCount = 7, CategoryId = 24,
+            Id = 207,
+            Name = "API Design",
+            LevelCount = 7,
+            CategoryId = 24,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "REST API basics" },
@@ -482,7 +552,10 @@ public static class SeedData
         };
         var skill208 = new SkillEntity
         {
-            Id = 208, Name = "Security", LevelCount = 7, CategoryId = 24,
+            Id = 208,
+            Name = "Security",
+            LevelCount = 7,
+            CategoryId = 24,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Basic authentication and authorization" },
@@ -496,7 +569,10 @@ public static class SeedData
         };
         var skill209 = new SkillEntity
         {
-            Id = 209, Name = "Performance", LevelCount = 6, CategoryId = 24,
+            Id = 209,
+            Name = "Performance",
+            LevelCount = 6,
+            CategoryId = 24,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Awareness" },
@@ -511,7 +587,10 @@ public static class SeedData
         // Database (cat25)
         var skill210 = new SkillEntity
         {
-            Id = 210, Name = "DBMS/SQL", LevelCount = 7, CategoryId = 25,
+            Id = 210,
+            Name = "DBMS/SQL",
+            LevelCount = 7,
+            CategoryId = 25,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "SQL basics (SELECT, WHERE), Joins, CRUD operations" },
@@ -527,7 +606,10 @@ public static class SeedData
         // Version Control (cat26)
         var skill211 = new SkillEntity
         {
-            Id = 211, Name = "Version Control", LevelCount = 7, CategoryId = 26,
+            Id = 211,
+            Name = "Version Control",
+            LevelCount = 7,
+            CategoryId = 26,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Git clone, commit, push, Basic conflicts oplossen" },
@@ -543,7 +625,10 @@ public static class SeedData
         // Code Quality (cat27)
         var skill212 = new SkillEntity
         {
-            Id = 212, Name = "Clean Code", LevelCount = 7, CategoryId = 27,
+            Id = 212,
+            Name = "Clean Code",
+            LevelCount = 7,
+            CategoryId = 27,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Naamgeving, formatting, Code comments" },
@@ -557,7 +642,10 @@ public static class SeedData
         };
         var skill213 = new SkillEntity
         {
-            Id = 213, Name = "Design Patterns", LevelCount = 7, CategoryId = 27,
+            Id = 213,
+            Name = "Design Patterns",
+            LevelCount = 7,
+            CategoryId = 27,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Begrip design patterns, Observer, Decorator" },
@@ -573,7 +661,10 @@ public static class SeedData
         // Testing & QA (cat29)
         var skill214 = new SkillEntity
         {
-            Id = 214, Name = "Unit Testing", LevelCount = 7, CategoryId = 29,
+            Id = 214,
+            Name = "Unit Testing",
+            LevelCount = 7,
+            CategoryId = 29,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "xUnit/NUnit basics, Assertions" },
@@ -587,7 +678,10 @@ public static class SeedData
         };
         var skill215 = new SkillEntity
         {
-            Id = 215, Name = "Integration Testing", LevelCount = 6, CategoryId = 29,
+            Id = 215,
+            Name = "Integration Testing",
+            LevelCount = 6,
+            CategoryId = 29,
             Levels =
             [
                 new SkillLevelEntity { Level = 2, Descriptor = "Test setup begrip" },
@@ -600,7 +694,10 @@ public static class SeedData
         };
         var skill216 = new SkillEntity
         {
-            Id = 216, Name = "Code Coverage", LevelCount = 7, CategoryId = 29,
+            Id = 216,
+            Name = "Code Coverage",
+            LevelCount = 7,
+            CategoryId = 29,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Tests uitvoeren, Mutation testing begrip" },
@@ -616,7 +713,10 @@ public static class SeedData
         // DevOps/Cloud (cat30)
         var skill217 = new SkillEntity
         {
-            Id = 217, Name = "CI/CD", LevelCount = 7, CategoryId = 30,
+            Id = 217,
+            Name = "CI/CD",
+            LevelCount = 7,
+            CategoryId = 30,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Pipeline begrip, Docker begrip" },
@@ -630,7 +730,10 @@ public static class SeedData
         };
         var skill218 = new SkillEntity
         {
-            Id = 218, Name = "Monitoring & Logging", LevelCount = 7, CategoryId = 30,
+            Id = 218,
+            Name = "Monitoring & Logging",
+            LevelCount = 7,
+            CategoryId = 30,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Logging gebruiken, Debug tools" },
@@ -644,7 +747,10 @@ public static class SeedData
         };
         var skill219 = new SkillEntity
         {
-            Id = 219, Name = "Infrastructure/Cloud", LevelCount = 5, CategoryId = 30,
+            Id = 219,
+            Name = "Infrastructure/Cloud",
+            LevelCount = 5,
+            CategoryId = 30,
             Levels =
             [
                 new SkillLevelEntity { Level = 3, Descriptor = "Resource management" },
@@ -658,7 +764,10 @@ public static class SeedData
         // Soft Skills (cat31)
         var skill220 = new SkillEntity
         {
-            Id = 220, Name = "Communicatie", LevelCount = 7, CategoryId = 31,
+            Id = 220,
+            Name = "Communicatie",
+            LevelCount = 7,
+            CategoryId = 31,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Vragen stellen, Feedback ontvangen" },
@@ -672,7 +781,10 @@ public static class SeedData
         };
         var skill221 = new SkillEntity
         {
-            Id = 221, Name = "Samenwerking", LevelCount = 7, CategoryId = 31,
+            Id = 221,
+            Name = "Samenwerking",
+            LevelCount = 7,
+            CategoryId = 31,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Code reviews ontvangen, Scrum ceremonies" },
@@ -686,7 +798,10 @@ public static class SeedData
         };
         var skill222 = new SkillEntity
         {
-            Id = 222, Name = "Probleemoplossing", LevelCount = 7, CategoryId = 31,
+            Id = 222,
+            Name = "Probleemoplossing",
+            LevelCount = 7,
+            CategoryId = 31,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Debuggen met hulp, Tickets oppakken" },
@@ -700,7 +815,10 @@ public static class SeedData
         };
         var skill223 = new SkillEntity
         {
-            Id = 223, Name = "Agile & Scrum", LevelCount = 7, CategoryId = 31,
+            Id = 223,
+            Name = "Agile & Scrum",
+            LevelCount = 7,
+            CategoryId = 31,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Ceremonies bijwonen, User stories begrijpen" },
@@ -716,7 +834,10 @@ public static class SeedData
         // Frontend (cat32)
         var skill224 = new SkillEntity
         {
-            Id = 224, Name = "HTML/CSS", LevelCount = 7, CategoryId = 32,
+            Id = 224,
+            Name = "HTML/CSS",
+            LevelCount = 7,
+            CategoryId = 32,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Semantische HTML, Basis CSS styling" },
@@ -730,7 +851,10 @@ public static class SeedData
         };
         var skill225 = new SkillEntity
         {
-            Id = 225, Name = "JavaScript/TypeScript", LevelCount = 7, CategoryId = 32,
+            Id = 225,
+            Name = "JavaScript/TypeScript",
+            LevelCount = 7,
+            CategoryId = 32,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "ES6 basics, Async/await" },
@@ -744,7 +868,10 @@ public static class SeedData
         };
         var skill226 = new SkillEntity
         {
-            Id = 226, Name = "Framework", LevelCount = 7, CategoryId = 32,
+            Id = 226,
+            Name = "Framework",
+            LevelCount = 7,
+            CategoryId = 32,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "1 framework basics, Props/events, React/Angular/Vue" },
@@ -758,7 +885,10 @@ public static class SeedData
         };
         var skill227 = new SkillEntity
         {
-            Id = 227, Name = "UI/UX", LevelCount = 7, CategoryId = 32,
+            Id = 227,
+            Name = "UI/UX",
+            LevelCount = 7,
+            CategoryId = 32,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Component gebruik" },
@@ -774,7 +904,10 @@ public static class SeedData
         // Verantwoordelijkheden (cat35)
         var skill228 = new SkillEntity
         {
-            Id = 228, Name = "Project/Scope", LevelCount = 7, CategoryId = 35,
+            Id = 228,
+            Name = "Project/Scope",
+            LevelCount = 7,
+            CategoryId = 35,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Taken/tickets" },
@@ -788,7 +921,10 @@ public static class SeedData
         };
         var skill229 = new SkillEntity
         {
-            Id = 229, Name = "Autonomie", LevelCount = 7, CategoryId = 35,
+            Id = 229,
+            Name = "Autonomie",
+            LevelCount = 7,
+            CategoryId = 35,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Begeleiding nodig" },
@@ -802,7 +938,10 @@ public static class SeedData
         };
         var skill230 = new SkillEntity
         {
-            Id = 230, Name = "Impact", LevelCount = 7, CategoryId = 35,
+            Id = 230,
+            Name = "Impact",
+            LevelCount = 7,
+            CategoryId = 35,
             Levels =
             [
                 new SkillLevelEntity { Level = 1, Descriptor = "Persoonlijke output" },
@@ -850,6 +989,17 @@ public static class SeedData
             skill220, skill221, skill222, skill223,
             skill224, skill225, skill226, skill227,
             skill228, skill229, skill230
+        );
+
+        await db.SaveChangesAsync();
+
+        // Skill prerequisites
+        db.SkillPrerequisites.AddRange(
+            // .NET: ASP.NET Core requires C# and .NET framework knowledge
+            new SkillPrerequisiteEntity { SkillId = 26, PrerequisiteSkillId = 23 }, // ASP.NET Core → C#
+            new SkillPrerequisiteEntity { SkillId = 26, PrerequisiteSkillId = 24 }, // ASP.NET Core → .NET
+                                                                                    // .NET: Dependency Injection requires .NET basics
+            new SkillPrerequisiteEntity { SkillId = 25, PrerequisiteSkillId = 24 }  // DI → .NET
         );
 
         await db.SaveChangesAsync();
@@ -955,6 +1105,7 @@ public static class SeedData
     {
         if (!await db.ConsultantProfiles.AnyAsync())
         {
+            // Assign learner@test.local to the .NET profile (TeamId = 2)
             var learner = db.Users.FirstOrDefault(u => u.Email == "learner@test.local");
             if (learner != null)
             {

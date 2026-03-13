@@ -34,5 +34,8 @@ public class CourseEntity
     [ForeignKey(nameof(TeamId))]
     public TeamEntity? Team { get; set; }
 
+    public IList<CourseResourceEntity> Resources { get; set; } = [];
+
+
     public override string ToString() => $"{Name} ({Category})";
 }

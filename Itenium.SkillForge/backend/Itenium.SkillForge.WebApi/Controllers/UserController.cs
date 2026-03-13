@@ -31,7 +31,7 @@ public class UserController : ControllerBase
 
         if (_currentUser.Teams.Count > 0)
         {
-            return Ok(await _userService.GetTeamMembersAsync(_currentUser.Teams.ToArray()));
+            return Ok(await _userService.GetTeamMembersAsync(_currentUser.Teams));
         }
 
         var self = await _userService.GetUserByIdAsync(_currentUser.UserId!);
@@ -50,7 +50,7 @@ public class UserController : ControllerBase
             return Ok(new List<UserDto>());
         }
 
-        return Ok(await _userService.GetCoachesForTeamsAsync(_currentUser.Teams.ToArray()));
+        return Ok(await _userService.GetCoachesForTeamsAsync(_currentUser.Teams));
     }
 
     /// <summary>
@@ -72,6 +72,16 @@ public class UserController : ControllerBase
     {
         var user = await _userService.GetUserByIdAsync(userId);
         return user == null ? NotFound() : Ok(user);
+    }
+
+    /// <summary>
+    /// Get all backoffice users (for feedback recipient selection).
+    /// </summary>
+    [HttpGet("admins")]
+    [Authorize(Roles = "manager,backoffice")]
+    public async Task<ActionResult<IList<UserDto>>> GetAdmins()
+    {
+        return Ok(await _userService.GetAdminUsersAsync());
     }
 
     /// <summary>

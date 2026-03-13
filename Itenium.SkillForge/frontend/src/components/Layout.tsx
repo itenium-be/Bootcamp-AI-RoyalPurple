@@ -232,6 +232,7 @@ export function Layout() {
     { path: '/my-progress', icon: TrendingUp, label: t('nav.myProgress') },
     { path: '/my-certificates', icon: GraduationCap, label: t('nav.myCertificates') },
     { path: '/roadmap', icon: TrendingUp, label: t('nav.myRoadmap') },
+    { path: '/feedback', icon: MessageSquare, label: t('nav.feedback') },
   ];
 
   // Catalog - shown for all users
@@ -239,9 +240,11 @@ export function Layout() {
 
   // Team section - shown for managers
   const teamNavItems = [
+    { path: '/coach', icon: GraduationCap, label: t('nav.teamOverview') },
     { path: '/admin/users', icon: Users, label: t('nav.teamMembers') },
     { path: '/team/progress', icon: BarChart3, label: t('nav.teamProgress') },
     { path: '/team/assignments', icon: ClipboardList, label: t('nav.assignments') },
+    { path: '/feedback', icon: MessageSquare, label: t('nav.feedback') },
     { path: '/team/profiles', icon: Award, label: t('nav.skillProfiles') },
   ];
 

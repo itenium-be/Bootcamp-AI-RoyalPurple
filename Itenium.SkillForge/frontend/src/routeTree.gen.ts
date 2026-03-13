@@ -14,11 +14,14 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticated/roadmap'
 import { Route as AuthenticatedMyProfileRouteImport } from './routes/_authenticated/my-profile'
+import { Route as AuthenticatedFeedbackRouteImport } from './routes/_authenticated/feedback'
 import { Route as AuthenticatedCoursesRouteImport } from './routes/_authenticated/courses'
+import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
+import { Route as AuthenticatedTeamProfilesRouteImport } from './routes/_authenticated/team/profiles'
+import { Route as AuthenticatedReportsFeedbackRouteImport } from './routes/_authenticated/reports/feedback'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authenticated/admin/teams'
-import { Route as AuthenticatedTeamProfilesRouteImport } from './routes/_authenticated/team/profiles'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -44,9 +47,19 @@ const AuthenticatedMyProfileRoute = AuthenticatedMyProfileRouteImport.update({
   path: '/my-profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFeedbackRoute = AuthenticatedFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCoursesRoute = AuthenticatedCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const authSignInRoute = authSignInRouteImport.update({
@@ -54,6 +67,18 @@ const authSignInRoute = authSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTeamProfilesRoute =
+  AuthenticatedTeamProfilesRouteImport.update({
+    id: '/team/profiles',
+    path: '/team/profiles',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsFeedbackRoute =
+  AuthenticatedReportsFeedbackRouteImport.update({
+    id: '/reports/feedback',
+    path: '/reports/feedback',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/admin/users',
   path: '/admin/users',
@@ -64,81 +89,94 @@ const AuthenticatedAdminTeamsRoute = AuthenticatedAdminTeamsRouteImport.update({
   path: '/admin/teams',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedTeamProfilesRoute = AuthenticatedTeamProfilesRouteImport.update({
-  id: '/team/profiles',
-  path: '/team/profiles',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/sign-in': typeof authSignInRoute
+  '/coach': typeof AuthenticatedCoachRoute
   '/courses': typeof AuthenticatedCoursesRoute
-  '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/feedback': typeof AuthenticatedFeedbackRoute
   '/my-profile': typeof AuthenticatedMyProfileRoute
+  '/roadmap': typeof AuthenticatedRoadmapRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/reports/feedback': typeof AuthenticatedReportsFeedbackRoute
   '/team/profiles': typeof AuthenticatedTeamProfilesRoute
 }
 export interface FileRoutesByTo {
   '/sign-in': typeof authSignInRoute
+  '/coach': typeof AuthenticatedCoachRoute
   '/courses': typeof AuthenticatedCoursesRoute
-  '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/feedback': typeof AuthenticatedFeedbackRoute
   '/my-profile': typeof AuthenticatedMyProfileRoute
+  '/roadmap': typeof AuthenticatedRoadmapRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/reports/feedback': typeof AuthenticatedReportsFeedbackRoute
   '/team/profiles': typeof AuthenticatedTeamProfilesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/(auth)/sign-in': typeof authSignInRoute
+  '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/courses': typeof AuthenticatedCoursesRoute
-  '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
+  '/_authenticated/feedback': typeof AuthenticatedFeedbackRoute
   '/_authenticated/my-profile': typeof AuthenticatedMyProfileRoute
+  '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/reports/feedback': typeof AuthenticatedReportsFeedbackRoute
   '/_authenticated/team/profiles': typeof AuthenticatedTeamProfilesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/sign-in'
+    | '/coach'
     | '/courses'
-    | '/roadmap'
+    | '/feedback'
     | '/my-profile'
+    | '/roadmap'
     | '/settings'
     | '/'
     | '/admin/teams'
     | '/admin/users'
+    | '/reports/feedback'
     | '/team/profiles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/sign-in'
+    | '/coach'
     | '/courses'
-    | '/roadmap'
+    | '/feedback'
     | '/my-profile'
+    | '/roadmap'
     | '/settings'
     | '/'
     | '/admin/teams'
     | '/admin/users'
+    | '/reports/feedback'
     | '/team/profiles'
   id:
     | '__root__'
     | '/_authenticated'
     | '/(auth)/sign-in'
+    | '/_authenticated/coach'
     | '/_authenticated/courses'
-    | '/_authenticated/roadmap'
+    | '/_authenticated/feedback'
     | '/_authenticated/my-profile'
+    | '/_authenticated/roadmap'
     | '/_authenticated/settings'
     | '/_authenticated/'
     | '/_authenticated/admin/teams'
     | '/_authenticated/admin/users'
+    | '/_authenticated/reports/feedback'
     | '/_authenticated/team/profiles'
   fileRoutesById: FileRoutesById
 }
@@ -184,11 +222,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/feedback': {
+      id: '/_authenticated/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof AuthenticatedFeedbackRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/courses': {
       id: '/_authenticated/courses'
       path: '/courses'
       fullPath: '/courses'
       preLoaderRoute: typeof AuthenticatedCoursesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/coach': {
+      id: '/_authenticated/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof AuthenticatedCoachRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/(auth)/sign-in': {
@@ -197,6 +249,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/sign-in'
       preLoaderRoute: typeof authSignInRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/team/profiles': {
+      id: '/_authenticated/team/profiles'
+      path: '/team/profiles'
+      fullPath: '/team/profiles'
+      preLoaderRoute: typeof AuthenticatedTeamProfilesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/feedback': {
+      id: '/_authenticated/reports/feedback'
+      path: '/reports/feedback'
+      fullPath: '/reports/feedback'
+      preLoaderRoute: typeof AuthenticatedReportsFeedbackRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
@@ -212,35 +278,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTeamsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/team/profiles': {
-      id: '/_authenticated/team/profiles'
-      path: '/team/profiles'
-      fullPath: '/team/profiles'
-      preLoaderRoute: typeof AuthenticatedTeamProfilesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedCoursesRoute: typeof AuthenticatedCoursesRoute
-  AuthenticatedRoadmapRoute: typeof AuthenticatedRoadmapRoute
+  AuthenticatedFeedbackRoute: typeof AuthenticatedFeedbackRoute
   AuthenticatedMyProfileRoute: typeof AuthenticatedMyProfileRoute
+  AuthenticatedRoadmapRoute: typeof AuthenticatedRoadmapRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedReportsFeedbackRoute: typeof AuthenticatedReportsFeedbackRoute
   AuthenticatedTeamProfilesRoute: typeof AuthenticatedTeamProfilesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedCoursesRoute: AuthenticatedCoursesRoute,
-  AuthenticatedRoadmapRoute: AuthenticatedRoadmapRoute,
+  AuthenticatedFeedbackRoute: AuthenticatedFeedbackRoute,
   AuthenticatedMyProfileRoute: AuthenticatedMyProfileRoute,
+  AuthenticatedRoadmapRoute: AuthenticatedRoadmapRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedReportsFeedbackRoute: AuthenticatedReportsFeedbackRoute,
   AuthenticatedTeamProfilesRoute: AuthenticatedTeamProfilesRoute,
 }
 

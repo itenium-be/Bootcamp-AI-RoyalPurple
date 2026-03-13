@@ -19,11 +19,20 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<SkillEntity> Skills => Set<SkillEntity>();
 
+    public DbSet<UserActivityEntity> UserActivities => Set<UserActivityEntity>();
+
     public DbSet<SkillLevelEntity> SkillLevels => Set<SkillLevelEntity>();
 
     public DbSet<SkillPrerequisiteEntity> SkillPrerequisites => Set<SkillPrerequisiteEntity>();
 
+    public DbSet<FeedbackEntity> Feedbacks => Set<FeedbackEntity>();
+
+    public DbSet<FeedbackCommentEntity> FeedbackComments => Set<FeedbackCommentEntity>();
+
     public DbSet<ConsultantProfileEntity> ConsultantProfiles => Set<ConsultantProfileEntity>();
+
+    public DbSet<CourseResourceEntity> CourseResources => Set<CourseResourceEntity>();
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

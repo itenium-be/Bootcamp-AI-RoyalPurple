@@ -26,6 +26,7 @@ const node = (overrides: Partial<RoadmapNode> = {}): RoadmapNode => ({
   description: null,
   tier: 1,
   teamId: 1,
+  prerequisites: [],
   ...overrides,
 });
 
@@ -92,6 +93,25 @@ describe('Roadmap', () => {
     render(<Roadmap />);
     fireEvent.click(screen.getByText('roadmap.showAll'));
     expect(screen.queryByText('roadmap.showAll')).not.toBeInTheDocument();
+  });
+
+  it('shows prerequisite warning when skill has prerequisites', () => {
+    mockUseQuery.mockReturnValue({
+      data: [node({ name: 'Spring Boot', prerequisites: ['Java Basics', 'OOP Fundamentals'] })],
+      isLoading: false,
+    });
+    render(<Roadmap />);
+    expect(screen.getByText(/Java Basics/)).toBeInTheDocument();
+    expect(screen.getByText(/OOP Fundamentals/)).toBeInTheDocument();
+  });
+
+  it('does not show prerequisite warning when skill has no prerequisites', () => {
+    mockUseQuery.mockReturnValue({
+      data: [node({ prerequisites: [] })],
+      isLoading: false,
+    });
+    render(<Roadmap />);
+    expect(screen.queryByText('roadmap.prerequisites')).not.toBeInTheDocument();
   });
 
   it('does not show Show All button when list is empty', () => {

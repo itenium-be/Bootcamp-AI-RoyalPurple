@@ -24,6 +24,7 @@ try
 
     builder.Services.AddScoped<ISkillForgeUser, SkillForgeUser>();
     builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddScoped<IDashboardService, DashboardService>();
 
     builder.AddForgeControllers();
     builder.AddForgeSwagger();

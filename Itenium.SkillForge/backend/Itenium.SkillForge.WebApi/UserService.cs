@@ -27,7 +27,7 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<IList<UserDto>> GetTeamMembersAsync(int[] teamIds)
+    public async Task<IList<UserDto>> GetTeamMembersAsync(ICollection<int> teamIds)
     {
         var found = new HashSet<ForgeUser>();
         foreach (var teamId in teamIds)
@@ -49,7 +49,7 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<IList<UserDto>> GetCoachesForTeamsAsync(int[] teamIds)
+    public async Task<IList<UserDto>> GetCoachesForTeamsAsync(ICollection<int> teamIds)
     {
         var found = new HashSet<ForgeUser>();
         foreach (var teamId in teamIds)
@@ -68,6 +68,18 @@ public class UserService : IUserService
 
         var result = new List<UserDto>();
         foreach (var user in found)
+        {
+            result.Add(await ToDto(user));
+        }
+
+        return result;
+    }
+
+    public async Task<IList<UserDto>> GetAdminUsersAsync()
+    {
+        var users = await _userManager.GetUsersInRoleAsync("backoffice");
+        var result = new List<UserDto>();
+        foreach (var user in users)
         {
             result.Add(await ToDto(user));
         }
@@ -124,7 +136,7 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<bool> AssignTeamsAsync(string userId, int[] teamIds)
+    public async Task<bool> AssignTeamsAsync(string userId, ICollection<int> teamIds)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)

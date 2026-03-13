@@ -11,6 +11,10 @@ namespace Itenium.SkillForge.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Clear existing skills — they will be reseeded. Required because CategoryId
+            // defaults to 0 and no SkillCategories row with Id=0 exists yet.
+            migrationBuilder.Sql("DELETE FROM \"Skills\";");
+
             migrationBuilder.DropForeignKey(
                 name: "FK_Skills_Teams_TeamId",
                 table: "Skills");
@@ -48,6 +52,9 @@ namespace Itenium.SkillForge.Data.Migrations
                         principalTable: "Teams",
                         principalColumn: "Id");
                 });
+
+            // Clear any skills seeded by AddSkills migration — they will be re-seeded with proper categories
+            migrationBuilder.Sql("DELETE FROM \"Skills\";");
 
             migrationBuilder.AddColumn<int>(
                 name: "CategoryId",
