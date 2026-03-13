@@ -81,7 +81,7 @@ public class UserService : IUserService
         return user == null ? null : await ToDto(user);
     }
 
-    public async Task<UserDto?> CreateUserAsync(CreateUserRequest request)
+    public async Task<CreateUserResult> CreateUserAsync(CreateUserRequest request)
     {
         var user = new ForgeUser
         {
@@ -95,7 +95,10 @@ public class UserService : IUserService
         var result = await _userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
         {
-            return null;
+            var errors = result.Errors
+                .Select(e => new UserError(e.Code, e.Description))
+                .ToList();
+            return CreateUserResult.Failure(errors);
         }
 
         await _userManager.AddToRoleAsync(user, request.Role);
@@ -104,7 +107,7 @@ public class UserService : IUserService
             await _userManager.AddClaimAsync(user, new Claim("team", teamId.ToString(CultureInfo.InvariantCulture)));
         }
 
-        return await ToDto(user);
+        return CreateUserResult.Success(await ToDto(user));
     }
 
     public async Task<bool> AssignRoleAsync(string userId, string role)

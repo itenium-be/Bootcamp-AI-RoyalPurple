@@ -171,7 +171,7 @@ public class UserControllerTests
     public async Task CreateUser_ReturnsCreatedUser()
     {
         var request = new CreateUserRequest("alice", "alice@test.local", "Pass123!", "Alice", "Smith", "learner", [1]);
-        _userService.CreateUserAsync(request).Returns(Alice);
+        _userService.CreateUserAsync(request).Returns(CreateUserResult.Success(Alice));
 
         var result = await _sut.CreateUser(request);
 
@@ -181,14 +181,17 @@ public class UserControllerTests
     }
 
     [Test]
-    public async Task CreateUser_WhenServiceReturnsNull_ReturnsBadRequest()
+    public async Task CreateUser_WhenServiceFails_ReturnsBadRequestWithErrors()
     {
         var request = new CreateUserRequest("alice", "alice@test.local", "weak", "Alice", "Smith", "learner", []);
-        _userService.CreateUserAsync(request).Returns((UserDto?)null);
+        var errors = new[] { new UserError("PasswordTooShort", "Password must be at least 8 characters.") };
+        _userService.CreateUserAsync(request).Returns(CreateUserResult.Failure(errors));
 
         var result = await _sut.CreateUser(request);
 
-        Assert.That(result.Result, Is.TypeOf<BadRequestResult>());
+        var badRequest = result.Result as BadRequestObjectResult;
+        Assert.That(badRequest, Is.Not.Null);
+        Assert.That(badRequest!.Value, Is.InstanceOf<IReadOnlyList<UserError>>());
     }
 
     // PUT /api/user/{id}/role
