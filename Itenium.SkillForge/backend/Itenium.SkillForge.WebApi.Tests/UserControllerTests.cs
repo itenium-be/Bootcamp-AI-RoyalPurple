@@ -2,6 +2,7 @@ using Itenium.SkillForge.Services;
 using Itenium.SkillForge.WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using NSubstitute.Core.Arguments;
 
 namespace Itenium.SkillForge.WebApi.Tests;
 
@@ -48,7 +49,7 @@ public class UserControllerTests
         IList<UserDto> teamMembers = [Alice, Bob];
         _currentUser.IsBackOffice.Returns(false);
         _currentUser.Teams.Returns(TeamIds12);
-        _userService.GetTeamMembersAsync(TeamIds12).Returns(teamMembers);
+        _userService.GetTeamMembersAsync(Arg.Is<int[]>(a => a.SequenceEqual(TeamIds12))).Returns(teamMembers);
 
         var result = await _sut.GetUsers();
 
@@ -80,7 +81,7 @@ public class UserControllerTests
         IList<UserDto> teamMembers = [Alice];
         _currentUser.IsBackOffice.Returns(false);
         _currentUser.Teams.Returns(TeamIds1);
-        _userService.GetTeamMembersAsync(TeamIds1).Returns(teamMembers);
+        _userService.GetTeamMembersAsync(Arg.Is<int[]>(a => a.SequenceEqual(TeamIds1))).Returns(teamMembers);
 
         var result = await _sut.GetUsers();
 
@@ -121,7 +122,7 @@ public class UserControllerTests
     {
         IList<UserDto> coaches = [Bob];
         _currentUser.Teams.Returns(TeamIds1);
-        _userService.GetCoachesForTeamsAsync(TeamIds1).Returns(coaches);
+        _userService.GetCoachesForTeamsAsync(Arg.Is<int[]>(a => a.SequenceEqual(TeamIds1))).Returns(coaches);
 
         var result = await _sut.GetCoaches();
 
@@ -171,7 +172,7 @@ public class UserControllerTests
     public async Task CreateUser_ReturnsCreatedUser()
     {
         var request = new CreateUserRequest("alice", "alice@test.local", "Pass123!", "Alice", "Smith", "learner", [1]);
-        _userService.CreateUserAsync(request).Returns(Alice);
+        _userService.CreateUserAsync(request).Returns(CreateUserResult.Success(Alice));
 
         var result = await _sut.CreateUser(request);
 
@@ -181,14 +182,17 @@ public class UserControllerTests
     }
 
     [Test]
-    public async Task CreateUser_WhenServiceReturnsNull_ReturnsBadRequest()
+    public async Task CreateUser_WhenServiceFails_ReturnsBadRequestWithErrors()
     {
         var request = new CreateUserRequest("alice", "alice@test.local", "weak", "Alice", "Smith", "learner", []);
-        _userService.CreateUserAsync(request).Returns((UserDto?)null);
+        var errors = new[] { new UserError("PasswordTooShort", "Password must be at least 8 characters.") };
+        _userService.CreateUserAsync(request).Returns(CreateUserResult.Failure(errors));
 
         var result = await _sut.CreateUser(request);
 
-        Assert.That(result.Result, Is.TypeOf<BadRequestResult>());
+        var badRequest = result.Result as BadRequestObjectResult;
+        Assert.That(badRequest, Is.Not.Null);
+        Assert.That(badRequest!.Value, Is.InstanceOf<IReadOnlyList<UserError>>());
     }
 
     // PUT /api/user/{id}/role
@@ -219,7 +223,7 @@ public class UserControllerTests
     public async Task AssignTeams_WhenSucceeds_ReturnsNoContent()
     {
         var teams = new int[] { 1, 2 };
-        _userService.AssignTeamsAsync("id1", teams).Returns(true);
+        _userService.AssignTeamsAsync("id1", Arg.Is<int[]>(a => a.SequenceEqual(teams))).Returns(true);
 
         var result = await _sut.AssignTeams("id1", new AssignTeamsRequest(teams));
 

@@ -50,7 +50,7 @@ import {
   MessageSquare,
   CheckCircle,
 } from 'lucide-react';
-import { useAuthStore, useTeamStore, useThemeStore, type Team } from '@/stores';
+import { useAuthStore, useTeamStore, useThemeStore, useSkinStore, type Team } from '@/stores';
 import { fetchUserTeams } from '@/api/client';
 
 const languages = [
@@ -197,6 +197,7 @@ export function Layout() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const { resolvedTheme, setTheme } = useThemeStore();
+  const { skin, setSkin } = useSkinStore();
   const { mode, setTeams } = useTeamStore();
 
   const isBackOffice = user?.isBackOffice ?? false;
@@ -406,6 +407,38 @@ export function Layout() {
               </SidebarGroupContent>
             </SidebarGroup>
           )}
+          {/* Skin switcher */}
+          <SidebarGroup>
+            <SidebarGroupLabel>{t('nav.theme', 'Theme')}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => setSkin('classic')}
+                    className={skin === 'classic' ? 'bg-sidebar-accent' : ''}
+                  >
+                    <span>🎨</span>
+                    <span>Classic</span>
+                    {skin === 'classic' && (
+                      <span className="ml-auto text-xs text-sidebar-accent-foreground">{t('common.active', '✓')}</span>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => setSkin('wouter')}
+                    className={skin === 'wouter' ? 'bg-sidebar-accent' : ''}
+                  >
+                    <img src="/wouter.jpg" alt="Wouter" className="size-4 rounded-full object-cover object-top" />
+                    <span>Wouter</span>
+                    {skin === 'wouter' && (
+                      <span className="ml-auto text-xs text-sidebar-accent-foreground">{t('common.active', '✓')}</span>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         </SidebarContent>
 
         <SidebarFooter>

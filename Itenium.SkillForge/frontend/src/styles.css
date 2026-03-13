@@ -92,6 +92,18 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ─── Wouter skin ─────────────────────────────────────────────────────────── */
+html.skin-wouter button:not([data-sidebar='menu-button']):not(:disabled),
+html.skin-wouter [role='button']:not([data-sidebar='menu-button']):not(:disabled) {
+  background-image: url('/wouter.jpg') !important;
+  background-size: cover !important;
+  background-position: center top !important;
+  background-color: transparent !important;
+  color: white !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

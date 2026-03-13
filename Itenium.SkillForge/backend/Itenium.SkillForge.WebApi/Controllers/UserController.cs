@@ -81,13 +81,13 @@ public class UserController : ControllerBase
     [Authorize(Roles = "backoffice")]
     public async Task<ActionResult<UserDto>> CreateUser(CreateUserRequest request)
     {
-        var user = await _userService.CreateUserAsync(request);
-        if (user == null)
+        var result = await _userService.CreateUserAsync(request);
+        if (!result.Succeeded)
         {
-            return BadRequest();
+            return BadRequest(result.Errors);
         }
 
-        return CreatedAtAction(nameof(GetUserById), new { userId = user.Id }, user);
+        return CreatedAtAction(nameof(GetUserById), new { userId = result.User!.Id }, result.User);
     }
 
     /// <summary>

@@ -29,7 +29,9 @@ public class RoadmapController : ControllerBase
     public async Task<ActionResult<List<SkillDto>>> GetRoadmap([FromQuery] bool showAll = false)
     {
         var teams = _user.Teams;
-        var query = _db.Skills.Where(s => teams.Contains(s.TeamId));
+        var query = _db.Skills
+            .Include(s => s.Category)
+            .Where(s => s.Category.TeamId != null && teams.Contains(s.Category.TeamId.Value));
 
         if (!showAll)
             query = query.Where(s => s.Tier <= 2);
@@ -37,7 +39,7 @@ public class RoadmapController : ControllerBase
         var skills = await query
             .OrderBy(s => s.Tier)
             .ThenBy(s => s.Name)
-            .Select(s => new SkillDto(s.Id, s.Name, s.Description, s.Tier, s.TeamId))
+            .Select(s => new SkillDto(s.Id, s.Name, s.Description, s.Tier, s.Category.TeamId ?? 0))
             .ToListAsync();
 
         return Ok(skills);

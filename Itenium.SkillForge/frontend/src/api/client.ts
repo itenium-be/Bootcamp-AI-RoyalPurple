@@ -60,6 +60,20 @@ export async function fetchUserTeams(): Promise<Team[]> {
   return response.data;
 }
 
+export async function createTeam(name: string): Promise<Team> {
+  const response = await api.post<Team>('/api/team', { name });
+  return response.data;
+}
+
+export async function updateTeam(id: number, name: string): Promise<Team> {
+  const response = await api.put<Team>(`/api/team/${id}`, { name });
+  return response.data;
+}
+
+export async function deleteTeam(id: number): Promise<void> {
+  await api.delete(`/api/team/${id}`);
+}
+
 interface Course {
   id: number;
   name: string;

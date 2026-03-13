@@ -11,8 +11,8 @@ public class RoadmapControllerTests : DatabaseTestBase
 {
     private ISkillForgeUser _user = null!;
     private RoadmapController _sut = null!;
-    private TeamEntity _javaTeam = null!;
-    private TeamEntity _dotnetTeam = null!;
+    private SkillCategoryEntity _javaCategory = null!;
+    private SkillCategoryEntity _dotnetCategory = null!;
 
     [SetUp]
     public async Task Setup()
@@ -20,9 +20,14 @@ public class RoadmapControllerTests : DatabaseTestBase
         _user = Substitute.For<ISkillForgeUser>();
         _sut = new RoadmapController(Db, _user);
 
-        _javaTeam = new TeamEntity { Name = "Java" };
-        _dotnetTeam = new TeamEntity { Name = ".NET" };
-        Db.Teams.AddRange(_javaTeam, _dotnetTeam);
+        var javaTeam = new TeamEntity { Name = "Java" };
+        var dotnetTeam = new TeamEntity { Name = ".NET" };
+        Db.Teams.AddRange(javaTeam, dotnetTeam);
+        await Db.SaveChangesAsync();
+
+        _javaCategory = new SkillCategoryEntity { Name = "Java Skills", TeamId = javaTeam.Id };
+        _dotnetCategory = new SkillCategoryEntity { Name = ".NET Skills", TeamId = dotnetTeam.Id };
+        Db.SkillCategories.AddRange(_javaCategory, _dotnetCategory);
         await Db.SaveChangesAsync();
     }
 
@@ -30,12 +35,12 @@ public class RoadmapControllerTests : DatabaseTestBase
     public async Task GetRoadmap_WithoutShowAll_ReturnsOnlyTier1And2Skills()
     {
         Db.Skills.AddRange(
-            new SkillEntity { Name = "Java Basics", Tier = 1, TeamId = _javaTeam.Id },
-            new SkillEntity { Name = "Spring Boot", Tier = 2, TeamId = _javaTeam.Id },
-            new SkillEntity { Name = "Microservices", Tier = 3, TeamId = _javaTeam.Id });
+            new SkillEntity { Name = "Java Basics", Tier = 1, CategoryId = _javaCategory.Id },
+            new SkillEntity { Name = "Spring Boot", Tier = 2, CategoryId = _javaCategory.Id },
+            new SkillEntity { Name = "Microservices", Tier = 3, CategoryId = _javaCategory.Id });
         await Db.SaveChangesAsync();
         _user.IsBackOffice.Returns(false);
-        _user.Teams.Returns(new[] { _javaTeam.Id });
+        _user.Teams.Returns(new[] { _javaCategory.TeamId!.Value });
 
         var result = await _sut.GetRoadmap(showAll: false);
 
@@ -50,12 +55,12 @@ public class RoadmapControllerTests : DatabaseTestBase
     public async Task GetRoadmap_WithShowAll_ReturnsAllTiers()
     {
         Db.Skills.AddRange(
-            new SkillEntity { Name = "Java Basics", Tier = 1, TeamId = _javaTeam.Id },
-            new SkillEntity { Name = "Spring Boot", Tier = 2, TeamId = _javaTeam.Id },
-            new SkillEntity { Name = "Microservices", Tier = 3, TeamId = _javaTeam.Id });
+            new SkillEntity { Name = "Java Basics", Tier = 1, CategoryId = _javaCategory.Id },
+            new SkillEntity { Name = "Spring Boot", Tier = 2, CategoryId = _javaCategory.Id },
+            new SkillEntity { Name = "Microservices", Tier = 3, CategoryId = _javaCategory.Id });
         await Db.SaveChangesAsync();
         _user.IsBackOffice.Returns(false);
-        _user.Teams.Returns(new[] { _javaTeam.Id });
+        _user.Teams.Returns(new[] { _javaCategory.TeamId!.Value });
 
         var result = await _sut.GetRoadmap(showAll: true);
 
@@ -69,11 +74,11 @@ public class RoadmapControllerTests : DatabaseTestBase
     public async Task GetRoadmap_FiltersToUserTeam()
     {
         Db.Skills.AddRange(
-            new SkillEntity { Name = "Java Basics", Tier = 1, TeamId = _javaTeam.Id },
-            new SkillEntity { Name = "C# Fundamentals", Tier = 1, TeamId = _dotnetTeam.Id });
+            new SkillEntity { Name = "Java Basics", Tier = 1, CategoryId = _javaCategory.Id },
+            new SkillEntity { Name = "C# Fundamentals", Tier = 1, CategoryId = _dotnetCategory.Id });
         await Db.SaveChangesAsync();
         _user.IsBackOffice.Returns(false);
-        _user.Teams.Returns(new[] { _javaTeam.Id });
+        _user.Teams.Returns(new[] { _javaCategory.TeamId!.Value });
 
         var result = await _sut.GetRoadmap();
 
@@ -86,7 +91,7 @@ public class RoadmapControllerTests : DatabaseTestBase
     [Test]
     public async Task GetRoadmap_WithNoTeams_ReturnsEmpty()
     {
-        Db.Skills.Add(new SkillEntity { Name = "Java Basics", Tier = 1, TeamId = _javaTeam.Id });
+        Db.Skills.Add(new SkillEntity { Name = "Java Basics", Tier = 1, CategoryId = _javaCategory.Id });
         await Db.SaveChangesAsync();
         _user.IsBackOffice.Returns(false);
         _user.Teams.Returns(Array.Empty<int>());
@@ -103,13 +108,13 @@ public class RoadmapControllerTests : DatabaseTestBase
     {
         for (var i = 1; i <= 5; i++)
         {
-            Db.Skills.Add(new SkillEntity { Name = $"Foundation {i}", Tier = 1, TeamId = _javaTeam.Id });
-            Db.Skills.Add(new SkillEntity { Name = $"Core {i}", Tier = 2, TeamId = _javaTeam.Id });
-            Db.Skills.Add(new SkillEntity { Name = $"Advanced {i}", Tier = 3, TeamId = _javaTeam.Id });
+            Db.Skills.Add(new SkillEntity { Name = $"Foundation {i}", Tier = 1, CategoryId = _javaCategory.Id });
+            Db.Skills.Add(new SkillEntity { Name = $"Core {i}", Tier = 2, CategoryId = _javaCategory.Id });
+            Db.Skills.Add(new SkillEntity { Name = $"Advanced {i}", Tier = 3, CategoryId = _javaCategory.Id });
         }
         await Db.SaveChangesAsync();
         _user.IsBackOffice.Returns(false);
-        _user.Teams.Returns(new[] { _javaTeam.Id });
+        _user.Teams.Returns(new[] { _javaCategory.TeamId!.Value });
 
         var result = await _sut.GetRoadmap(showAll: false);
 
@@ -122,12 +127,12 @@ public class RoadmapControllerTests : DatabaseTestBase
     public async Task GetRoadmap_SkillsOrderedByTierThenName()
     {
         Db.Skills.AddRange(
-            new SkillEntity { Name = "Spring Boot", Tier = 2, TeamId = _javaTeam.Id },
-            new SkillEntity { Name = "Java Basics", Tier = 1, TeamId = _javaTeam.Id },
-            new SkillEntity { Name = "Git", Tier = 1, TeamId = _javaTeam.Id });
+            new SkillEntity { Name = "Spring Boot", Tier = 2, CategoryId = _javaCategory.Id },
+            new SkillEntity { Name = "Java Basics", Tier = 1, CategoryId = _javaCategory.Id },
+            new SkillEntity { Name = "Git", Tier = 1, CategoryId = _javaCategory.Id });
         await Db.SaveChangesAsync();
         _user.IsBackOffice.Returns(false);
-        _user.Teams.Returns(new[] { _javaTeam.Id });
+        _user.Teams.Returns(new[] { _javaCategory.TeamId!.Value });
 
         var result = await _sut.GetRoadmap(showAll: true);
 

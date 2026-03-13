@@ -118,7 +118,19 @@ function CreateUserSheet({
       form.reset();
       onOpenChange(false);
     },
-    onError: () => toast.error(t('users.createError', 'Failed to create user')),
+    onError: (error: unknown) => {
+      const data = (error as { response?: { data?: unknown } })?.response?.data;
+      let detail = '';
+      if (Array.isArray(data)) {
+        detail = (data as { description?: string; code?: string }[])
+          .map((e) => e.description ?? e.code ?? '')
+          .filter(Boolean)
+          .join('\n');
+      } else if (typeof data === 'string') {
+        detail = data;
+      }
+      toast.error(t('users.createError', 'Failed to create user'), { description: detail || undefined });
+    },
   });
 
   const selectedTeams = form.watch('teams');
@@ -126,7 +138,7 @@ function CreateUserSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[420px] overflow-y-auto">
+      <SheetContent className="w-[420px] overflow-y-auto pl-4">
         <SheetHeader>
           <SheetTitle>{t('users.createTitle', 'Create User')}</SheetTitle>
           <SheetDescription>{t('users.createDesc', 'Add a new user to the platform.')}</SheetDescription>
@@ -332,7 +344,7 @@ function EditUserSheet({
 
   return (
     <Sheet open onOpenChange={onOpenChange}>
-      <SheetContent className="w-[420px] overflow-y-auto">
+      <SheetContent className="w-[420px] overflow-y-auto pl-4">
         <SheetHeader>
           <SheetTitle>
             {user.firstName} {user.lastName}

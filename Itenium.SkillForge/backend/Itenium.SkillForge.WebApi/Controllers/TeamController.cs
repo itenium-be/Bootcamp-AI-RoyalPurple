@@ -36,4 +36,68 @@ public class TeamController : ControllerBase
             .Where(t => _user.Teams.Contains(t.Id))
             .ToListAsync();
     }
+
+    /// <summary>
+    /// Create a new team. Backoffice only.
+    /// </summary>
+    [HttpPost]
+    public async Task<ActionResult<TeamEntity>> CreateTeam([FromBody] CreateTeamRequest request)
+    {
+        if (!_user.IsBackOffice)
+        {
+            return Forbid();
+        }
+
+        var team = new TeamEntity { Name = request.Name };
+        _db.Teams.Add(team);
+        await _db.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetUserTeams), new { }, team);
+    }
+
+    /// <summary>
+    /// Update a team. Backoffice can update any team; managers can only update their own teams.
+    /// </summary>
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<TeamEntity>> UpdateTeam(int id, [FromBody] UpdateTeamRequest request)
+    {
+        if (!_user.IsBackOffice && (!_user.IsManager || !_user.Teams.Contains(id)))
+        {
+            return Forbid();
+        }
+
+        var team = await _db.Teams.FindAsync(id);
+        if (team == null)
+        {
+            return NotFound();
+        }
+
+        team.Name = request.Name;
+        await _db.SaveChangesAsync();
+
+        return Ok(team);
+    }
+
+    /// <summary>
+    /// Delete a team. Backoffice only.
+    /// </summary>
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteTeam(int id)
+    {
+        if (!_user.IsBackOffice)
+        {
+            return Forbid();
+        }
+
+        var team = await _db.Teams.FindAsync(id);
+        if (team == null)
+        {
+            return NotFound();
+        }
+
+        _db.Teams.Remove(team);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 }
