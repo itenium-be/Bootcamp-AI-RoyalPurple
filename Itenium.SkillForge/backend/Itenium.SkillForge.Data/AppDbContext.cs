@@ -25,6 +25,10 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<SkillPrerequisiteEntity> SkillPrerequisites => Set<SkillPrerequisiteEntity>();
 
+    public DbSet<GoalEntity> Goals => Set<GoalEntity>();
+
+    public DbSet<GoalResourceEntity> GoalResources => Set<GoalResourceEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
