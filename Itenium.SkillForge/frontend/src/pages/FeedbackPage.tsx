@@ -255,17 +255,21 @@ function FeedbackDetail({ feedbackId, onClose }: { feedbackId: number; onClose: 
         <Card>
           <CardContent className="pt-4 space-y-2">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="font-medium">{isAuthor ? t('feedback.you', 'You') : detail.authorId}</span>
+              <span className="font-medium">
+                {isAuthor ? t('feedback.you', 'You') : (detail.authorName ?? detail.authorId)}
+              </span>
               <ChevronRight className="size-3" />
-              <span>{detail.recipientId === user?.id ? t('feedback.you', 'You') : detail.recipientId}</span>
+              <span>
+                {detail.recipientId === user?.id
+                  ? t('feedback.you', 'You')
+                  : (detail.recipientName ?? detail.recipientId)}
+              </span>
               <span className="ml-auto">{formatDate(detail.createdAt)}</span>
             </div>
             {detail.courseId != null && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <BookOpen className="size-3" />
-                <span>
-                  {t('feedback.courseContext', 'Course')} #{detail.courseId}
-                </span>
+                <span>{detail.courseName ?? `${t('feedback.courseContext', 'Course')} #${detail.courseId}`}</span>
               </div>
             )}
             <p className="text-sm whitespace-pre-wrap">{detail.content}</p>
@@ -283,6 +287,9 @@ function FeedbackDetail({ feedbackId, onClose }: { feedbackId: number; onClose: 
                 <div
                   className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${c.authorId === user?.id ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
                 >
+                  {c.authorId !== user?.id && (
+                    <p className="text-xs font-medium opacity-80 mb-1">{c.authorName ?? c.authorId}</p>
+                  )}
                   <p>{c.content}</p>
                   <p className="text-xs opacity-60 mt-1">{formatDate(c.createdAt)}</p>
                 </div>
@@ -342,8 +349,16 @@ function FeedbackListItem({
         <Badge variant={isAuthor ? 'default' : 'secondary'} className="text-xs">
           {isAuthor ? t('feedback.sent', 'Sent') : t('feedback.received', 'Received')}
         </Badge>
-        {item.courseId != null && <BookOpen className="size-3 text-muted-foreground" />}
-        <span className="ml-auto text-xs text-muted-foreground">{formatDate(item.createdAt)}</span>
+        <span className="text-xs text-muted-foreground truncate">
+          {isAuthor ? (item.recipientName ?? item.recipientId) : (item.authorName ?? item.authorId)}
+        </span>
+        {item.courseId != null && (
+          <>
+            <BookOpen className="size-3 text-muted-foreground shrink-0" />
+            <span className="text-xs text-muted-foreground truncate">{item.courseName ?? `#${item.courseId}`}</span>
+          </>
+        )}
+        <span className="ml-auto text-xs text-muted-foreground shrink-0">{formatDate(item.createdAt)}</span>
       </div>
       <p className="text-sm line-clamp-2 text-muted-foreground">{item.content}</p>
     </button>

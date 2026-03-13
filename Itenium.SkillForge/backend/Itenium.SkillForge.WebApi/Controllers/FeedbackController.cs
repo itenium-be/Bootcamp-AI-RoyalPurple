@@ -29,15 +29,25 @@ public class FeedbackController : ControllerBase
     public async Task<ActionResult<List<FeedbackDto>>> GetFeedback()
     {
         var userId = _user.UserId!;
-        var query = _db.Feedbacks.AsQueryable();
+        var query = _db.Feedbacks.Include(f => f.Course).AsQueryable();
 
         if (!_user.IsBackOffice)
             query = query.Where(f => f.AuthorId == userId || f.RecipientId == userId);
 
-        return await query
-            .OrderByDescending(f => f.CreatedAt)
-            .Select(f => new FeedbackDto(f.Id, f.AuthorId, f.RecipientId, f.CourseId, f.Content, f.CreatedAt))
-            .ToListAsync();
+        var items = await query.OrderByDescending(f => f.CreatedAt).ToListAsync();
+
+        var userIds = items.SelectMany(f => new[] { f.AuthorId, f.RecipientId }).Distinct(StringComparer.Ordinal).ToList();
+        var users = await _db.Users
+            .Where(u => userIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => $"{u.FirstName} {u.LastName}".Trim(), StringComparer.Ordinal);
+
+        return items.Select(f => new FeedbackDto(
+            f.Id, f.AuthorId, f.RecipientId, f.CourseId,
+            users.GetValueOrDefault(f.AuthorId),
+            users.GetValueOrDefault(f.RecipientId),
+            f.Course?.Name,
+            f.Content, f.CreatedAt))
+            .ToList();
     }
 
     /// <summary>
@@ -50,18 +60,31 @@ public class FeedbackController : ControllerBase
         var userId = _user.UserId!;
         var feedback = await _db.Feedbacks
             .Include(f => f.Comments)
+            .Include(f => f.Course)
             .FirstOrDefaultAsync(f => f.Id == id);
 
         if (feedback == null) return NotFound();
         if (!_user.IsBackOffice && feedback.AuthorId != userId && feedback.RecipientId != userId)
             return Forbid();
 
+        var allUserIds = new[] { feedback.AuthorId, feedback.RecipientId }
+            .Concat(feedback.Comments.Select(c => c.AuthorId))
+            .Distinct(StringComparer.Ordinal).ToList();
+        var users = await _db.Users
+            .Where(u => allUserIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => $"{u.FirstName} {u.LastName}".Trim(), StringComparer.Ordinal);
+
         IList<FeedbackCommentDto> comments = feedback.Comments
             .OrderBy(c => c.CreatedAt)
-            .Select(c => new FeedbackCommentDto(c.Id, c.AuthorId, c.Content, c.CreatedAt))
+            .Select(c => new FeedbackCommentDto(c.Id, c.AuthorId, users.GetValueOrDefault(c.AuthorId), c.Content, c.CreatedAt))
             .ToList();
 
-        return Ok(new FeedbackDetailDto(feedback.Id, feedback.AuthorId, feedback.RecipientId, feedback.CourseId, feedback.Content, feedback.CreatedAt, comments));
+        return Ok(new FeedbackDetailDto(
+            feedback.Id, feedback.AuthorId, feedback.RecipientId, feedback.CourseId,
+            users.GetValueOrDefault(feedback.AuthorId),
+            users.GetValueOrDefault(feedback.RecipientId),
+            feedback.Course?.Name,
+            feedback.Content, feedback.CreatedAt, comments));
     }
 
     /// <summary>
@@ -81,7 +104,7 @@ public class FeedbackController : ControllerBase
         _db.Feedbacks.Add(feedback);
         await _db.SaveChangesAsync();
 
-        var dto = new FeedbackDto(feedback.Id, feedback.AuthorId, feedback.RecipientId, feedback.CourseId, feedback.Content, feedback.CreatedAt);
+        var dto = new FeedbackDto(feedback.Id, feedback.AuthorId, feedback.RecipientId, feedback.CourseId, null, null, null, feedback.Content, feedback.CreatedAt);
         return CreatedAtAction(nameof(GetFeedbackById), new { id = feedback.Id }, dto);
     }
 
@@ -108,13 +131,13 @@ public class FeedbackController : ControllerBase
         _db.FeedbackComments.Add(comment);
         await _db.SaveChangesAsync();
 
-        var dto = new FeedbackCommentDto(comment.Id, comment.AuthorId, comment.Content, comment.CreatedAt);
+        var dto = new FeedbackCommentDto(comment.Id, comment.AuthorId, null, comment.Content, comment.CreatedAt);
         return CreatedAtAction(nameof(GetFeedbackById), new { id = feedback.Id }, dto);
     }
 }
 
-public record FeedbackDto(int Id, string AuthorId, string RecipientId, int? CourseId, string Content, DateTime CreatedAt);
-public record FeedbackDetailDto(int Id, string AuthorId, string RecipientId, int? CourseId, string Content, DateTime CreatedAt, IList<FeedbackCommentDto> Comments);
-public record FeedbackCommentDto(int Id, string AuthorId, string Content, DateTime CreatedAt);
+public record FeedbackDto(int Id, string AuthorId, string RecipientId, int? CourseId, string? AuthorName, string? RecipientName, string? CourseName, string Content, DateTime CreatedAt);
+public record FeedbackDetailDto(int Id, string AuthorId, string RecipientId, int? CourseId, string? AuthorName, string? RecipientName, string? CourseName, string Content, DateTime CreatedAt, IList<FeedbackCommentDto> Comments);
+public record FeedbackCommentDto(int Id, string AuthorId, string? AuthorName, string Content, DateTime CreatedAt);
 public record CreateFeedbackRequest(string RecipientId, string Content, int? CourseId);
 public record CreateCommentRequest(string Content);

@@ -169,6 +169,7 @@ public class FeedbackControllerTests : DatabaseTestBase
         Assert.That(dto!.AuthorId, Is.EqualTo("manager1"));
         Assert.That(dto.RecipientId, Is.EqualTo("admin1"));
         Assert.That(dto.Content, Is.EqualTo("Great team culture!"));
+        Assert.That(dto.AuthorName, Is.Null); // no real user records in test DB
 
         var saved = await Db.Feedbacks.FindAsync(dto.Id);
         Assert.That(saved, Is.Not.Null);
