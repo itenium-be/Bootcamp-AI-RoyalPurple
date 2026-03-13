@@ -213,3 +213,53 @@ export async function fetchCourseResources(courseId: number): Promise<CourseReso
   const response = await api.get<CourseResource[]>(`/api/course/${courseId}/resource`);
   return response.data;
 }
+
+export interface CourseRequest {
+  name: string;
+  description: string | null;
+  category: string | null;
+  level: string | null;
+}
+
+export async function createCourse(request: CourseRequest): Promise<Course> {
+  const response = await api.post<Course>('/api/course', request);
+  return response.data;
+}
+
+export async function updateCourse(id: number, request: CourseRequest): Promise<Course> {
+  const response = await api.put<Course>(`/api/course/${id}`, request);
+  return response.data;
+}
+
+export async function deleteCourse(id: number): Promise<void> {
+  await api.delete(`/api/course/${id}`);
+}
+
+export interface CourseResourceRequest {
+  title: string;
+  url: string | null;
+  type: CourseResourceType;
+  description: string | null;
+  durationMinutes: number | null;
+  order: number;
+  skillId: number | null;
+  toLevel: number | null;
+}
+
+export async function createCourseResource(courseId: number, request: CourseResourceRequest): Promise<CourseResource> {
+  const response = await api.post<CourseResource>(`/api/course/${courseId}/resource`, request);
+  return response.data;
+}
+
+export async function updateCourseResource(
+  courseId: number,
+  resourceId: number,
+  request: CourseResourceRequest,
+): Promise<CourseResource> {
+  const response = await api.put<CourseResource>(`/api/course/${courseId}/resource/${resourceId}`, request);
+  return response.data;
+}
+
+export async function deleteCourseResource(courseId: number, resourceId: number): Promise<void> {
+  await api.delete(`/api/course/${courseId}/resource/${resourceId}`);
+}
