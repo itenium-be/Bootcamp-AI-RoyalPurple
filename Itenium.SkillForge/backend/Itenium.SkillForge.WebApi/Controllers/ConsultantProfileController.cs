@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Itenium.SkillForge.WebApi.Controllers;
 
-public record ConsultantDto(string UserId, int? TeamId, string? TeamName);
+public record ConsultantDto(string UserId, int? TeamId, string? TeamName, string? FirstName, string? LastName);
 
 public record AssignProfileRequest(int TeamId);
 
@@ -18,11 +18,13 @@ public class ConsultantProfileController : ControllerBase
 {
     private readonly AppDbContext _db;
     private readonly ISkillForgeUser _user;
+    private readonly IUserService _userService;
 
-    public ConsultantProfileController(AppDbContext db, ISkillForgeUser user)
+    public ConsultantProfileController(AppDbContext db, ISkillForgeUser user, IUserService userService)
     {
         _db = db;
         _user = user;
+        _userService = userService;
     }
 
     /// <summary>
@@ -33,10 +35,18 @@ public class ConsultantProfileController : ControllerBase
     {
         var profiles = await _db.ConsultantProfiles
             .Include(p => p.Team)
-            .Select(p => new ConsultantDto(p.UserId, p.TeamId, p.Team!.Name))
             .ToListAsync();
 
-        return Ok(profiles);
+        var users = await _userService.GetAllUsersAsync();
+        var userMap = users.ToDictionary(u => u.Id, StringComparer.Ordinal);
+
+        var result = profiles.Select(p =>
+        {
+            userMap.TryGetValue(p.UserId, out var user);
+            return new ConsultantDto(p.UserId, p.TeamId, p.Team?.Name, user?.FirstName, user?.LastName);
+        }).ToList();
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -103,6 +113,6 @@ public class ConsultantProfileController : ControllerBase
             return NotFound();
         }
 
-        return Ok(new ConsultantDto(profile.UserId, profile.TeamId, profile.Team?.Name));
+        return Ok(new ConsultantDto(profile.UserId, profile.TeamId, profile.Team?.Name, null, null));
     }
 }

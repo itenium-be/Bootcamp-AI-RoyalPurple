@@ -10,13 +10,15 @@ namespace Itenium.SkillForge.WebApi.Tests;
 public class ConsultantProfileControllerTests : DatabaseTestBase
 {
     private ISkillForgeUser _user = null!;
+    private IUserService _userService = null!;
     private ConsultantProfileController _sut = null!;
 
     [SetUp]
     public void Setup()
     {
         _user = Substitute.For<ISkillForgeUser>();
-        _sut = new ConsultantProfileController(Db, _user);
+        _userService = Substitute.For<IUserService>();
+        _sut = new ConsultantProfileController(Db, _user, _userService);
     }
 
     [Test]
@@ -33,6 +35,10 @@ public class ConsultantProfileControllerTests : DatabaseTestBase
         });
         await Db.SaveChangesAsync();
 
+        _userService.GetAllUsersAsync().Returns([
+            new UserDto("user-1", "jdoe", "j@example.com", "John", "Doe", "learner", []),
+        ]);
+
         var result = await _sut.GetConsultants();
 
         var okResult = result.Result as OkObjectResult;
@@ -42,11 +48,15 @@ public class ConsultantProfileControllerTests : DatabaseTestBase
         Assert.That(consultants![0].UserId, Is.EqualTo("user-1"));
         Assert.That(consultants[0].TeamId, Is.EqualTo(team.Id));
         Assert.That(consultants[0].TeamName, Is.EqualTo(".NET"));
+        Assert.That(consultants[0].FirstName, Is.EqualTo("John"));
+        Assert.That(consultants[0].LastName, Is.EqualTo("Doe"));
     }
 
     [Test]
     public async Task GetConsultants_WhenNoProfiles_ReturnsEmptyList()
     {
+        _userService.GetAllUsersAsync().Returns([]);
+
         var result = await _sut.GetConsultants();
 
         var okResult = result.Result as OkObjectResult;

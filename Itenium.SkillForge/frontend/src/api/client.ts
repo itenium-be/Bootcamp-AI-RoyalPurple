@@ -93,6 +93,8 @@ interface ConsultantProfile {
   userId: string;
   teamId: number | null;
   teamName: string | null;
+  firstName: string | null;
+  lastName: string | null;
 }
 
 export async function fetchConsultants(): Promise<ConsultantProfile[]> {
