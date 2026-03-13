@@ -49,6 +49,9 @@ namespace Itenium.SkillForge.Data.Migrations
                         principalColumn: "Id");
                 });
 
+            // Clear any skills seeded by AddSkills migration — they will be re-seeded with proper categories
+            migrationBuilder.Sql("DELETE FROM \"Skills\";");
+
             migrationBuilder.AddColumn<int>(
                 name: "CategoryId",
                 table: "Skills",
