@@ -72,3 +72,16 @@ export async function fetchCourses(): Promise<Course[]> {
   const response = await api.get<Course[]>('/api/course');
   return response.data;
 }
+
+export interface RoadmapNode {
+  id: number;
+  name: string;
+  description: string | null;
+  tier: number;
+  teamId: number;
+}
+
+export async function fetchRoadmap(showAll: boolean = false): Promise<RoadmapNode[]> {
+  const response = await api.get<RoadmapNode[]>(`/api/roadmap?showAll=${showAll}`);
+  return response.data;
+}

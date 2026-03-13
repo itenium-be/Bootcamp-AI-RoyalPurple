@@ -23,6 +23,7 @@
     "myCourses": "My Courses",
     "myProgress": "My Progress",
     "myCertificates": "My Certificates",
+    "myRoadmap": "My Roadmap",
     "catalogSection": "Catalog",
     "catalog": "Browse Courses",
     "team": "Team",
@@ -104,6 +105,15 @@
     "noResults": "No results found",
     "active": "Active",
     "user": "User"
+  },
+  "roadmap": {
+    "title": "My Roadmap",
+    "tier1": "Foundation",
+    "tier2": "Core",
+    "tier3": "Advanced",
+    "tier4": "Expert",
+    "showAll": "Show all",
+    "noRoadmap": "No roadmap available for your profile"
   },
   "errors": {
     "sessionExpired": "Session expired!",
