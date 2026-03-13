@@ -35,6 +35,8 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<CourseEnrollmentEntity> CourseEnrollments => Set<CourseEnrollmentEntity>();
 
+    public DbSet<CourseAssignmentEntity> CourseAssignments => Set<CourseAssignmentEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
