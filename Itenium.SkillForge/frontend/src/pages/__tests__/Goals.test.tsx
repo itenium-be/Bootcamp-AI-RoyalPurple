@@ -10,9 +10,11 @@ vi.mock('react-i18next', () => ({
 const mockUseQuery = vi.fn();
 vi.mock('@tanstack/react-query', () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args),
+  useMutation: () => ({ mutate: vi.fn() }),
+  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
 }));
 
-vi.mock('@/api/client', () => ({ fetchGoals: vi.fn() }));
+vi.mock('@/api/client', () => ({ fetchGoals: vi.fn(), raiseReadinessFlag: vi.fn(), resolveReadinessFlag: vi.fn() }));
 
 // eslint-disable-next-line import-x/order -- must come after vi.mock calls
 import Goals from '../Goals';

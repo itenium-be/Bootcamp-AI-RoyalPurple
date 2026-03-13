@@ -1,13 +1,24 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { fetchGoals } from '@/api/client';
+import { fetchGoals, raiseReadinessFlag, resolveReadinessFlag } from '@/api/client';
 
 export default function Goals() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   const { data: goals = [], isLoading } = useQuery({
     queryKey: ['goals'],
     queryFn: () => fetchGoals(),
+  });
+
+  const raise = useMutation({
+    mutationFn: raiseReadinessFlag,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
+  });
+
+  const resolve = useMutation({
+    mutationFn: resolveReadinessFlag,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
   });
 
   if (isLoading) {
@@ -32,6 +43,24 @@ export default function Goals() {
           <p className="text-sm text-muted-foreground mt-1">
             {t('goals.niveau')}: {goal.currentLevel} → {goal.targetLevel}
           </p>
+
+          <div className="mt-3">
+            {goal.hasActiveReadinessFlag ? (
+              <button
+                className="text-sm text-yellow-700 border border-yellow-400 rounded px-2 py-1 mr-2"
+                onClick={() => resolve.mutate(goal.id)}
+              >
+                {t('goals.resolveFlag')}
+              </button>
+            ) : (
+              <button
+                className="text-sm text-green-700 border border-green-400 rounded px-2 py-1 mr-2"
+                onClick={() => raise.mutate(goal.id)}
+              >
+                {t('goals.raiseFlag')}
+              </button>
+            )}
+          </div>
 
           <div className="mt-3">
             <p className="text-sm font-medium mb-1">{t('goals.resources')}</p>

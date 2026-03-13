@@ -220,6 +220,15 @@
     "created": "Feedback ingediend",
     "createError": "Kon feedback niet indienen"
   },
+  "goals": {
+    "noGoals": "Geen actieve doelen",
+    "deadline": "Deadline",
+    "niveau": "Niveau",
+    "resources": "Bronnen",
+    "noResources": "Geen bronnen",
+    "raiseFlag": "Ik ben klaar voor review",
+    "resolveFlag": "Vlag oplossen"
+  },
   "errors": {
     "sessionExpired": "Sessie verlopen!",
     "internalServerError": "Interne serverfout!"

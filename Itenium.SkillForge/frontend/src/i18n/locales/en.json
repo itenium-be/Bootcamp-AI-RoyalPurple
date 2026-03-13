@@ -220,6 +220,15 @@
     "created": "Feedback submitted",
     "createError": "Failed to submit feedback"
   },
+  "goals": {
+    "noGoals": "No active goals",
+    "deadline": "Deadline",
+    "niveau": "Level",
+    "resources": "Resources",
+    "noResources": "No resources",
+    "raiseFlag": "I'm ready for review",
+    "resolveFlag": "Resolve flag"
+  },
   "errors": {
     "sessionExpired": "Session expired!",
     "internalServerError": "Internal Server Error!"

@@ -190,14 +190,14 @@ export interface ConsultantSummary {
   readinessFlagAgeInDays: number | null;
 }
 
-export interface GoalResource {
+interface GoalResource {
   id: number;
   title: string;
   url: string;
   type: string;
 }
 
-export interface Goal {
+export interface GoalDto {
   id: number;
   skillName: string;
   currentLevel: number;
@@ -207,8 +207,8 @@ export interface Goal {
   hasActiveReadinessFlag: boolean;
 }
 
-export async function fetchMyGoals(): Promise<Goal[]> {
-  const response = await api.get<Goal[]>('/api/goal');
+export async function fetchGoals(): Promise<GoalDto[]> {
+  const response = await api.get<GoalDto[]>('/api/goal');
   return response.data;
 }
 
