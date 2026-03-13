@@ -141,7 +141,7 @@ function CourseSheet({
         category: values.category || null,
         level: values.level || null,
       };
-      return isEdit ? updateCourse(course!.id, req) : createCourse(req);
+      return isEdit && course ? updateCourse(course.id, req) : createCourse(req);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['catalog-courses'] });
@@ -159,7 +159,7 @@ function CourseSheet({
       <SheetContent className="w-[420px] pl-4">
         <SheetHeader>
           <SheetTitle>{isEdit ? t('catalog.editCourse') : t('catalog.addCourse')}</SheetTitle>
-          <SheetDescription>{isEdit ? course!.name : t('catalog.addCourseDesc')}</SheetDescription>
+          <SheetDescription>{isEdit ? course?.name : t('catalog.addCourseDesc')}</SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="space-y-4 py-4">
@@ -295,7 +295,7 @@ function ResourceSheet({
         skillId: null,
         toLevel: null,
       };
-      return isEdit ? updateCourseResource(courseId, resource!.id, req) : createCourseResource(courseId, req);
+      return isEdit && resource ? updateCourseResource(courseId, resource.id, req) : createCourseResource(courseId, req);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] });
@@ -313,7 +313,7 @@ function ResourceSheet({
       <SheetContent className="w-[420px] pl-4">
         <SheetHeader>
           <SheetTitle>{isEdit ? t('catalog.editResource') : t('catalog.addResource')}</SheetTitle>
-          <SheetDescription>{isEdit ? resource!.title : t('catalog.addResourceDesc')}</SheetDescription>
+          <SheetDescription>{isEdit ? resource?.title : t('catalog.addResourceDesc')}</SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="space-y-4 py-4">
