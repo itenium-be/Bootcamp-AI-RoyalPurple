@@ -49,10 +49,7 @@ describe('Roadmap', () => {
 
   it('renders skill names from API response', () => {
     mockUseQuery.mockReturnValue({
-      data: [
-        node({ id: 1, name: 'Java Basics', tier: 1 }),
-        node({ id: 2, name: 'Spring Boot', tier: 2 }),
-      ],
+      data: [node({ id: 1, name: 'Java Basics', tier: 1 }), node({ id: 2, name: 'Spring Boot', tier: 2 })],
       isLoading: false,
     });
     render(<Roadmap />);
@@ -71,10 +68,7 @@ describe('Roadmap', () => {
 
   it('shows tier labels as section headings', () => {
     mockUseQuery.mockReturnValue({
-      data: [
-        node({ id: 1, tier: 1 }),
-        node({ id: 2, name: 'Spring Boot', tier: 2 }),
-      ],
+      data: [node({ id: 1, tier: 1 }), node({ id: 2, name: 'Spring Boot', tier: 2 })],
       isLoading: false,
     });
     render(<Roadmap />);

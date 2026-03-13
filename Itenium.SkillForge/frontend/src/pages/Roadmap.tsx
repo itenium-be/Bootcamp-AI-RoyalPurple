@@ -35,18 +35,14 @@ export default function Roadmap() {
         <>
           {tiers.map((tier) => (
             <div key={tier} className="mb-8">
-              <h2 className="text-lg font-semibold mb-3">
-                {t(TIER_KEYS[tier] ?? `Tier ${tier}`)}
-              </h2>
+              <h2 className="text-lg font-semibold mb-3">{t(TIER_KEYS[tier] ?? `Tier ${tier}`)}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {nodes
                   .filter((n) => n.tier === tier)
                   .map((node) => (
                     <div key={node.id} className="border rounded-lg p-4">
                       <h3 className="font-medium">{node.name}</h3>
-                      {node.description && (
-                        <p className="text-sm text-muted-foreground mt-1">{node.description}</p>
-                      )}
+                      {node.description && <p className="text-sm text-muted-foreground mt-1">{node.description}</p>}
                     </div>
                   ))}
               </div>
@@ -54,10 +50,7 @@ export default function Roadmap() {
           ))}
 
           {!showAll && (
-            <button
-              onClick={() => setShowAll(true)}
-              className="mt-2 px-4 py-2 border rounded hover:bg-accent"
-            >
+            <button onClick={() => setShowAll(true)} className="mt-2 px-4 py-2 border rounded hover:bg-accent">
               {t('roadmap.showAll')}
             </button>
           )}
