@@ -38,6 +38,10 @@ public class AppDbContext : ForgeIdentityDbContext
     {
         base.OnModelCreating(builder);
 
+        builder.Entity<ConsultantProfileEntity>()
+            .HasIndex(p => p.UserId)
+            .IsUnique();
+
         builder.Entity<SkillPrerequisiteEntity>()
             .HasKey(sp => new { sp.SkillId, sp.PrerequisiteSkillId });
 

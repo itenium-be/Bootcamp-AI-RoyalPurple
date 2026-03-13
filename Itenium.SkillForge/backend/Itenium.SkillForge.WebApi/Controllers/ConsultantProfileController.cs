@@ -31,6 +31,7 @@ public class ConsultantProfileController : ControllerBase
     /// Get all consultant profile assignments. Visible to coaches and backoffice.
     /// </summary>
     [HttpGet("consultants")]
+    [Authorize(Roles = "backoffice")]
     public async Task<ActionResult<List<ConsultantDto>>> GetConsultants()
     {
         var profiles = await _db.ConsultantProfiles
@@ -53,6 +54,7 @@ public class ConsultantProfileController : ControllerBase
     /// Assign or update a consultant's competence centre profile.
     /// </summary>
     [HttpPut("consultants/{userId}")]
+    [Authorize(Roles = "backoffice")]
     public async Task<IActionResult> AssignProfile(string userId, [FromBody] AssignProfileRequest request)
     {
         var teamExists = await _db.Teams.AnyAsync(t => t.Id == request.TeamId);
@@ -84,6 +86,7 @@ public class ConsultantProfileController : ControllerBase
     /// Remove a consultant's profile assignment.
     /// </summary>
     [HttpDelete("consultants/{userId}")]
+    [Authorize(Roles = "backoffice")]
     public async Task<IActionResult> RemoveProfile(string userId)
     {
         var profile = await _db.ConsultantProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
@@ -113,6 +116,7 @@ public class ConsultantProfileController : ControllerBase
             return NotFound();
         }
 
-        return Ok(new ConsultantDto(profile.UserId, profile.TeamId, profile.Team?.Name, null, null));
+        var user = await _userService.GetUserByIdAsync(userId!);
+        return Ok(new ConsultantDto(profile.UserId, profile.TeamId, profile.Team?.Name, user?.FirstName, user?.LastName));
     }
 }
