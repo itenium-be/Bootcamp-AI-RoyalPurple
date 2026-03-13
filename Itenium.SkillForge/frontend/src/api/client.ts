@@ -313,6 +313,26 @@ export async function deleteCourseResource(courseId: number, resourceId: number)
   await api.delete(`/api/course/${courseId}/resource/${resourceId}`);
 }
 
+export interface Enrollment {
+  id: number;
+  courseId: number;
+  courseName: string;
+  enrolledAt: string;
+}
+
+export async function fetchMyEnrollments(): Promise<Enrollment[]> {
+  const response = await api.get<Enrollment[]>('/api/enrollment');
+  return response.data;
+}
+
+export async function enrollCourse(courseId: number): Promise<void> {
+  await api.post(`/api/enrollment/${courseId}`);
+}
+
+export async function unenrollCourse(courseId: number): Promise<void> {
+  await api.delete(`/api/enrollment/${courseId}`);
+}
+
 export interface CourseAssignment {
   id: number;
   courseId: number;

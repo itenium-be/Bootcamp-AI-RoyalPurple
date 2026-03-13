@@ -31,6 +31,7 @@ import {
   fetchUserTeams,
   fetchConsultants,
   type CourseAssignment,
+  type AssignCourseRequest,
 } from '@/api/client';
 
 const assignSchema = z.object({
@@ -104,12 +105,13 @@ export function Assignments() {
   });
 
   const onSubmit = (values: AssignFormValues) => {
-    createMutation.mutate({
+    const req: AssignCourseRequest = {
       courseId: values.courseId,
       teamId: values.teamId,
       userId: values.userId || null,
       isRequired: values.isRequired,
-    });
+    };
+    createMutation.mutate(req);
   };
 
   const handleDelete = (assignment: CourseAssignment) => {
@@ -162,12 +164,7 @@ export function Assignments() {
                   </span>
                 </td>
                 <td className="p-3">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDelete(a)}
-                    disabled={deleteMutation.isPending}
-                  >
+                  <Button size="sm" variant="ghost" onClick={() => handleDelete(a)} disabled={deleteMutation.isPending}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </td>
@@ -271,10 +268,7 @@ export function Assignments() {
                 control={control}
                 name="isRequired"
                 render={({ field }) => (
-                  <Select
-                    value={field.value ? 'true' : 'false'}
-                    onValueChange={(v) => field.onChange(v === 'true')}
-                  >
+                  <Select value={field.value ? 'true' : 'false'} onValueChange={(v) => field.onChange(v === 'true')}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

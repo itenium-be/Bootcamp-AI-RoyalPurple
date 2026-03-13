@@ -3,13 +3,13 @@ import { BookOpen, Users, ClipboardList } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@itenium-forge/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTeamStore } from '@/stores';
-import { fetchDashboardStats } from '@/api/client';
+import { fetchDashboardStats, type DashboardStats } from '@/api/client';
 
 export function Dashboard() {
   const { t } = useTranslation();
   const { mode, selectedTeam } = useTeamStore();
 
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<DashboardStats>({
     queryKey: ['dashboard-stats'],
     queryFn: fetchDashboardStats,
     enabled: mode === 'manager',

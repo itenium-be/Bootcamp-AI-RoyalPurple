@@ -33,6 +33,8 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<CourseResourceEntity> CourseResources => Set<CourseResourceEntity>();
 
+    public DbSet<CourseEnrollmentEntity> CourseEnrollments => Set<CourseEnrollmentEntity>();
+
     public DbSet<CourseAssignmentEntity> CourseAssignments => Set<CourseAssignmentEntity>();
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -41,6 +43,10 @@ public class AppDbContext : ForgeIdentityDbContext
 
         builder.Entity<ConsultantProfileEntity>()
             .HasIndex(p => p.UserId)
+            .IsUnique();
+
+        builder.Entity<CourseEnrollmentEntity>()
+            .HasIndex(e => new { e.UserId, e.CourseId })
             .IsUnique();
 
         builder.Entity<SkillPrerequisiteEntity>()

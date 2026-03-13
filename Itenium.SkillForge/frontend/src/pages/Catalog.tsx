@@ -50,7 +50,12 @@ import {
   createCourseResource,
   updateCourseResource,
   deleteCourseResource,
+  fetchMyEnrollments,
+  enrollCourse,
+  unenrollCourse,
+  type CourseRequest,
   type CourseResource,
+  type CourseResourceRequest,
   type CourseResourceType,
 } from '@/api/client';
 import { useAuthStore } from '@/stores';
@@ -135,7 +140,7 @@ function CourseSheet({
 
   const mutation = useMutation({
     mutationFn: (values: CourseFormValues) => {
-      const req = {
+      const req: CourseRequest = {
         name: values.name,
         description: values.description || null,
         category: values.category || null,
@@ -285,7 +290,7 @@ function ResourceSheet({
 
   const mutation = useMutation({
     mutationFn: (values: ResourceFormValues) => {
-      const req = {
+      const req: CourseResourceRequest = {
         title: values.title,
         type: values.type,
         url: values.url || null,
@@ -533,7 +538,15 @@ function ResourceList({ courseId, canEdit }: { courseId: number; canEdit: boolea
 
 // ─── Course card ───────────────────────────────────────────────────────────────
 
-function CourseCard({ course, canEdit }: { course: Course; canEdit: boolean }) {
+function CourseCard({
+  course,
+  canEdit,
+  isEnrolled,
+}: {
+  course: Course;
+  canEdit: boolean;
+  isEnrolled: boolean;
+}) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(false);
@@ -548,6 +561,24 @@ function CourseCard({ course, canEdit }: { course: Course; canEdit: boolean }) {
     onError: () => toast.error(t('catalog.courseDeleteError')),
   });
 
+  const enrollMutation = useMutation({
+    mutationFn: () => enrollCourse(course.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-enrollments'] });
+      toast.success(t('progress.enrollSuccess'));
+    },
+    onError: () => toast.error(t('progress.enrollError')),
+  });
+
+  const unenrollMutation = useMutation({
+    mutationFn: () => unenrollCourse(course.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-enrollments'] });
+      toast.success(t('progress.unenrollSuccess'));
+    },
+    onError: () => toast.error(t('progress.unenrollError')),
+  });
+
   return (
     <div className="rounded-lg border bg-card">
       <div className="p-4">
@@ -558,7 +589,7 @@ function CourseCard({ course, canEdit }: { course: Course; canEdit: boolean }) {
               <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{course.description}</p>
             )}
           </div>
-          <div className="flex shrink-0 items-start gap-1">
+          <div className="flex shrink-0 items-start gap-2">
             <div className="flex flex-col items-end gap-1">
               {course.category && (
                 <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
@@ -569,6 +600,26 @@ function CourseCard({ course, canEdit }: { course: Course; canEdit: boolean }) {
                 <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{course.level}</span>
               )}
             </div>
+            {!canEdit && (
+              isEnrolled ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => unenrollMutation.mutate()}
+                  disabled={unenrollMutation.isPending}
+                >
+                  {t('progress.enrolled')}
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={() => enrollMutation.mutate()}
+                  disabled={enrollMutation.isPending}
+                >
+                  {t('progress.enroll')}
+                </Button>
+              )
+            )}
             {canEdit && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -632,6 +683,14 @@ export function Catalog() {
     queryFn: () => fetchCourses(),
   });
 
+  const { data: enrollments = [] } = useQuery({
+    queryKey: ['my-enrollments'],
+    queryFn: fetchMyEnrollments,
+    enabled: !canEdit,
+  });
+
+  const enrolledCourseIds = new Set(enrollments.map((e) => e.courseId));
+
   const categories = [...new Set(courses.map((c) => c.category).filter(Boolean))] as string[];
 
   const filtered = courses.filter((c) => {
@@ -687,7 +746,7 @@ export function Catalog() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((course) => (
-            <CourseCard key={course.id} course={course} canEdit={!!canEdit} />
+            <CourseCard key={course.id} course={course} canEdit={!!canEdit} isEnrolled={enrolledCourseIds.has(course.id)} />
           ))}
         </div>
       )}
