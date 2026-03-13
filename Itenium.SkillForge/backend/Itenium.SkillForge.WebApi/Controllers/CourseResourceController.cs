@@ -38,10 +38,6 @@ public class CourseResourceController : ControllerBase
     [HttpGet("{resourceId:int}")]
     public async Task<ActionResult<CourseResourceEntity>> GetResource(int courseId, int resourceId)
     {
-        var courseExists = await _db.Courses.AnyAsync(c => c.Id == courseId);
-        if (!courseExists)
-            return NotFound();
-
         var resource = await _db.CourseResources
             .FirstOrDefaultAsync(r => r.Id == resourceId && r.CourseId == courseId);
 
@@ -54,7 +50,7 @@ public class CourseResourceController : ControllerBase
     /// <summary>Add a resource to a course.</summary>
     [HttpPost]
     [Authorize(Roles = "backoffice,manager")]
-    public async Task<ActionResult<CourseResourceEntity>> CreateResource(int courseId, [FromBody] CreateCourseResourceRequest request)
+    public async Task<ActionResult<CourseResourceEntity>> CreateResource(int courseId, [FromBody] CourseResourceRequest request)
     {
         var courseExists = await _db.Courses.AnyAsync(c => c.Id == courseId);
         if (!courseExists)
@@ -82,7 +78,7 @@ public class CourseResourceController : ControllerBase
     /// <summary>Update a resource on a course.</summary>
     [HttpPut("{resourceId:int}")]
     [Authorize(Roles = "backoffice,manager")]
-    public async Task<ActionResult<CourseResourceEntity>> UpdateResource(int courseId, int resourceId, [FromBody] UpdateCourseResourceRequest request)
+    public async Task<ActionResult<CourseResourceEntity>> UpdateResource(int courseId, int resourceId, [FromBody] CourseResourceRequest request)
     {
         var resource = await _db.CourseResources
             .FirstOrDefaultAsync(r => r.Id == resourceId && r.CourseId == courseId);
@@ -122,17 +118,7 @@ public class CourseResourceController : ControllerBase
     }
 }
 
-public record CreateCourseResourceRequest(
-    string Title,
-    string? Url,
-    CourseResourceType Type,
-    string? Description,
-    int? DurationMinutes,
-    int Order,
-    int? SkillId,
-    int? ToLevel);
-
-public record UpdateCourseResourceRequest(
+public record CourseResourceRequest(
     string Title,
     string? Url,
     CourseResourceType Type,

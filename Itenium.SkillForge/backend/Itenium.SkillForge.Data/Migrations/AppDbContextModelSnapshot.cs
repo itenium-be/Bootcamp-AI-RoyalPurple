@@ -691,8 +691,6 @@ namespace Itenium.SkillForge.Data.Migrations
                         .HasForeignKey("TeamId");
 
                     b.Navigation("Team");
-
-                    b.Navigation("Resources");
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.CourseResourceEntity", b =>

@@ -121,7 +121,7 @@ public class CourseResourceControllerTests : DatabaseTestBase
     [Test]
     public async Task CreateResource_CreatesAndReturns201()
     {
-        var request = new CreateCourseResourceRequest("Intro Video", "https://example.com", CourseResourceType.Video, "An intro", 10, 1, null, null);
+        var request = new CourseResourceRequest("Intro Video", "https://example.com", CourseResourceType.Video, "An intro", 10, 1, null, null);
 
         var result = await _sut.CreateResource(_course.Id, request);
 
@@ -135,7 +135,7 @@ public class CourseResourceControllerTests : DatabaseTestBase
     [Test]
     public async Task CreateResource_WhenCourseNotFound_ReturnsNotFound()
     {
-        var request = new CreateCourseResourceRequest("Intro Video", null, CourseResourceType.Video, null, null, 1, null, null);
+        var request = new CourseResourceRequest("Intro Video", null, CourseResourceType.Video, null, null, 1, null, null);
 
         var result = await _sut.CreateResource(999, request);
 
@@ -145,7 +145,7 @@ public class CourseResourceControllerTests : DatabaseTestBase
     [Test]
     public async Task CreateResource_PersistsToDatabase()
     {
-        var request = new CreateCourseResourceRequest("Article", null, CourseResourceType.Article, null, null, 1, null, null);
+        var request = new CourseResourceRequest("Article", null, CourseResourceType.Article, null, null, 1, null, null);
 
         await _sut.CreateResource(_course.Id, request);
 
@@ -161,7 +161,7 @@ public class CourseResourceControllerTests : DatabaseTestBase
         Db.CourseResources.Add(resource);
         await Db.SaveChangesAsync();
 
-        var request = new UpdateCourseResourceRequest("New Title", "https://example.com", CourseResourceType.Video, "Updated", 15, 2, null, null);
+        var request = new CourseResourceRequest("New Title", "https://example.com", CourseResourceType.Video, "Updated", 15, 2, null, null);
 
         var result = await _sut.UpdateResource(_course.Id, resource.Id, request);
 
@@ -175,7 +175,7 @@ public class CourseResourceControllerTests : DatabaseTestBase
     [Test]
     public async Task UpdateResource_WhenNotFound_ReturnsNotFound()
     {
-        var request = new UpdateCourseResourceRequest("Title", null, CourseResourceType.Article, null, null, 1, null, null);
+        var request = new CourseResourceRequest("Title", null, CourseResourceType.Article, null, null, 1, null, null);
 
         var result = await _sut.UpdateResource(_course.Id, 999, request);
 
