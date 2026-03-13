@@ -161,6 +161,8 @@
   "catalog": {
     "subtitle": "Bekijk alle beschikbare cursussen en hun leermaterialen",
     "allCategories": "Alle categorieën",
+    "selectCategory": "Selecteer een categorie",
+    "selectLevel": "Selecteer een niveau",
     "showResources": "Leermaterialen tonen",
     "hideResources": "Leermaterialen verbergen",
     "noResources": "Nog geen leermaterialen voor deze cursus",

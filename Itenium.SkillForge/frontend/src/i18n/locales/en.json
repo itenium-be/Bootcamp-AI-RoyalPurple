@@ -161,6 +161,8 @@
   "catalog": {
     "subtitle": "Browse all available courses and their resources",
     "allCategories": "All categories",
+    "selectCategory": "Select a category",
+    "selectLevel": "Select a level",
     "showResources": "Show resources",
     "hideResources": "Hide resources",
     "noResources": "No resources for this course yet",

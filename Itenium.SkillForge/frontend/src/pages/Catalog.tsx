@@ -402,7 +402,12 @@ function ResourceSheet({
                   <FormItem>
                     <FormLabel>{t('catalog.order')}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" min={0} />
+                      <Input
+                        {...field}
+                        type="number"
+                        min={0}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
