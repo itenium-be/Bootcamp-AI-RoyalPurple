@@ -33,6 +33,12 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<CourseResourceEntity> CourseResources => Set<CourseResourceEntity>();
 
+    public DbSet<GoalEntity> Goals => Set<GoalEntity>();
+
+    public DbSet<GoalResourceEntity> GoalResources => Set<GoalResourceEntity>();
+
+    public DbSet<ReadinessFlagEntity> ReadinessFlags => Set<ReadinessFlagEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
