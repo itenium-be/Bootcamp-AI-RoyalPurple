@@ -84,7 +84,10 @@ function CreateFeedbackSheet({ open, onOpenChange }: { open: boolean; onOpenChan
     queryFn: isManager ? fetchAdmins : fetchMyCoaches,
   });
 
-  const { data: courses = [] } = useQuery({ queryKey: ['courses'], queryFn: () => fetchCourses() });
+  const { data: courses = [] } = useQuery<Awaited<ReturnType<typeof fetchCourses>>>({
+    queryKey: ['courses'],
+    queryFn: () => fetchCourses(),
+  });
 
   const form = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),

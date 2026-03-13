@@ -146,6 +146,8 @@ public class ConsultantProfileControllerTests : DatabaseTestBase
         await Db.SaveChangesAsync();
 
         _user.UserId.Returns("current-user");
+        _userService.GetUserByIdAsync("current-user").Returns(
+            new UserDto("current-user", "jdoe", "j@example.com", "John", "Doe", "learner", []));
 
         var result = await _sut.GetMyProfile();
 
@@ -154,6 +156,8 @@ public class ConsultantProfileControllerTests : DatabaseTestBase
         var profile = okResult!.Value as ConsultantDto;
         Assert.That(profile, Is.Not.Null);
         Assert.That(profile!.TeamName, Is.EqualTo(".NET"));
+        Assert.That(profile.FirstName, Is.EqualTo("John"));
+        Assert.That(profile.LastName, Is.EqualTo("Doe"));
     }
 
     [Test]

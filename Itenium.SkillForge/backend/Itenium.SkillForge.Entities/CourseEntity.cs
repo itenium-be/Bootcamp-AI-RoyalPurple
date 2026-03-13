@@ -36,5 +36,6 @@ public class CourseEntity
 
     public IList<CourseResourceEntity> Resources { get; set; } = [];
 
+
     public override string ToString() => $"{Name} ({Category})";
 }

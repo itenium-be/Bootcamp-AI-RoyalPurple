@@ -33,9 +33,14 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<CourseResourceEntity> CourseResources => Set<CourseResourceEntity>();
 
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<ConsultantProfileEntity>()
+            .HasIndex(p => p.UserId)
+            .IsUnique();
 
         builder.Entity<SkillPrerequisiteEntity>()
             .HasKey(sp => new { sp.SkillId, sp.PrerequisiteSkillId });

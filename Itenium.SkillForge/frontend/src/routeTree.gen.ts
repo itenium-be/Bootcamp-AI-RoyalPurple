@@ -97,6 +97,7 @@ const AuthenticatedAdminTeamsRoute = AuthenticatedAdminTeamsRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthenticatedIndexRoute
   '/sign-in': typeof authSignInRoute
   '/catalog': typeof AuthenticatedCatalogRoute
   '/coach': typeof AuthenticatedCoachRoute
@@ -105,7 +106,6 @@ export interface FileRoutesByFullPath {
   '/my-profile': typeof AuthenticatedMyProfileRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/': typeof AuthenticatedIndexRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/reports/feedback': typeof AuthenticatedReportsFeedbackRoute
@@ -146,6 +146,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/sign-in'
     | '/catalog'
     | '/coach'
@@ -154,7 +155,6 @@ export interface FileRouteTypes {
     | '/my-profile'
     | '/roadmap'
     | '/settings'
-    | '/'
     | '/admin/teams'
     | '/admin/users'
     | '/reports/feedback'
@@ -202,7 +202,7 @@ declare module '@tanstack/react-router' {
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
