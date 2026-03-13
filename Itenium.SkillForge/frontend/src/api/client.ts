@@ -255,12 +255,22 @@ export interface CourseResource {
   durationMinutes: number | null;
   order: number;
   skillId: number | null;
+  skillName: string | null;
   toLevel: number | null;
+  isCompleted: boolean;
 }
 
 export async function fetchCourseResources(courseId: number): Promise<CourseResource[]> {
   const response = await api.get<CourseResource[]>(`/api/course/${courseId}/resource`);
   return response.data;
+}
+
+export async function markResourceComplete(courseId: number, resourceId: number): Promise<void> {
+  await api.post(`/api/course/${courseId}/resource/${resourceId}/complete`);
+}
+
+export async function unmarkResourceComplete(courseId: number, resourceId: number): Promise<void> {
+  await api.delete(`/api/course/${courseId}/resource/${resourceId}/complete`);
 }
 
 export interface CourseRequest {

@@ -1,5 +1,6 @@
 using Itenium.SkillForge.Data;
 using Itenium.SkillForge.Entities;
+using Itenium.SkillForge.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,23 +13,39 @@ namespace Itenium.SkillForge.WebApi.Controllers;
 public class CourseResourceController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly ISkillForgeUser _currentUser;
 
-    public CourseResourceController(AppDbContext db)
+    public CourseResourceController(AppDbContext db, ISkillForgeUser currentUser)
     {
         _db = db;
+        _currentUser = currentUser;
     }
 
     /// <summary>Get all resources for a course, ordered by display order.</summary>
     [HttpGet]
-    public async Task<ActionResult<IList<CourseResourceEntity>>> GetResources(int courseId)
+    public async Task<ActionResult<IList<CourseResourceDto>>> GetResources(int courseId)
     {
         var courseExists = await _db.Courses.AnyAsync(c => c.Id == courseId);
         if (!courseExists)
             return NotFound();
 
+        var userId = _currentUser.UserId!;
+        var courseResourceIds = _db.CourseResources
+            .Where(r => r.CourseId == courseId)
+            .Select(r => r.Id);
+        var completedIds = await _db.ResourceCompletions
+            .Where(c => c.UserId == userId && courseResourceIds.Contains(c.ResourceId))
+            .Select(c => c.ResourceId)
+            .ToHashSetAsync();
+
         var resources = await _db.CourseResources
             .Where(r => r.CourseId == courseId)
+            .Include(r => r.Skill)
             .OrderBy(r => r.Order)
+            .Select(r => new CourseResourceDto(
+                r.Id, r.CourseId, r.Title, r.Url, r.Type, r.Description,
+                r.DurationMinutes, r.Order, r.SkillId, r.Skill != null ? r.Skill.Name : null,
+                r.ToLevel, completedIds.Contains(r.Id)))
             .ToListAsync();
 
         return Ok(resources);
@@ -116,7 +133,64 @@ public class CourseResourceController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>Mark a resource as completed by the current user.</summary>
+    [HttpPost("{resourceId:int}/complete")]
+    public async Task<IActionResult> MarkComplete(int courseId, int resourceId)
+    {
+        var resourceExists = await _db.CourseResources
+            .AnyAsync(r => r.Id == resourceId && r.CourseId == courseId);
+        if (!resourceExists)
+            return NotFound();
+
+        var userId = _currentUser.UserId!;
+        var alreadyCompleted = await _db.ResourceCompletions
+            .AnyAsync(c => c.UserId == userId && c.ResourceId == resourceId);
+        if (alreadyCompleted)
+            return Conflict();
+
+        _db.ResourceCompletions.Add(new ResourceCompletionEntity
+        {
+            UserId = userId,
+            ResourceId = resourceId,
+            CompletedAt = DateTime.UtcNow,
+        });
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    /// <summary>Remove completion record for a resource.</summary>
+    [HttpDelete("{resourceId:int}/complete")]
+    public async Task<IActionResult> UnmarkComplete(int courseId, int resourceId)
+    {
+        var userId = _currentUser.UserId!;
+        var completion = await _db.ResourceCompletions
+            .FirstOrDefaultAsync(c => c.UserId == userId && c.ResourceId == resourceId);
+
+        if (completion == null)
+            return NotFound();
+
+        _db.ResourceCompletions.Remove(completion);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 }
+
+public record CourseResourceDto(
+    int Id,
+    int CourseId,
+    string Title,
+    string? Url,
+    CourseResourceType Type,
+    string? Description,
+    int? DurationMinutes,
+    int Order,
+    int? SkillId,
+    string? SkillName,
+    int? ToLevel,
+    bool IsCompleted);
 
 public record CourseResourceRequest(
     string Title,

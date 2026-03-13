@@ -33,6 +33,8 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<CourseResourceEntity> CourseResources => Set<CourseResourceEntity>();
 
+    public DbSet<ResourceCompletionEntity> ResourceCompletions => Set<ResourceCompletionEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -51,5 +53,9 @@ public class AppDbContext : ForgeIdentityDbContext
             .WithMany()
             .HasForeignKey(sp => sp.PrerequisiteSkillId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ResourceCompletionEntity>()
+            .HasIndex(r => new { r.UserId, r.ResourceId })
+            .IsUnique();
     }
 }
