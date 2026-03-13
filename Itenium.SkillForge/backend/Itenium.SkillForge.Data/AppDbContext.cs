@@ -19,6 +19,8 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<SkillEntity> Skills => Set<SkillEntity>();
 
+    public DbSet<UserActivityEntity> UserActivities => Set<UserActivityEntity>();
+
     public DbSet<SkillLevelEntity> SkillLevels => Set<SkillLevelEntity>();
 
     public DbSet<SkillPrerequisiteEntity> SkillPrerequisites => Set<SkillPrerequisiteEntity>();

@@ -1,5 +1,4 @@
 using Itenium.SkillForge.Data;
-using Itenium.SkillForge.Entities;
 using Itenium.SkillForge.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,12 +26,12 @@ public class RoadmapController : ControllerBase
     /// Pass showAll=true to return the full roadmap.
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<List<SkillEntity>>> GetRoadmap([FromQuery] bool showAll = false)
+    public async Task<ActionResult<List<SkillDto>>> GetRoadmap([FromQuery] bool showAll = false)
     {
-        var teamIds = _user.Teams.ToList();
+        var teams = _user.Teams;
         var query = _db.Skills
             .Include(s => s.Category)
-            .Where(s => s.Category.TeamId != null && teamIds.Contains(s.Category.TeamId.Value));
+            .Where(s => s.Category.TeamId != null && teams.Contains(s.Category.TeamId.Value));
 
         if (!showAll)
             query = query.Where(s => s.Tier <= 2);
@@ -40,6 +39,7 @@ public class RoadmapController : ControllerBase
         var skills = await query
             .OrderBy(s => s.Tier)
             .ThenBy(s => s.Name)
+            .Select(s => new SkillDto(s.Id, s.Name, s.Description, s.Tier, s.Category.TeamId ?? 0))
             .ToListAsync();
 
         return Ok(skills);

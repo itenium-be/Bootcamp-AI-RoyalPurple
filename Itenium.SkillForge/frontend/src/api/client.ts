@@ -147,3 +147,20 @@ export async function fetchRoadmap(showAll = false): Promise<RoadmapNode[]> {
   const response = await api.get<RoadmapNode[]>(`/api/roadmap?showAll=${showAll}`);
   return response.data;
 }
+
+export interface ConsultantSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  teams: number[];
+  lastActivityAt: string | null;
+  isInactive: boolean;
+  activeGoalCount: number;
+  isReady: boolean;
+}
+
+export async function fetchCoachDashboard(): Promise<ConsultantSummary[]> {
+  const response = await api.get<ConsultantSummary[]>('/api/dashboard');
+  return response.data;
+}

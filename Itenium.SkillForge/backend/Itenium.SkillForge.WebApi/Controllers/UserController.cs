@@ -31,7 +31,7 @@ public class UserController : ControllerBase
 
         if (_currentUser.Teams.Count > 0)
         {
-            return Ok(await _userService.GetTeamMembersAsync(_currentUser.Teams.ToArray()));
+            return Ok(await _userService.GetTeamMembersAsync(_currentUser.Teams));
         }
 
         var self = await _userService.GetUserByIdAsync(_currentUser.UserId!);
@@ -50,7 +50,7 @@ public class UserController : ControllerBase
             return Ok(new List<UserDto>());
         }
 
-        return Ok(await _userService.GetCoachesForTeamsAsync(_currentUser.Teams.ToArray()));
+        return Ok(await _userService.GetCoachesForTeamsAsync(_currentUser.Teams));
     }
 
     /// <summary>

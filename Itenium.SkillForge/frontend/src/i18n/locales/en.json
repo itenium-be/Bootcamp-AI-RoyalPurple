@@ -24,6 +24,7 @@
     "myProgress": "My Progress",
     "myCertificates": "My Certificates",
     "myRoadmap": "My Roadmap",
+    "teamOverview": "Team Overview",
     "catalogSection": "Catalog",
     "catalog": "Browse Courses",
     "team": "Team",
@@ -59,7 +60,11 @@
     "welcome": "Welcome to Itenium SkillForge",
     "totalCourses": "Total Courses",
     "activeLearners": "Active Learners",
-    "completedCourses": "Completed Courses"
+    "completedCourses": "Completed Courses",
+    "teamOverview": "Team Overview",
+    "noConsultants": "No consultants in your team",
+    "inactive": "Inactive",
+    "goals": "Goals"
   },
   "courses": {
     "title": "Courses",
