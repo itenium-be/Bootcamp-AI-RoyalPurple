@@ -211,7 +211,7 @@ public static class SeedData
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, "learner");
-                await userManager.AddClaimAsync(user, new Claim("team", "1")); // Java
+                await userManager.AddClaimAsync(user, new Claim("team", "1")); // Java team
             }
         }
     }
