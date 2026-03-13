@@ -1,5 +1,6 @@
 using Itenium.SkillForge.Entities;
 using Itenium.SkillForge.WebApi.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Itenium.SkillForge.WebApi.Tests;
@@ -172,5 +173,45 @@ public class CourseControllerTests : DatabaseTestBase
         Assert.That(okResult, Is.Not.Null);
         var courses = okResult!.Value as List<CourseEntity>;
         Assert.That(courses, Has.Count.EqualTo(2));
+    }
+
+    // Authorization attribute tests
+
+    [Test]
+    public void CreateCourse_RequiresBackofficeOrManagerRole()
+    {
+        var method = typeof(CourseController).GetMethod(nameof(CourseController.CreateCourse))!;
+        var attr = method.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+            .Cast<AuthorizeAttribute>()
+            .SingleOrDefault();
+
+        Assert.That(attr, Is.Not.Null, "CreateCourse should have [Authorize] attribute");
+        Assert.That(attr!.Roles, Does.Contain("backoffice"));
+        Assert.That(attr.Roles, Does.Contain("manager"));
+    }
+
+    [Test]
+    public void UpdateCourse_RequiresBackofficeOrManagerRole()
+    {
+        var method = typeof(CourseController).GetMethod(nameof(CourseController.UpdateCourse))!;
+        var attr = method.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+            .Cast<AuthorizeAttribute>()
+            .SingleOrDefault();
+
+        Assert.That(attr, Is.Not.Null, "UpdateCourse should have [Authorize] attribute");
+        Assert.That(attr!.Roles, Does.Contain("backoffice"));
+        Assert.That(attr.Roles, Does.Contain("manager"));
+    }
+
+    [Test]
+    public void DeleteCourse_RequiresBackofficeRole()
+    {
+        var method = typeof(CourseController).GetMethod(nameof(CourseController.DeleteCourse))!;
+        var attr = method.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+            .Cast<AuthorizeAttribute>()
+            .SingleOrDefault();
+
+        Assert.That(attr, Is.Not.Null, "DeleteCourse should have [Authorize] attribute");
+        Assert.That(attr!.Roles, Does.Contain("backoffice"));
     }
 }

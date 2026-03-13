@@ -52,6 +52,7 @@ public class CourseController : ControllerBase
     /// Create a new course.
     /// </summary>
     [HttpPost]
+    [Authorize(Roles = "backoffice,manager")]
     public async Task<ActionResult<CourseEntity>> CreateCourse([FromBody] CreateCourseRequest request)
     {
         var course = new CourseEntity
@@ -72,6 +73,7 @@ public class CourseController : ControllerBase
     /// Update an existing course.
     /// </summary>
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "backoffice,manager")]
     public async Task<ActionResult<CourseEntity>> UpdateCourse(int id, [FromBody] UpdateCourseRequest request)
     {
         var course = await _db.Courses.FindAsync(id);
@@ -94,6 +96,7 @@ public class CourseController : ControllerBase
     /// Delete a course.
     /// </summary>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "backoffice")]
     public async Task<ActionResult> DeleteCourse(int id)
     {
         var course = await _db.Courses.FindAsync(id);
