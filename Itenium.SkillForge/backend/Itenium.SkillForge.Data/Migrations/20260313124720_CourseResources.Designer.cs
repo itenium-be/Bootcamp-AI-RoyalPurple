@@ -3,6 +3,7 @@ using System;
 using Itenium.SkillForge.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Itenium.SkillForge.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260313124720_CourseResources")]
+    partial class CourseResources
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,32 +95,6 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("Itenium.SkillForge.Entities.ConsultantProfileEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("TeamId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("ConsultantProfiles");
-                });
-
             modelBuilder.Entity("Itenium.SkillForge.Entities.CourseEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -146,12 +123,7 @@ namespace Itenium.SkillForge.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TeamId");
 
                     b.ToTable("Courses");
                 });
@@ -673,26 +645,6 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Itenium.SkillForge.Entities.ConsultantProfileEntity", b =>
-                {
-                    b.HasOne("Itenium.SkillForge.Entities.TeamEntity", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("Itenium.SkillForge.Entities.CourseEntity", b =>
-                {
-                    b.HasOne("Itenium.SkillForge.Entities.TeamEntity", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId");
-
-                    b.Navigation("Team");
-                });
-
             modelBuilder.Entity("Itenium.SkillForge.Entities.CourseResourceEntity", b =>
                 {
                     b.HasOne("Itenium.SkillForge.Entities.CourseEntity", "Course")
@@ -711,7 +663,6 @@ namespace Itenium.SkillForge.Data.Migrations
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
-
                 {
                     b.HasOne("Itenium.SkillForge.Entities.TeamEntity", "Team")
                         .WithMany()
@@ -760,7 +711,6 @@ namespace Itenium.SkillForge.Data.Migrations
 
                     b.Navigation("Skill");
                 });
-
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {

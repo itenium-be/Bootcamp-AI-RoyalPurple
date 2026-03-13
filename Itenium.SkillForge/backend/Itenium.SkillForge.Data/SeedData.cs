@@ -17,6 +17,7 @@ public static class SeedData
 
         await SeedTeams(db);
         await SeedCourses(db);
+        await SeedCourseResources(db);
         await SeedSkillCatalogue(db);
         await app.SeedTestUsers();
         await SeedConsultantProfiles(db);
@@ -25,6 +26,8 @@ public static class SeedData
     public static async Task SeedDevelopmentData_ForTest(AppDbContext db)
     {
         await SeedTeams(db);
+        await SeedCourses(db);
+        await SeedCourseResources(db);
         await SeedSkillCatalogue(db);
     }
 
@@ -54,6 +57,46 @@ public static class SeedData
                 new CourseEntity { Id = 6, Name = "Test Automation", Description = "Automate tests with Selenium and Playwright", Category = "Quality", Level = "Intermediate", TeamId = 4 });           // QA
             await db.SaveChangesAsync();
         }
+    }
+
+    private static async Task SeedCourseResources(AppDbContext db)
+    {
+        if (await db.CourseResources.AnyAsync())
+            return;
+
+        var courseIds = await db.Courses.OrderBy(c => c.Id).Select(c => c.Id).ToListAsync();
+        if (courseIds.Count == 0)
+            return;
+
+        var resources = new List<CourseResourceEntity>();
+        var definitions = new[]
+        {
+            (Title: "Programming Basics Video Series", Type: CourseResourceType.Video, Url: (string?)"https://example.com/prog-basics", DurationMinutes: (int?)120, Order: 1, Description: (string?)"Introduction to core programming concepts"),
+            (Title: "Hello World Exercises", Type: CourseResourceType.Exercise, Url: (string?)null, DurationMinutes: (int?)null, Order: 2, Description: (string?)"Hands-on exercises to get started"),
+            (Title: "Clean Code Book", Type: CourseResourceType.Book, Url: (string?)null, DurationMinutes: (int?)null, Order: 3, Description: (string?)"Robert C. Martin's classic on writing clean code"),
+            (Title: "Async/Await Deep Dive", Type: CourseResourceType.Article, Url: (string?)"https://example.com/async-await", DurationMinutes: (int?)null, Order: 1, Description: (string?)"Understanding async programming in .NET"),
+            (Title: "LINQ Mastery Workshop", Type: CourseResourceType.Exercise, Url: (string?)null, DurationMinutes: (int?)90, Order: 2, Description: (string?)"Advanced LINQ query exercises"),
+            (Title: "Microservices Architecture Patterns", Type: CourseResourceType.Video, Url: (string?)"https://example.com/microservices", DurationMinutes: (int?)180, Order: 1, Description: (string?)null),
+            (Title: "Scrum Guide", Type: CourseResourceType.Article, Url: (string?)"https://scrumguides.org", DurationMinutes: (int?)null, Order: 1, Description: (string?)"The official Scrum Guide"),
+        };
+
+        for (var i = 0; i < Math.Min(courseIds.Count, definitions.Length); i++)
+        {
+            var def = definitions[i];
+            resources.Add(new CourseResourceEntity
+            {
+                CourseId = courseIds[i % courseIds.Count],
+                Title = def.Title,
+                Type = def.Type,
+                Url = def.Url,
+                DurationMinutes = def.DurationMinutes,
+                Order = def.Order,
+                Description = def.Description,
+            });
+        }
+
+        db.CourseResources.AddRange(resources);
+        await db.SaveChangesAsync();
     }
 
     private static async Task SeedSkillCatalogue(AppDbContext db)
