@@ -1,11 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { BookOpen, Users, Award } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@itenium-forge/ui';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCourses, fetchDashboardStats } from '@/api/client';
 import { useTeamStore } from '@/stores';
 
 export function Dashboard() {
   const { t } = useTranslation();
   const { mode, selectedTeam } = useTeamStore();
+  const { data: courses = [] } = useQuery({ queryKey: ['courses'], queryFn: fetchCourses });
+  const { data: stats } = useQuery({ queryKey: ['dashboard-stats'], queryFn: fetchDashboardStats });
+  const publishedCount = courses.filter((c) => c.status === 'Published').length;
 
   return (
     <div className="space-y-6">
@@ -24,8 +29,8 @@ export function Dashboard() {
             <BookOpen className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">+3 from last month</p>
+            <div className="text-2xl font-bold">{publishedCount}</div>
+            <p className="text-xs text-muted-foreground">{courses.length} {t('dashboard.total')}</p>
           </CardContent>
         </Card>
 
@@ -35,8 +40,7 @@ export function Dashboard() {
             <Users className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">156</div>
-            <p className="text-xs text-muted-foreground">Active this month</p>
+            <div className="text-2xl font-bold">{stats?.activeLearners ?? '—'}</div>
           </CardContent>
         </Card>
 
@@ -46,8 +50,7 @@ export function Dashboard() {
             <Award className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89</div>
-            <p className="text-xs text-muted-foreground">Certificates issued</p>
+            <div className="text-2xl font-bold">{stats?.completedEnrollments ?? '—'}</div>
           </CardContent>
         </Card>
       </div>

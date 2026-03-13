@@ -52,6 +52,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore, useTeamStore, useThemeStore, type Team } from '@/stores';
 import { fetchUserTeams } from '@/api/client';
+import { queryClient } from '@/lib/queryClient';
 
 const languages = [
   { code: 'nl', name: 'NL' },
@@ -215,6 +216,7 @@ export function Layout() {
 
   const handleLogout = () => {
     logout();
+    queryClient.clear();
     router.navigate({ to: '/sign-in' });
   };
 
@@ -227,6 +229,7 @@ export function Layout() {
   // My Learning section - shown for learners and managers
   const myLearningNavItems = [
     { path: '/my-courses', icon: BookOpen, label: t('nav.myCourses') },
+    { path: '/my-feedback', icon: MessageSquare, label: t('nav.feedback') },
     { path: '/my-progress', icon: TrendingUp, label: t('nav.myProgress') },
     { path: '/my-certificates', icon: Award, label: t('nav.myCertificates') },
   ];
@@ -281,8 +284,8 @@ export function Layout() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {/* My Learning - shown for learners only */}
-          {isLearnerOnly && (
+          {/* My Learning - shown for all non-backoffice users */}
+          {!isBackOffice && (
             <SidebarGroup>
               <SidebarGroupLabel>{t('nav.myLearning')}</SidebarGroupLabel>
               <SidebarGroupContent>
@@ -344,6 +347,27 @@ export function Layout() {
 
           {/* Courses management - shown for managers (not learners) */}
           {mode === 'manager' && !isLearnerOnly && (
+            <SidebarGroup>
+              <SidebarGroupLabel>{t('nav.coursesSection')}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {coursesNavItems.map((item) => (
+                    <SidebarMenuItem key={item.path}>
+                      <SidebarMenuButton asChild>
+                        <Link to={item.path} activeProps={{ className: 'bg-accent' }}>
+                          <item.icon className="size-4" />
+                          <span>{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
+
+          {/* Courses management - shown for backoffice */}
+          {mode === 'backoffice' && isBackOffice && (
             <SidebarGroup>
               <SidebarGroupLabel>{t('nav.coursesSection')}</SidebarGroupLabel>
               <SidebarGroupContent>

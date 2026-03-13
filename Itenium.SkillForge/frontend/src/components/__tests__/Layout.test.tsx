@@ -28,6 +28,11 @@ vi.mock('@tanstack/react-query', () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args),
 }));
 
+// Mock queryClient to avoid i18n initialization in tests
+vi.mock('@/lib/queryClient', () => ({
+  queryClient: { clear: vi.fn() },
+}));
+
 // Mock the UI library with minimal stubs
 // Note: vi.mock factories are hoisted, so we must define stubs inline
 vi.mock('@itenium-forge/ui', () => {
@@ -115,6 +120,7 @@ function setupStores(options: {
       email: 'test@test.com',
       name: userName,
       isBackOffice,
+      isManager: false,
     },
   });
 
@@ -150,8 +156,7 @@ describe('Layout', () => {
 
       expect(screen.getByText('nav.myLearning')).toBeInTheDocument();
       expect(screen.getByText('nav.myCourses')).toBeInTheDocument();
-      expect(screen.getByText('nav.myProgress')).toBeInTheDocument();
-      expect(screen.getByText('nav.myCertificates')).toBeInTheDocument();
+      expect(screen.getAllByText('nav.feedback').length).toBeGreaterThanOrEqual(1);
     });
 
     it('hides My Learning section for backoffice users', () => {

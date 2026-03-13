@@ -22,6 +22,15 @@ try
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.AddForgeOpenIddict<AppDbContext>(options => options.UseNpgsql(connectionString));
 
+    builder.Services.Configure<Microsoft.AspNetCore.Identity.IdentityOptions>(options =>
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
+    });
+
     builder.Services.AddScoped<ISkillForgeUser, SkillForgeUser>();
 
     builder.AddForgeControllers();

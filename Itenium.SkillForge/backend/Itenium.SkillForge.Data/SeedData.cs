@@ -31,6 +31,9 @@ public static class SeedData
                 new TeamEntity { Id = 4, Name = "QA" });
             await db.SaveChangesAsync();
         }
+
+        await db.Database.ExecuteSqlRawAsync(
+            "SELECT setval(pg_get_serial_sequence('\"Teams\"', 'Id'), COALESCE(MAX(\"Id\"), 0) + 1, false) FROM \"Teams\"");
     }
 
     private static async Task SeedCourses(AppDbContext db)
@@ -38,12 +41,32 @@ public static class SeedData
         if (!await db.Courses.AnyAsync())
         {
             db.Courses.AddRange(
-                new CourseEntity { Id = 1, Name = "Introduction to Programming", Description = "Learn the basics of programming", Category = "Development", Level = "Beginner" },
-                new CourseEntity { Id = 2, Name = "Advanced C#", Description = "Master C# programming language", Category = "Development", Level = "Advanced" },
-                new CourseEntity { Id = 3, Name = "Cloud Architecture", Description = "Design scalable cloud solutions", Category = "Architecture", Level = "Intermediate" },
-                new CourseEntity { Id = 4, Name = "Agile Project Management", Description = "Learn agile methodologies", Category = "Management", Level = "Beginner" });
+                new CourseEntity { Id = 1, Name = "Introduction to Programming", Description = "Learn the basics of programming", Category = "Development", Level = "Beginner", Status = CourseStatus.Published },
+                new CourseEntity { Id = 2, Name = "Advanced C#", Description = "Master C# programming language", Category = "Development", Level = "Advanced", Status = CourseStatus.Published },
+                new CourseEntity { Id = 3, Name = "Cloud Architecture", Description = "Design scalable cloud solutions", Category = "Architecture", Level = "Intermediate", Status = CourseStatus.Published },
+                new CourseEntity { Id = 4, Name = "Agile Project Management", Description = "Learn agile methodologies", Category = "Management", Level = "Beginner", Status = CourseStatus.Draft });
             await db.SaveChangesAsync();
         }
+
+        else
+        {
+            // Ensure existing courses have a Published status (migration default was Draft)
+            var draftCourses = await db.Courses
+                .Where(c => c.Status == CourseStatus.Draft && c.Id != 4)
+                .ToListAsync();
+            if (draftCourses.Count > 0)
+            {
+                foreach (var course in draftCourses)
+                {
+                    course.Status = CourseStatus.Published;
+                }
+                await db.SaveChangesAsync();
+            }
+        }
+
+        // Reset PK sequence to avoid conflicts after explicit ID inserts
+        await db.Database.ExecuteSqlRawAsync(
+            "SELECT setval(pg_get_serial_sequence('\"Courses\"', 'Id'), COALESCE(MAX(\"Id\"), 0) + 1, false) FROM \"Courses\"");
     }
 
     private static async Task SeedTestUsers(this WebApplication app)

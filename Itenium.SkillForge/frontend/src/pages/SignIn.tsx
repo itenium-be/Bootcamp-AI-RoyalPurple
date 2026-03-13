@@ -22,7 +22,7 @@ import {
   CardFooter,
 } from '@itenium-forge/ui';
 import { useAuthStore } from '@/stores';
-import { loginApi } from '@/api/client';
+import { loginApi, recordActivity } from '@/api/client';
 
 const createFormSchema = (t: (key: string) => string) =>
   z.object({
@@ -63,6 +63,8 @@ export function SignIn() {
     try {
       const response = await loginApi(data.username, data.password);
       setToken(response.access_token);
+      // Record login activity (fire-and-forget, don't block navigation)
+      recordActivity().catch(() => undefined);
 
       // Navigate to redirect URL or home
       const redirectTo = search.redirect || '/';

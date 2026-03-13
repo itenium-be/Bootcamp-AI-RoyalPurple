@@ -41,6 +41,7 @@ describe('useAuthStore', () => {
         name: 'Alice',
         email: 'alice@example.com',
         isBackOffice: true,
+        isManager: false,
       });
     });
 

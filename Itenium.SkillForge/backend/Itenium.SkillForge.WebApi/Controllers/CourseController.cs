@@ -54,7 +54,9 @@ public class CourseController : ControllerBase
             Name = request.Name,
             Description = request.Description,
             Category = request.Category,
-            Level = request.Level
+            Level = request.Level,
+            Status = request.Status,
+            IsMandatory = request.IsMandatory,
         };
 
         _db.Courses.Add(course);
@@ -79,6 +81,8 @@ public class CourseController : ControllerBase
         course.Description = request.Description;
         course.Category = request.Category;
         course.Level = request.Level;
+        course.Status = request.Status;
+        course.IsMandatory = request.IsMandatory;
 
         await _db.SaveChangesAsync();
 

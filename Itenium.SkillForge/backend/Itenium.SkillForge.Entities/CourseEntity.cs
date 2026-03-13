@@ -23,6 +23,10 @@ public class CourseEntity
     [MaxLength(50)]
     public string? Level { get; set; }
 
+    public CourseStatus Status { get; set; } = CourseStatus.Draft;
+
+    public bool IsMandatory { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public override string ToString() => $"{Name} ({Category})";

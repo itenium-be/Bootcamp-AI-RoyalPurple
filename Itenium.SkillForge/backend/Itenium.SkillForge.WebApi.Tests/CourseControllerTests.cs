@@ -132,4 +132,97 @@ public class CourseControllerTests : DatabaseTestBase
         var result = await _sut.DeleteCourse(999);
         Assert.That(result, Is.TypeOf<NotFoundResult>());
     }
+
+    [Test]
+    public async Task CreateCourse_DefaultsIsMandatoryToFalse()
+    {
+        var request = new CreateCourseRequest("New Course", null, null, null);
+
+        var result = await _sut.CreateCourse(request);
+
+        var createdResult = result.Result as CreatedAtActionResult;
+        var course = createdResult!.Value as CourseEntity;
+        Assert.That(course!.IsMandatory, Is.False);
+    }
+
+    [Test]
+    public async Task CreateCourse_WithIsMandatory_SetsMandatory()
+    {
+        var request = new CreateCourseRequest("New Course", null, null, null, IsMandatory: true);
+
+        var result = await _sut.CreateCourse(request);
+
+        var createdResult = result.Result as CreatedAtActionResult;
+        var course = createdResult!.Value as CourseEntity;
+        Assert.That(course!.IsMandatory, Is.True);
+    }
+
+    [Test]
+    public async Task UpdateCourse_IsMandatory_UpdatesFlag()
+    {
+        var course = new CourseEntity { Name = "Course", IsMandatory = false };
+        Db.Courses.Add(course);
+        await Db.SaveChangesAsync();
+
+        var request = new UpdateCourseRequest("Course", null, null, null, IsMandatory: true);
+        var result = await _sut.UpdateCourse(course.Id, request);
+
+        var okResult = result.Result as OkObjectResult;
+        var updated = okResult!.Value as CourseEntity;
+        Assert.That(updated!.IsMandatory, Is.True);
+    }
+
+    [Test]
+    public async Task CreateCourse_DefaultsStatusToDraft()
+    {
+        var request = new CreateCourseRequest("New Course", null, null, null);
+
+        var result = await _sut.CreateCourse(request);
+
+        var createdResult = result.Result as CreatedAtActionResult;
+        var course = createdResult!.Value as CourseEntity;
+        Assert.That(course!.Status, Is.EqualTo(CourseStatus.Draft));
+    }
+
+    [Test]
+    public async Task CreateCourse_WithPublishedStatus_SetsStatus()
+    {
+        var request = new CreateCourseRequest("New Course", null, null, null, CourseStatus.Published);
+
+        var result = await _sut.CreateCourse(request);
+
+        var createdResult = result.Result as CreatedAtActionResult;
+        var course = createdResult!.Value as CourseEntity;
+        Assert.That(course!.Status, Is.EqualTo(CourseStatus.Published));
+    }
+
+    [Test]
+    public async Task UpdateCourse_UpdatesStatus()
+    {
+        var course = new CourseEntity { Name = "Course", Status = CourseStatus.Draft };
+        Db.Courses.Add(course);
+        await Db.SaveChangesAsync();
+
+        var request = new UpdateCourseRequest("Course", null, null, null, CourseStatus.Published);
+        var result = await _sut.UpdateCourse(course.Id, request);
+
+        var okResult = result.Result as OkObjectResult;
+        var updated = okResult!.Value as CourseEntity;
+        Assert.That(updated!.Status, Is.EqualTo(CourseStatus.Published));
+    }
+
+    [Test]
+    public async Task UpdateCourse_ArchiveCourse_SetsArchivedStatus()
+    {
+        var course = new CourseEntity { Name = "Course", Status = CourseStatus.Published };
+        Db.Courses.Add(course);
+        await Db.SaveChangesAsync();
+
+        var request = new UpdateCourseRequest("Course", null, null, null, CourseStatus.Archived);
+        var result = await _sut.UpdateCourse(course.Id, request);
+
+        var okResult = result.Result as OkObjectResult;
+        var updated = okResult!.Value as CourseEntity;
+        Assert.That(updated!.Status, Is.EqualTo(CourseStatus.Archived));
+    }
 }
