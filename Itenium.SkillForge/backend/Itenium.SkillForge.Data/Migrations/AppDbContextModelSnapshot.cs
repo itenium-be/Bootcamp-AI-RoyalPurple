@@ -271,6 +271,76 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.ToTable("Feedbacks");
                 });
 
+            modelBuilder.Entity("Itenium.SkillForge.Entities.GoalEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CoachId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("ConsultantId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<int>("CurrentLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Deadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TargetLevel")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("Goals");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.GoalResourceEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GoalId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GoalId");
+
+                    b.ToTable("GoalResources");
+                });
+
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -797,6 +867,28 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.Navigation("Course");
                 });
 
+            modelBuilder.Entity("Itenium.SkillForge.Entities.GoalEntity", b =>
+                {
+                    b.HasOne("Itenium.SkillForge.Entities.SkillEntity", "Skill")
+                        .WithMany()
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Skill");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.GoalResourceEntity", b =>
+                {
+                    b.HasOne("Itenium.SkillForge.Entities.GoalEntity", "Goal")
+                        .WithMany("Resources")
+                        .HasForeignKey("GoalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Goal");
+                });
+
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
 
                 {
@@ -932,6 +1024,11 @@ namespace Itenium.SkillForge.Data.Migrations
             modelBuilder.Entity("Itenium.SkillForge.Entities.FeedbackEntity", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.GoalEntity", b =>
+                {
+                    b.Navigation("Resources");
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
