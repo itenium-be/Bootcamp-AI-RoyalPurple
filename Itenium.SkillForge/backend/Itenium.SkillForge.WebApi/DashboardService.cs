@@ -44,7 +44,21 @@ public class DashboardService : IDashboardService
             .Where(a => userIds.Contains(a.UserId))
             .ToDictionaryAsync(a => a.UserId);
 
+        var activeGoalCounts = await _db.Goals
+            .Where(g => userIds.Contains(g.ConsultantId))
+            .GroupBy(g => g.ConsultantId)
+            .ToDictionaryAsync(g => g.Key, g => g.Count());
+
         var now = DateTime.UtcNow;
+
+        var readinessFlagsByUser = await _db.ReadinessFlags
+            .Where(f => f.ResolvedAt == null && userIds.Contains(f.Goal.ConsultantId))
+            .Select(f => new { f.Goal.ConsultantId, f.RaisedAt })
+            .GroupBy(f => f.ConsultantId)
+            .ToDictionaryAsync(
+                g => g.Key,
+                g => (int)(now - g.Min(f => f.RaisedAt)).TotalDays);
+
         var result = new List<ConsultantSummaryDto>();
         foreach (var user in found.OrderBy(u => u.LastName, StringComparer.Ordinal).ThenBy(u => u.FirstName, StringComparer.Ordinal))
         {
@@ -58,6 +72,9 @@ public class DashboardService : IDashboardService
             var lastActivityAt = activity?.LastActivityAt;
             var isInactive = lastActivityAt == null || (now - lastActivityAt.Value) > InactiveThreshold;
 
+            activeGoalCounts.TryGetValue(user.Id, out var activeGoalCount);
+            var isReady = readinessFlagsByUser.TryGetValue(user.Id, out var flagAge);
+
             result.Add(new ConsultantSummaryDto(
                 user.Id,
                 user.FirstName ?? string.Empty,
@@ -66,8 +83,9 @@ public class DashboardService : IDashboardService
                 teams,
                 lastActivityAt,
                 isInactive,
-                ActiveGoalCount: 0,
-                IsReady: false));
+                ActiveGoalCount: activeGoalCount,
+                IsReady: isReady,
+                ReadinessFlagAgeInDays: isReady ? flagAge : null));
         }
 
         return result;

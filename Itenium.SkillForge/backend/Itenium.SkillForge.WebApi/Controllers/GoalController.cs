@@ -34,6 +34,7 @@ public class GoalController : ControllerBase
         var goals = await _db.Goals
             .Include(g => g.Skill)
             .Include(g => g.Resources)
+            .Include(g => g.ReadinessFlags)
             .Where(g => g.ConsultantId == targetId)
             .OrderBy(g => g.Deadline)
             .ToListAsync();
@@ -71,6 +72,65 @@ public class GoalController : ControllerBase
         return CreatedAtAction(nameof(GetGoals), new { }, ToDto(goal));
     }
 
+    /// <summary>
+    /// Consultant raises a readiness flag on their own goal, signalling they are
+    /// ready for coach review. Maximum one active flag per goal at a time.
+    /// </summary>
+    [HttpPost("{goalId}/readiness-flag")]
+    public async Task<IActionResult> RaiseReadinessFlag(int goalId)
+    {
+        var goal = await _db.Goals.FindAsync(goalId);
+        if (goal == null)
+            return NotFound();
+
+        if (goal.ConsultantId != _user.UserId && !_user.IsManager && !_user.IsBackOffice)
+            return Forbid();
+
+        var alreadyActive = await _db.ReadinessFlags
+            .AnyAsync(f => f.GoalId == goalId && f.ResolvedAt == null);
+
+        if (alreadyActive)
+            return Conflict();
+
+        _db.ReadinessFlags.Add(new ReadinessFlagEntity
+        {
+            GoalId = goalId,
+            RaisedAt = DateTime.UtcNow,
+        });
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Resolves (dismisses) the active readiness flag on a goal.
+    /// Consultant can resolve their own flag; manager can resolve any flag on their team's goals.
+    /// </summary>
+    [HttpDelete("{goalId}/readiness-flag")]
+    public async Task<IActionResult> ResolveReadinessFlag(int goalId)
+    {
+        var goal = await _db.Goals.FindAsync(goalId);
+        if (goal == null)
+            return NotFound();
+
+        var isOwner = goal.ConsultantId == _user.UserId;
+        var isCoach = (_user.IsManager || _user.IsBackOffice) && goal.CoachId == _user.UserId;
+
+        if (!isOwner && !isCoach)
+            return Forbid();
+
+        var flag = await _db.ReadinessFlags
+            .FirstOrDefaultAsync(f => f.GoalId == goalId && f.ResolvedAt == null);
+
+        if (flag == null)
+            return NotFound();
+
+        flag.ResolvedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
     private static GoalDto ToDto(GoalEntity g) =>
         new(
             g.Id,
@@ -78,5 +138,6 @@ public class GoalController : ControllerBase
             g.CurrentLevel,
             g.TargetLevel,
             g.Deadline,
-            g.Resources.Select(r => new GoalResourceDto(r.Id, r.Title, r.Url, r.Type)).ToList());
+            g.Resources.Select(r => new GoalResourceDto(r.Id, r.Title, r.Url, r.Type)).ToList(),
+            g.ReadinessFlags.Any(f => f.ResolvedAt == null));
 }

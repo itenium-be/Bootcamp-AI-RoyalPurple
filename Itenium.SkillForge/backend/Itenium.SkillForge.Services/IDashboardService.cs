@@ -9,7 +9,8 @@ public record ConsultantSummaryDto(
     DateTime? LastActivityAt,
     bool IsInactive,
     int ActiveGoalCount,
-    bool IsReady);
+    bool IsReady,
+    int? ReadinessFlagAgeInDays);
 
 public interface IDashboardService
 {

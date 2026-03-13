@@ -16,13 +16,13 @@ public class DashboardControllerTests
     private static readonly int[] TeamIds12 = [1, 2];
 
     private static ConsultantSummaryDto ActiveConsultant(string id = "id1") =>
-        new(id, "Alice", "Smith", "alice@test.local", [1], DateTime.UtcNow.AddDays(-1), false, 0, false);
+        new(id, "Alice", "Smith", "alice@test.local", [1], DateTime.UtcNow.AddDays(-1), false, 0, false, null);
 
     private static ConsultantSummaryDto InactiveConsultant(string id = "id2") =>
-        new(id, "Bob", "Jones", "bob@test.local", [1], DateTime.UtcNow.AddDays(-30), true, 0, false);
+        new(id, "Bob", "Jones", "bob@test.local", [1], DateTime.UtcNow.AddDays(-30), true, 0, false, null);
 
     private static ConsultantSummaryDto NeverActiveConsultant(string id = "id3") =>
-        new(id, "Charlie", "Brown", "charlie@test.local", [1], null, true, 0, false);
+        new(id, "Charlie", "Brown", "charlie@test.local", [1], null, true, 0, false, null);
 
     [SetUp]
     public void Setup()
@@ -115,6 +115,24 @@ public class DashboardControllerTests
         var ok = result.Result as OkObjectResult;
         var list = ok!.Value as IList<ConsultantSummaryDto>;
         Assert.That(list![0].ActiveGoalCount, Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task GetDashboard_ReadyConsultant_HasIsReadyTrueAndFlagAge()
+    {
+        IList<ConsultantSummaryDto> summaries =
+        [
+            new("id1", "Alice", "Smith", "alice@test.local", [1], DateTime.UtcNow.AddDays(-1), false, 1, true, 2),
+        ];
+        _currentUser.Teams.Returns(TeamIds1);
+        _dashboardService.GetConsultantSummariesAsync(TeamIds1).Returns(summaries);
+
+        var result = await _sut.GetDashboard();
+
+        var ok = result.Result as OkObjectResult;
+        var list = ok!.Value as IList<ConsultantSummaryDto>;
+        Assert.That(list![0].IsReady, Is.True);
+        Assert.That(list[0].ReadinessFlagAgeInDays, Is.EqualTo(2));
     }
 
     [Test]

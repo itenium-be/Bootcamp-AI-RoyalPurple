@@ -30,6 +30,7 @@ const consultant = (overrides: Partial<ConsultantSummary> = {}): ConsultantSumma
   isInactive: false,
   activeGoalCount: 0,
   isReady: false,
+  readinessFlagAgeInDays: null,
   ...overrides,
 });
 
@@ -84,5 +85,29 @@ describe('CoachDashboard', () => {
   test('query uses fetchCoachDashboard', () => {
     render(<CoachDashboard />);
     expect(mockUseQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['coach-dashboard'] }));
+  });
+
+  test('shows readiness flag badge when consultant is ready', () => {
+    mockUseQuery.mockReturnValue({
+      data: [consultant({ isReady: true, readinessFlagAgeInDays: 2 })],
+      isLoading: false,
+    });
+    render(<CoachDashboard />);
+    expect(screen.getByText('dashboard.ready')).toBeInTheDocument();
+  });
+
+  test('shows readiness flag age when flag is raised today', () => {
+    mockUseQuery.mockReturnValue({
+      data: [consultant({ isReady: true, readinessFlagAgeInDays: 0 })],
+      isLoading: false,
+    });
+    render(<CoachDashboard />);
+    expect(screen.getByText(/dashboard\.readinessFlagAge/)).toBeInTheDocument();
+  });
+
+  test('does not show readiness flag badge when consultant is not ready', () => {
+    mockUseQuery.mockReturnValue({ data: [consultant({ isReady: false })], isLoading: false });
+    render(<CoachDashboard />);
+    expect(screen.queryByText('dashboard.ready')).not.toBeInTheDocument();
   });
 });

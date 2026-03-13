@@ -112,6 +112,61 @@ public class GoalControllerTests : DatabaseTestBase
     }
 
     [Test]
+    public async Task GetGoals_HasActiveReadinessFlagTrue_WhenFlagRaised()
+    {
+        var goal = new GoalEntity
+        {
+            ConsultantId = "user-1",
+            CoachId = "coach-1",
+            SkillId = _skill.Id,
+            CurrentLevel = 0,
+            TargetLevel = 1,
+            Deadline = DateTime.UtcNow.AddMonths(1),
+            ReadinessFlags = [new ReadinessFlagEntity { RaisedAt = DateTime.UtcNow.AddDays(-1) }],
+        };
+        Db.Goals.Add(goal);
+        await Db.SaveChangesAsync();
+
+        _user.UserId.Returns("user-1");
+        _user.IsManager.Returns(false);
+        _user.IsBackOffice.Returns(false);
+
+        var result = await _sut.GetGoals();
+
+        var goals = (result.Result as OkObjectResult)!.Value as IList<GoalDto>;
+        Assert.That(goals![0].HasActiveReadinessFlag, Is.True);
+    }
+
+    [Test]
+    public async Task GetGoals_HasActiveReadinessFlagFalse_WhenFlagResolved()
+    {
+        var goal = new GoalEntity
+        {
+            ConsultantId = "user-1",
+            CoachId = "coach-1",
+            SkillId = _skill.Id,
+            CurrentLevel = 0,
+            TargetLevel = 1,
+            Deadline = DateTime.UtcNow.AddMonths(1),
+            ReadinessFlags =
+            [
+                new ReadinessFlagEntity { RaisedAt = DateTime.UtcNow.AddDays(-3), ResolvedAt = DateTime.UtcNow.AddDays(-1) },
+            ],
+        };
+        Db.Goals.Add(goal);
+        await Db.SaveChangesAsync();
+
+        _user.UserId.Returns("user-1");
+        _user.IsManager.Returns(false);
+        _user.IsBackOffice.Returns(false);
+
+        var result = await _sut.GetGoals();
+
+        var goals = (result.Result as OkObjectResult)!.Value as IList<GoalDto>;
+        Assert.That(goals![0].HasActiveReadinessFlag, Is.False);
+    }
+
+    [Test]
     public async Task CreateGoal_AsManager_CreatesGoal()
     {
         _user.UserId.Returns("coach-1");

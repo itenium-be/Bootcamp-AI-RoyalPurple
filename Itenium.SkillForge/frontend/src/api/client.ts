@@ -187,6 +187,37 @@ export interface ConsultantSummary {
   isInactive: boolean;
   activeGoalCount: number;
   isReady: boolean;
+  readinessFlagAgeInDays: number | null;
+}
+
+export interface GoalResource {
+  id: number;
+  title: string;
+  url: string;
+  type: string;
+}
+
+export interface Goal {
+  id: number;
+  skillName: string;
+  currentLevel: number;
+  targetLevel: number;
+  deadline: string;
+  resources: GoalResource[];
+  hasActiveReadinessFlag: boolean;
+}
+
+export async function fetchMyGoals(): Promise<Goal[]> {
+  const response = await api.get<Goal[]>('/api/goal');
+  return response.data;
+}
+
+export async function raiseReadinessFlag(goalId: number): Promise<void> {
+  await api.post(`/api/goal/${goalId}/readiness-flag`);
+}
+
+export async function resolveReadinessFlag(goalId: number): Promise<void> {
+  await api.delete(`/api/goal/${goalId}/readiness-flag`);
 }
 
 export async function fetchCoachDashboard(): Promise<ConsultantSummary[]> {

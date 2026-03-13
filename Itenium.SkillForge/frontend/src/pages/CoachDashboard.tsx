@@ -26,6 +26,16 @@ function ConsultantCard({ consultant }: { consultant: ConsultantSummary }) {
               {t('dashboard.inactive')}
             </span>
           )}
+          {consultant.isReady && (
+            <span className="text-xs font-medium text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/40 rounded px-2 py-0.5">
+              {t('dashboard.ready')}
+            </span>
+          )}
+          {consultant.isReady && consultant.readinessFlagAgeInDays !== null && (
+            <span className="text-xs text-muted-foreground">
+              {t('dashboard.readinessFlagAge', { days: consultant.readinessFlagAgeInDays })}
+            </span>
+          )}
           <span className="text-xs text-muted-foreground">
             {t('dashboard.goals')}: {consultant.activeGoalCount}
           </span>

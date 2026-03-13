@@ -8,7 +8,8 @@ public record GoalDto(
     int CurrentLevel,
     int TargetLevel,
     DateTime Deadline,
-    IReadOnlyList<GoalResourceDto> Resources);
+    IReadOnlyList<GoalResourceDto> Resources,
+    bool HasActiveReadinessFlag);
 
 public record CreateGoalResourceRequest(string Title, string Url, string Type);
 
