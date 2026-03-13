@@ -72,3 +72,28 @@ export async function fetchCourses(): Promise<Course[]> {
   const response = await api.get<Course[]>('/api/course');
   return response.data;
 }
+
+export interface UserDto {
+  id: string;
+  userName: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  teams: number[];
+}
+
+export async function fetchUsers(): Promise<UserDto[]> {
+  const response = await api.get<UserDto[]>('/api/user');
+  return response.data;
+}
+
+export async function fetchCurrentUser(): Promise<UserDto> {
+  const response = await api.get<UserDto>('/api/user/me');
+  return response.data;
+}
+
+export async function fetchMyCoaches(): Promise<UserDto[]> {
+  const response = await api.get<UserDto[]>('/api/user/coach');
+  return response.data;
+}

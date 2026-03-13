@@ -236,7 +236,7 @@ export function Layout() {
 
   // Team section - shown for managers
   const teamNavItems = [
-    { path: '/team/members', icon: Users, label: t('nav.teamMembers') },
+    { path: '/admin/users', icon: Users, label: t('nav.teamMembers') },
     { path: '/team/progress', icon: BarChart3, label: t('nav.teamProgress') },
     { path: '/team/assignments', icon: ClipboardList, label: t('nav.assignments') },
   ];
