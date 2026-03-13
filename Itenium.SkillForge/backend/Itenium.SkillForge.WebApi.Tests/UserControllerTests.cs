@@ -15,6 +15,8 @@ public class UserControllerTests
     private static readonly UserDto Alice = new("id1", "alice", "alice@test.local", "Alice", "Smith", "learner", [1]);
     private static readonly UserDto Bob = new("id2", "bob", "bob@test.local", "Bob", "Jones", "manager", [1, 2]);
     private static readonly UserDto Charlie = new("id3", "charlie", "charlie@test.local", "Charlie", "Brown", "backoffice", []);
+    private static readonly int[] TeamIds1 = [1];
+    private static readonly int[] TeamIds12 = [1, 2];
 
     [SetUp]
     public void Setup()
@@ -45,8 +47,8 @@ public class UserControllerTests
     {
         IList<UserDto> teamMembers = [Alice, Bob];
         _currentUser.IsBackOffice.Returns(false);
-        _currentUser.Teams.Returns(new[] { 1, 2 });
-        _userService.GetTeamMembersAsync([1, 2]).Returns(teamMembers);
+        _currentUser.Teams.Returns(TeamIds12);
+        _userService.GetTeamMembersAsync(TeamIds12).Returns(teamMembers);
 
         var result = await _sut.GetUsers();
 
@@ -77,8 +79,8 @@ public class UserControllerTests
     {
         IList<UserDto> teamMembers = [Alice];
         _currentUser.IsBackOffice.Returns(false);
-        _currentUser.Teams.Returns(new[] { 1 });
-        _userService.GetTeamMembersAsync([1]).Returns(teamMembers);
+        _currentUser.Teams.Returns(TeamIds1);
+        _userService.GetTeamMembersAsync(TeamIds1).Returns(teamMembers);
 
         var result = await _sut.GetUsers();
 
@@ -118,8 +120,8 @@ public class UserControllerTests
     public async Task GetCoaches_WhenUserHasTeams_ReturnsCoaches()
     {
         IList<UserDto> coaches = [Bob];
-        _currentUser.Teams.Returns(new[] { 1 });
-        _userService.GetCoachesForTeamsAsync([1]).Returns(coaches);
+        _currentUser.Teams.Returns(TeamIds1);
+        _userService.GetCoachesForTeamsAsync(TeamIds1).Returns(coaches);
 
         var result = await _sut.GetCoaches();
 
