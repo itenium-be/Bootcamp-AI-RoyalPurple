@@ -43,6 +43,11 @@ export default function Roadmap() {
                     <div key={node.id} className="border rounded-lg p-4">
                       <h3 className="font-medium">{node.name}</h3>
                       {node.description && <p className="text-sm text-muted-foreground mt-1">{node.description}</p>}
+                      {node.prerequisites.length > 0 && (
+                        <p className="text-sm text-yellow-600 mt-2">
+                          ⚠ {t('roadmap.prerequisites')}: {node.prerequisites.join(', ')}
+                        </p>
+                      )}
                     </div>
                   ))}
               </div>

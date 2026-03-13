@@ -169,6 +169,7 @@ export interface RoadmapNode {
   description: string | null;
   tier: number;
   teamId: number;
+  prerequisites: string[];
 }
 
 export async function fetchRoadmap(showAll = false): Promise<RoadmapNode[]> {

@@ -155,7 +155,8 @@
     "tier3": "Advanced",
     "tier4": "Expert",
     "showAll": "Show all",
-    "noRoadmap": "No roadmap available for your profile"
+    "noRoadmap": "No roadmap available for your profile",
+    "prerequisites": "Prerequisites"
   },
   "errors": {
     "sessionExpired": "Session expired!",
