@@ -4,7 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod/v4';
-import { Users, GraduationCap, Briefcase, Component, Plus, MoreHorizontal, Pencil, UserCheck } from 'lucide-react';
+import {
+  Users,
+  GraduationCap,
+  Briefcase,
+  Component,
+  Plus,
+  MoreHorizontal,
+  Pencil,
+  UserCheck,
+  UserPlus,
+} from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -12,7 +22,9 @@ import {
   CardTitle,
   Avatar,
   AvatarFallback,
+  Badge,
   Button,
+  Separator,
   Sheet,
   SheetContent,
   SheetHeader,
@@ -63,17 +75,28 @@ interface Team {
 // ─── Role badge ───────────────────────────────────────────────────────────────
 
 const roleMeta: Record<string, { label: string; className: string }> = {
-  backoffice: { label: 'Admin', className: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
-  manager: { label: 'Coach', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-  learner: { label: 'Consultant', className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
+  backoffice: {
+    label: 'Admin',
+    className:
+      'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 border-purple-200 dark:border-purple-800',
+  },
+  manager: {
+    label: 'Coach',
+    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border-blue-200 dark:border-blue-800',
+  },
+  learner: {
+    label: 'Consultant',
+    className:
+      'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-200 dark:border-green-800',
+  },
 };
 
 function RoleBadge({ role }: { role: string }) {
   const meta = roleMeta[role] ?? { label: role, className: 'bg-gray-100 text-gray-800' };
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${meta.className}`}>
+    <Badge variant="outline" className={meta.className}>
       {meta.label}
-    </span>
+    </Badge>
   );
 }
 
@@ -118,7 +141,20 @@ function CreateUserSheet({
       form.reset();
       onOpenChange(false);
     },
-    onError: () => toast.error(t('users.createError', 'Failed to create user')),
+    onError: (error: unknown) => {
+      const data = (error as { response?: { data?: unknown } })?.response?.data;
+      let detail = '';
+      if (Array.isArray(data)) {
+        // ASP.NET Identity errors: [{ code, description }]
+        detail = (data as { description?: string; code?: string }[])
+          .map((e) => e.description ?? e.code ?? '')
+          .filter(Boolean)
+          .join('\n');
+      } else if (typeof data === 'string') {
+        detail = data;
+      }
+      toast.error(t('users.createError', 'Failed to create user'), { description: detail || undefined });
+    },
   });
 
   const selectedTeams = form.watch('teams');
@@ -126,21 +162,71 @@ function CreateUserSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[420px] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>{t('users.createTitle', 'Create User')}</SheetTitle>
-          <SheetDescription>{t('users.createDesc', 'Add a new user to the platform.')}</SheetDescription>
+      <SheetContent className="w-[420px] overflow-y-auto px-6">
+        <SheetHeader className="pb-4 pt-2">
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <UserPlus className="size-5" />
+            </div>
+            <div>
+              <SheetTitle>{t('users.createTitle', 'Create User')}</SheetTitle>
+              <SheetDescription>{t('users.createDesc', 'Add a new user to the platform.')}</SheetDescription>
+            </div>
+          </div>
         </SheetHeader>
 
+        <Separator />
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-3">
+          <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="space-y-6 py-4">
+            {/* Personal information */}
+            <div className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {t('users.sectionPersonal', 'Personal information')}
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('users.firstName', 'First name')}</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('users.lastName', 'Last name')}</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Account */}
+            <div className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {t('users.sectionAccount', 'Account')}
+              </p>
               <FormField
                 control={form.control}
-                name="firstName"
+                name="userName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('users.firstName', 'First name')}</FormLabel>
+                    <FormLabel>{t('users.username', 'Username')}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -150,12 +236,25 @@ function CreateUserSheet({
               />
               <FormField
                 control={form.control}
-                name="lastName"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('users.lastName', 'Last name')}</FormLabel>
+                    <FormLabel>{t('users.email', 'Email')}</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('users.password', 'Password')}</FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -163,105 +262,76 @@ function CreateUserSheet({
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="userName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('users.username', 'Username')}</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Separator />
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('users.email', 'Email')}</FormLabel>
-                  <FormControl>
-                    <Input type="email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('users.password', 'Password')}</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('users.role', 'Role')}</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="learner">Consultant</SelectItem>
-                      <SelectItem value="manager">Coach</SelectItem>
-                      <SelectItem value="backoffice">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {(selectedRole === 'manager' || selectedRole === 'learner') && teams.length > 0 && (
+            {/* Access */}
+            <div className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {t('users.sectionAccess', 'Access')}
+              </p>
               <FormField
                 control={form.control}
-                name="teams"
-                render={() => (
+                name="role"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('users.teams', 'Teams')}</FormLabel>
-                    <div className="space-y-2">
-                      {teams.map((team) => (
-                        <div key={team.id} className="flex items-center gap-2">
-                          <Checkbox
-                            id={`team-${team.id}`}
-                            checked={selectedTeams.includes(team.id)}
-                            onCheckedChange={(checked) => {
-                              const current = form.getValues('teams');
-                              form.setValue(
-                                'teams',
-                                checked ? [...current, team.id] : current.filter((id) => id !== team.id),
-                              );
-                            }}
-                          />
-                          <label htmlFor={`team-${team.id}`} className="text-sm">
-                            {team.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
+                    <FormLabel>{t('users.role', 'Role')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="learner">Consultant</SelectItem>
+                        <SelectItem value="manager">Coach</SelectItem>
+                        <SelectItem value="backoffice">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
 
-            <SheetFooter className="pt-4">
+              {(selectedRole === 'manager' || selectedRole === 'learner') && teams.length > 0 && (
+                <FormField
+                  control={form.control}
+                  name="teams"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>{t('users.teams', 'Teams')}</FormLabel>
+                      <div className="rounded-lg border p-3 space-y-2.5">
+                        {teams.map((team) => (
+                          <div key={team.id} className="flex items-center gap-2.5">
+                            <Checkbox
+                              id={`team-${team.id}`}
+                              checked={selectedTeams.includes(team.id)}
+                              onCheckedChange={(checked) => {
+                                const current = form.getValues('teams');
+                                form.setValue(
+                                  'teams',
+                                  checked ? [...current, team.id] : current.filter((id) => id !== team.id),
+                                );
+                              }}
+                            />
+                            <label
+                              htmlFor={`team-${team.id}`}
+                              className="text-sm font-medium leading-none cursor-pointer"
+                            >
+                              {team.name}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+
+            <Separator />
+
+            <SheetFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 {t('common.cancel', 'Cancel')}
               </Button>
@@ -330,75 +400,97 @@ function EditUserSheet({
   const selectedRole = form.watch('role');
   const isPending = roleMutation.isPending || teamsMutation.isPending;
 
+  const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+
   return (
     <Sheet open onOpenChange={onOpenChange}>
-      <SheetContent className="w-[420px] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>
-            {user.firstName} {user.lastName}
-          </SheetTitle>
-          <SheetDescription>{user.email}</SheetDescription>
+      <SheetContent className="w-[420px] overflow-y-auto px-6">
+        <SheetHeader className="pb-4 pt-2">
+          <div className="flex items-center gap-3">
+            <Avatar className="size-12">
+              <AvatarFallback className="text-base">{initials || user.userName.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <SheetTitle className="flex items-center gap-2">
+                {user.firstName} {user.lastName}
+                <RoleBadge role={user.role} />
+              </SheetTitle>
+              <SheetDescription className="truncate">{user.email}</SheetDescription>
+            </div>
+          </div>
         </SheetHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('users.role', 'Role')}</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="learner">Consultant</SelectItem>
-                      <SelectItem value="manager">Coach</SelectItem>
-                      <SelectItem value="backoffice">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <Separator />
 
-            {(selectedRole === 'manager' || selectedRole === 'learner') && teams.length > 0 && (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
+            <div className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {t('users.sectionAccess', 'Access')}
+              </p>
               <FormField
                 control={form.control}
-                name="teams"
-                render={() => (
+                name="role"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('users.teams', 'Teams')}</FormLabel>
-                    <div className="space-y-2">
-                      {teams.map((team) => (
-                        <div key={team.id} className="flex items-center gap-2">
-                          <Checkbox
-                            id={`edit-team-${team.id}`}
-                            checked={selectedTeams.includes(team.id)}
-                            onCheckedChange={(checked) => {
-                              const current = form.getValues('teams');
-                              form.setValue(
-                                'teams',
-                                checked ? [...current, team.id] : current.filter((id) => id !== team.id),
-                              );
-                            }}
-                          />
-                          <label htmlFor={`edit-team-${team.id}`} className="text-sm">
-                            {team.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
+                    <FormLabel>{t('users.role', 'Role')}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="learner">Consultant</SelectItem>
+                        <SelectItem value="manager">Coach</SelectItem>
+                        <SelectItem value="backoffice">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
 
-            <SheetFooter className="pt-4">
+              {(selectedRole === 'manager' || selectedRole === 'learner') && teams.length > 0 && (
+                <FormField
+                  control={form.control}
+                  name="teams"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>{t('users.teams', 'Teams')}</FormLabel>
+                      <div className="rounded-lg border p-3 space-y-2.5">
+                        {teams.map((team) => (
+                          <div key={team.id} className="flex items-center gap-2.5">
+                            <Checkbox
+                              id={`edit-team-${team.id}`}
+                              checked={selectedTeams.includes(team.id)}
+                              onCheckedChange={(checked) => {
+                                const current = form.getValues('teams');
+                                form.setValue(
+                                  'teams',
+                                  checked ? [...current, team.id] : current.filter((id) => id !== team.id),
+                                );
+                              }}
+                            />
+                            <label
+                              htmlFor={`edit-team-${team.id}`}
+                              className="text-sm font-medium leading-none cursor-pointer"
+                            >
+                              {team.name}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+
+            <Separator />
+
+            <SheetFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 {t('common.cancel', 'Cancel')}
               </Button>
