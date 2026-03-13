@@ -242,12 +242,15 @@ export function Assignments() {
                   control={control}
                   name="userId"
                   render={({ field }) => (
-                    <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v || null)}>
+                    <Select
+                      value={field.value ?? '__all__'}
+                      onValueChange={(v) => field.onChange(v === '__all__' ? null : v)}
+                    >
                       <SelectTrigger>
-                        <SelectValue placeholder={t('assignments.wholeTeam')} />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">{t('assignments.wholeTeam')}</SelectItem>
+                        <SelectItem value="__all__">{t('assignments.wholeTeam')}</SelectItem>
                         {teamMembers.map((c) => (
                           <SelectItem key={c.userId} value={c.userId}>
                             {c.firstName} {c.lastName}
