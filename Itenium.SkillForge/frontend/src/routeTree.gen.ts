@@ -20,6 +20,7 @@ import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedCatalogRouteImport } from './routes/_authenticated/catalog'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as AuthenticatedTeamProfilesRouteImport } from './routes/_authenticated/team/profiles'
+import { Route as AuthenticatedTeamAssignmentsRouteImport } from './routes/_authenticated/team/assignments'
 import { Route as AuthenticatedReportsFeedbackRouteImport } from './routes/_authenticated/reports/feedback'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authenticated/admin/teams'
@@ -79,6 +80,12 @@ const AuthenticatedTeamProfilesRoute =
     path: '/team/profiles',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTeamAssignmentsRoute =
+  AuthenticatedTeamAssignmentsRouteImport.update({
+    id: '/team/assignments',
+    path: '/team/assignments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReportsFeedbackRoute =
   AuthenticatedReportsFeedbackRouteImport.update({
     id: '/reports/feedback',
@@ -97,7 +104,6 @@ const AuthenticatedAdminTeamsRoute = AuthenticatedAdminTeamsRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
   '/sign-in': typeof authSignInRoute
   '/catalog': typeof AuthenticatedCatalogRoute
   '/coach': typeof AuthenticatedCoachRoute
@@ -106,9 +112,11 @@ export interface FileRoutesByFullPath {
   '/my-profile': typeof AuthenticatedMyProfileRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/': typeof AuthenticatedIndexRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/reports/feedback': typeof AuthenticatedReportsFeedbackRoute
+  '/team/assignments': typeof AuthenticatedTeamAssignmentsRoute
   '/team/profiles': typeof AuthenticatedTeamProfilesRoute
 }
 export interface FileRoutesByTo {
@@ -124,6 +132,7 @@ export interface FileRoutesByTo {
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/reports/feedback': typeof AuthenticatedReportsFeedbackRoute
+  '/team/assignments': typeof AuthenticatedTeamAssignmentsRoute
   '/team/profiles': typeof AuthenticatedTeamProfilesRoute
 }
 export interface FileRoutesById {
@@ -141,12 +150,12 @@ export interface FileRoutesById {
   '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/reports/feedback': typeof AuthenticatedReportsFeedbackRoute
+  '/_authenticated/team/assignments': typeof AuthenticatedTeamAssignmentsRoute
   '/_authenticated/team/profiles': typeof AuthenticatedTeamProfilesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/sign-in'
     | '/catalog'
     | '/coach'
@@ -155,9 +164,11 @@ export interface FileRouteTypes {
     | '/my-profile'
     | '/roadmap'
     | '/settings'
+    | '/'
     | '/admin/teams'
     | '/admin/users'
     | '/reports/feedback'
+    | '/team/assignments'
     | '/team/profiles'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/admin/teams'
     | '/admin/users'
     | '/reports/feedback'
+    | '/team/assignments'
     | '/team/profiles'
   id:
     | '__root__'
@@ -189,6 +201,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/teams'
     | '/_authenticated/admin/users'
     | '/_authenticated/reports/feedback'
+    | '/_authenticated/team/assignments'
     | '/_authenticated/team/profiles'
   fileRoutesById: FileRoutesById
 }
@@ -202,7 +215,7 @@ declare module '@tanstack/react-router' {
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
-      fullPath: '/'
+      fullPath: ''
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -276,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamProfilesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/team/assignments': {
+      id: '/_authenticated/team/assignments'
+      path: '/team/assignments'
+      fullPath: '/team/assignments'
+      preLoaderRoute: typeof AuthenticatedTeamAssignmentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reports/feedback': {
       id: '/_authenticated/reports/feedback'
       path: '/reports/feedback'
@@ -312,6 +332,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedReportsFeedbackRoute: typeof AuthenticatedReportsFeedbackRoute
+  AuthenticatedTeamAssignmentsRoute: typeof AuthenticatedTeamAssignmentsRoute
   AuthenticatedTeamProfilesRoute: typeof AuthenticatedTeamProfilesRoute
 }
 
@@ -327,6 +348,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedReportsFeedbackRoute: AuthenticatedReportsFeedbackRoute,
+  AuthenticatedTeamAssignmentsRoute: AuthenticatedTeamAssignmentsRoute,
   AuthenticatedTeamProfilesRoute: AuthenticatedTeamProfilesRoute,
 }
 
