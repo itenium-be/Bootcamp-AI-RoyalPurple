@@ -64,7 +64,10 @@
     "teamOverview": "Team Overview",
     "noConsultants": "No consultants in your team",
     "inactive": "Inactive",
-    "goals": "Goals"
+    "goals": "Goals",
+    "readinessFlags": "Readiness Flags",
+    "noFlags": "No readiness flags",
+    "flagAge": "{{count}} day(s) ago"
   },
   "courses": {
     "title": "Courses",
@@ -141,6 +144,16 @@
     "showAll": "Show all",
     "noRoadmap": "No roadmap available for your profile",
     "prerequisites": "Prerequisites"
+  },
+  "goals": {
+    "noGoals": "No active goals",
+    "deadline": "Deadline",
+    "niveau": "Level",
+    "resources": "Resources",
+    "noResources": "No resources",
+    "raiseFlag": "Signal readiness",
+    "lowerFlag": "Lower flag",
+    "flaggedDaysAgo": "Flagged {{count}} day(s) ago"
   },
   "errors": {
     "sessionExpired": "Session expired!",

@@ -29,6 +29,8 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<GoalResourceEntity> GoalResources => Set<GoalResourceEntity>();
 
+    public DbSet<ReadinessFlagEntity> ReadinessFlags => Set<ReadinessFlagEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

@@ -44,6 +44,11 @@ public class DashboardService : IDashboardService
             .Where(a => userIds.Contains(a.UserId))
             .ToDictionaryAsync(a => a.UserId);
 
+        var readyUserIds = await _db.ReadinessFlags
+            .Select(f => f.Goal.ConsultantId)
+            .Distinct()
+            .ToHashSetAsync();
+
         var now = DateTime.UtcNow;
         var result = new List<ConsultantSummaryDto>();
         foreach (var user in found.OrderBy(u => u.LastName, StringComparer.Ordinal).ThenBy(u => u.FirstName, StringComparer.Ordinal))
@@ -67,7 +72,7 @@ public class DashboardService : IDashboardService
                 lastActivityAt,
                 isInactive,
                 ActiveGoalCount: 0,
-                IsReady: false));
+                IsReady: readyUserIds.Contains(user.Id)));
         }
 
         return result;

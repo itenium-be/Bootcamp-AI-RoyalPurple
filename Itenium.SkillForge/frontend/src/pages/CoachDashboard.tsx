@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { fetchCoachDashboard, type ConsultantSummary } from '@/api/client';
+import { fetchCoachDashboard, fetchReadinessFlags, type ConsultantSummary, type ReadinessFlagDto } from '@/api/client';
 
 function ConsultantCard({ consultant }: { consultant: ConsultantSummary }) {
   const { t } = useTranslation();
@@ -35,12 +35,32 @@ function ConsultantCard({ consultant }: { consultant: ConsultantSummary }) {
   );
 }
 
+function ReadinessFlagRow({ flag }: { flag: ReadinessFlagDto }) {
+  const { t } = useTranslation();
+  return (
+    <div className="border rounded-lg p-3 flex items-center justify-between gap-4">
+      <div>
+        <p className="text-sm font-medium">{flag.skillName}</p>
+        <p className="text-xs text-muted-foreground">{flag.consultantId}</p>
+      </div>
+      <span className="text-xs text-blue-700 bg-blue-100 dark:bg-blue-900/40 rounded px-2 py-0.5 shrink-0">
+        {t('dashboard.flagAge', { count: flag.ageDays })}
+      </span>
+    </div>
+  );
+}
+
 export default function CoachDashboard() {
   const { t } = useTranslation();
 
   const { data: consultants = [], isLoading } = useQuery({
     queryKey: ['coach-dashboard'],
     queryFn: fetchCoachDashboard,
+  });
+
+  const { data: flags = [] } = useQuery({
+    queryKey: ['readiness-flags'],
+    queryFn: fetchReadinessFlags,
   });
 
   if (isLoading) {
@@ -57,6 +77,17 @@ export default function CoachDashboard() {
         <div className="space-y-3">
           {consultants.map((consultant) => (
             <ConsultantCard key={consultant.id} consultant={consultant} />
+          ))}
+        </div>
+      )}
+
+      <h2 className="text-xl font-semibold mt-8 mb-4">{t('dashboard.readinessFlags')}</h2>
+      {flags.length === 0 ? (
+        <p className="text-muted-foreground">{t('dashboard.noFlags')}</p>
+      ) : (
+        <div className="space-y-2">
+          {flags.map((flag) => (
+            <ReadinessFlagRow key={flag.goalId} flag={flag} />
           ))}
         </div>
       )}

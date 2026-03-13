@@ -4,15 +4,24 @@ import { vi } from 'vitest';
 import type { GoalDto } from '@/api/client';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string, opts?: Record<string, unknown>) => (opts ? `${key}:${JSON.stringify(opts)}` : key),
+  }),
 }));
 
 const mockUseQuery = vi.fn();
+const mockUseMutation = vi.fn();
 vi.mock('@tanstack/react-query', () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args),
+  useMutation: (...args: unknown[]) => mockUseMutation(...args),
+  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
 }));
 
-vi.mock('@/api/client', () => ({ fetchGoals: vi.fn() }));
+vi.mock('@/api/client', () => ({
+  fetchGoals: vi.fn(),
+  raiseReadinessFlag: vi.fn(),
+  lowerReadinessFlag: vi.fn(),
+}));
 
 // eslint-disable-next-line import-x/order -- must come after vi.mock calls
 import Goals from '../Goals';
@@ -24,11 +33,14 @@ const goal = (overrides: Partial<GoalDto> = {}): GoalDto => ({
   targetLevel: 3,
   deadline: '2026-06-01T00:00:00Z',
   resources: [],
+  readinessFlagRaisedAt: null,
+  readinessFlagAgeDays: null,
   ...overrides,
 });
 
 beforeEach(() => {
   mockUseQuery.mockReturnValue({ data: [], isLoading: false });
+  mockUseMutation.mockReturnValue({ mutate: vi.fn(), isPending: false });
 });
 
 describe('Goals', () => {
@@ -78,5 +90,31 @@ describe('Goals', () => {
     mockUseQuery.mockReturnValue({ data: [goal({ resources: [] })], isLoading: false });
     render(<Goals />);
     expect(screen.getByText('goals.noResources')).toBeInTheDocument();
+  });
+
+  it('shows raise flag button when goal has no flag', () => {
+    mockUseQuery.mockReturnValue({ data: [goal({ readinessFlagRaisedAt: null })], isLoading: false });
+    render(<Goals />);
+    expect(screen.getByText('goals.raiseFlag')).toBeInTheDocument();
+  });
+
+  it('shows lower flag button when goal has active flag', () => {
+    mockUseQuery.mockReturnValue({
+      data: [goal({ readinessFlagRaisedAt: new Date(Date.now() - 2 * 86400000).toISOString() })],
+      isLoading: false,
+    });
+    render(<Goals />);
+    expect(screen.getByText('goals.lowerFlag')).toBeInTheDocument();
+  });
+
+  it('shows flag age when goal has active flag', () => {
+    mockUseQuery.mockReturnValue({
+      data: [
+        goal({ readinessFlagRaisedAt: new Date(Date.now() - 3 * 86400000).toISOString(), readinessFlagAgeDays: 3 }),
+      ],
+      isLoading: false,
+    });
+    render(<Goals />);
+    expect(screen.getByText(/goals\.flaggedDaysAgo/)).toBeInTheDocument();
   });
 });

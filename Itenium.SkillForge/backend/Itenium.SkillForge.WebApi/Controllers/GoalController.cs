@@ -34,6 +34,7 @@ public class GoalController : ControllerBase
         var goals = await _db.Goals
             .Include(g => g.Skill)
             .Include(g => g.Resources)
+            .Include(g => g.ReadinessFlag)
             .Where(g => g.ConsultantId == targetId)
             .OrderBy(g => g.Deadline)
             .ToListAsync();
@@ -71,12 +72,18 @@ public class GoalController : ControllerBase
         return CreatedAtAction(nameof(GetGoals), new { }, ToDto(goal));
     }
 
-    private static GoalDto ToDto(GoalEntity g) =>
-        new(
+    private static GoalDto ToDto(GoalEntity g)
+    {
+        var raisedAt = g.ReadinessFlag?.RaisedAt;
+        var ageDays = raisedAt.HasValue ? (int)(DateTime.UtcNow - raisedAt.Value).TotalDays : (int?)null;
+        return new(
             g.Id,
             g.Skill.Name,
             g.CurrentLevel,
             g.TargetLevel,
             g.Deadline,
-            g.Resources.Select(r => new GoalResourceDto(r.Id, r.Title, r.Url, r.Type)).ToList());
+            g.Resources.Select(r => new GoalResourceDto(r.Id, r.Title, r.Url, r.Type)).ToList(),
+            raisedAt,
+            ageDays);
+    }
 }

@@ -165,3 +165,47 @@ export async function fetchCoachDashboard(): Promise<ConsultantSummary[]> {
   const response = await api.get<ConsultantSummary[]>('/api/dashboard');
   return response.data;
 }
+
+export interface GoalResourceDto {
+  id: number;
+  title: string;
+  url: string;
+  type: string;
+}
+
+export interface GoalDto {
+  id: number;
+  skillName: string;
+  currentLevel: number;
+  targetLevel: number;
+  deadline: string;
+  resources: GoalResourceDto[];
+  readinessFlagRaisedAt: string | null;
+  readinessFlagAgeDays: number | null;
+}
+
+export async function fetchGoals(): Promise<GoalDto[]> {
+  const response = await api.get<GoalDto[]>('/api/goal');
+  return response.data;
+}
+
+export async function raiseReadinessFlag(goalId: number): Promise<void> {
+  await api.post(`/api/readiness-flag/${goalId}`);
+}
+
+export async function lowerReadinessFlag(goalId: number): Promise<void> {
+  await api.delete(`/api/readiness-flag/${goalId}`);
+}
+
+export interface ReadinessFlagDto {
+  goalId: number;
+  skillName: string;
+  consultantId: string;
+  raisedAt: string;
+  ageDays: number;
+}
+
+export async function fetchReadinessFlags(): Promise<ReadinessFlagDto[]> {
+  const response = await api.get<ReadinessFlagDto[]>('/api/readiness-flag');
+  return response.data;
+}

@@ -64,7 +64,10 @@
     "teamOverview": "Teamoverzicht",
     "noConsultants": "Geen consultants in uw team",
     "inactive": "Inactief",
-    "goals": "Doelen"
+    "goals": "Doelen",
+    "readinessFlags": "Gereedheidsmelding",
+    "noFlags": "Geen gereedheidsmeldingen",
+    "flagAge": "{{count}} dag(en) geleden"
   },
   "courses": {
     "title": "Cursussen",
@@ -141,6 +144,16 @@
     "showAll": "Alles tonen",
     "noRoadmap": "Geen roadmap beschikbaar voor jouw profiel",
     "prerequisites": "Vereisten"
+  },
+  "goals": {
+    "noGoals": "Geen actieve doelen",
+    "deadline": "Deadline",
+    "niveau": "Niveau",
+    "resources": "Bronnen",
+    "noResources": "Geen bronnen",
+    "raiseFlag": "Gereedheid melden",
+    "lowerFlag": "Melding intrekken",
+    "flaggedDaysAgo": "{{count}} dag(en) geleden gemeld"
   },
   "errors": {
     "sessionExpired": "Sessie verlopen!",

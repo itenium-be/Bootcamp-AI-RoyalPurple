@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import type { ConsultantSummary } from '@/api/client';
+import type { ConsultantSummary, ReadinessFlagDto } from '@/api/client';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -15,6 +15,7 @@ vi.mock('@tanstack/react-query', () => ({
 
 vi.mock('@/api/client', () => ({
   fetchCoachDashboard: vi.fn(),
+  fetchReadinessFlags: vi.fn(),
 }));
 
 // eslint-disable-next-line import-x/order -- must come after vi.mock calls
@@ -84,5 +85,48 @@ describe('CoachDashboard', () => {
   test('query uses fetchCoachDashboard', () => {
     render(<CoachDashboard />);
     expect(mockUseQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['coach-dashboard'] }));
+  });
+
+  test('shows readiness flags section when flags exist', () => {
+    const flag: ReadinessFlagDto = {
+      goalId: 1,
+      skillName: 'Java Basics',
+      consultantId: 'user-1',
+      raisedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+      ageDays: 2,
+    };
+    mockUseQuery
+      .mockReturnValueOnce({ data: [], isLoading: false })
+      .mockReturnValueOnce({ data: [flag], isLoading: false });
+    render(<CoachDashboard />);
+    expect(screen.getByText('Java Basics')).toBeInTheDocument();
+  });
+
+  test('shows flag age indicator', () => {
+    const flag: ReadinessFlagDto = {
+      goalId: 1,
+      skillName: 'Java Basics',
+      consultantId: 'user-1',
+      raisedAt: new Date(Date.now() - 5 * 86400000).toISOString(),
+      ageDays: 5,
+    };
+    mockUseQuery
+      .mockReturnValueOnce({ data: [], isLoading: false })
+      .mockReturnValueOnce({ data: [flag], isLoading: false });
+    render(<CoachDashboard />);
+    expect(screen.getByText(/dashboard\.flagAge/)).toBeInTheDocument();
+  });
+
+  test('shows no flags message when no readiness flags', () => {
+    mockUseQuery
+      .mockReturnValueOnce({ data: [], isLoading: false })
+      .mockReturnValueOnce({ data: [], isLoading: false });
+    render(<CoachDashboard />);
+    expect(screen.getByText('dashboard.noFlags')).toBeInTheDocument();
+  });
+
+  test('query uses fetchReadinessFlags', () => {
+    render(<CoachDashboard />);
+    expect(mockUseQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['readiness-flags'] }));
   });
 });

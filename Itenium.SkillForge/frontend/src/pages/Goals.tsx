@@ -1,6 +1,48 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { fetchGoals } from '@/api/client';
+import { fetchGoals, lowerReadinessFlag, raiseReadinessFlag, type GoalDto } from '@/api/client';
+
+function FlagButton({ goal }: { goal: GoalDto }) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+
+  const raise = useMutation({
+    mutationFn: () => raiseReadinessFlag(goal.id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
+  });
+
+  const lower = useMutation({
+    mutationFn: () => lowerReadinessFlag(goal.id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
+  });
+
+  if (goal.readinessFlagRaisedAt) {
+    return (
+      <div className="flex items-center gap-2 mt-2">
+        <span className="text-sm text-blue-600">
+          {t('goals.flaggedDaysAgo', { count: goal.readinessFlagAgeDays ?? 0 })}
+        </span>
+        <button
+          onClick={() => lower.mutate()}
+          disabled={lower.isPending}
+          className="text-sm text-red-600 hover:underline disabled:opacity-50"
+        >
+          {t('goals.lowerFlag')}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => raise.mutate()}
+      disabled={raise.isPending}
+      className="mt-2 text-sm text-blue-600 hover:underline disabled:opacity-50"
+    >
+      {t('goals.raiseFlag')}
+    </button>
+  );
+}
 
 export default function Goals() {
   const { t } = useTranslation();
@@ -50,6 +92,8 @@ export default function Goals() {
               </ul>
             )}
           </div>
+
+          <FlagButton goal={goal} />
         </div>
       ))}
     </div>

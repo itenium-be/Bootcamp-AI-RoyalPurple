@@ -32,4 +32,6 @@ public class GoalEntity
     public required string CoachId { get; set; }
 
     public IList<GoalResourceEntity> Resources { get; set; } = [];
+
+    public ReadinessFlagEntity? ReadinessFlag { get; set; }
 }

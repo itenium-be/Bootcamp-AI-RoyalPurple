@@ -8,7 +8,11 @@ public record GoalDto(
     int CurrentLevel,
     int TargetLevel,
     DateTime Deadline,
-    IReadOnlyList<GoalResourceDto> Resources);
+    IReadOnlyList<GoalResourceDto> Resources,
+    DateTime? ReadinessFlagRaisedAt,
+    int? ReadinessFlagAgeDays);
+
+public record ReadinessFlagDto(int GoalId, string SkillName, string ConsultantId, DateTime RaisedAt, int AgeDays);
 
 public record CreateGoalResourceRequest(string Title, string Url, string Type);
 
