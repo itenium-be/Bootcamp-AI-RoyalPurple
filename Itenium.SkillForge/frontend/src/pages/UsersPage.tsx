@@ -126,7 +126,7 @@ function CreateUserSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[420px] overflow-y-auto">
+      <SheetContent className="w-[420px] overflow-y-auto pl-4">
         <SheetHeader>
           <SheetTitle>{t('users.createTitle', 'Create User')}</SheetTitle>
           <SheetDescription>{t('users.createDesc', 'Add a new user to the platform.')}</SheetDescription>
@@ -332,7 +332,7 @@ function EditUserSheet({
 
   return (
     <Sheet open onOpenChange={onOpenChange}>
-      <SheetContent className="w-[420px] overflow-y-auto">
+      <SheetContent className="w-[420px] overflow-y-auto pl-4">
         <SheetHeader>
           <SheetTitle>
             {user.firstName} {user.lastName}
