@@ -4,3 +4,5 @@
 **/*.user
 **/TestResults/
 *.DotSettings.user
+# Test projects are not needed for building the WebApi
+**/*.Tests/
