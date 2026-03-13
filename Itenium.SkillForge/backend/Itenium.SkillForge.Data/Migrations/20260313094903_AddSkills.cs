@@ -11,6 +11,12 @@ namespace Itenium.SkillForge.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Drop old skill tables if they exist from a previous schema version (before migration history was introduced)
+            migrationBuilder.Sql("DROP TABLE IF EXISTS \"SkillPrerequisites\";");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS \"SkillLevels\";");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS \"Skills\" CASCADE;");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS \"SkillCategories\";");
+
             migrationBuilder.CreateTable(
                 name: "Skills",
                 columns: table => new
