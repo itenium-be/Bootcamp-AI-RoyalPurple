@@ -52,6 +52,41 @@ public class SkillForgeUserTests
     }
 
     [Test]
+    public void IsManager_WhenUserHasManagerRole_ReturnsTrue()
+    {
+        var claims = new List<Claim> { new(ClaimTypes.Role, "manager") };
+        SetupUser(claims);
+        var sut = new SkillForgeUser(_httpContextAccessor);
+
+        var result = sut.IsManager;
+
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public void IsManager_WhenUserDoesNotHaveManagerRole_ReturnsFalse()
+    {
+        var claims = new List<Claim> { new(ClaimTypes.Role, "learner") };
+        SetupUser(claims);
+        var sut = new SkillForgeUser(_httpContextAccessor);
+
+        var result = sut.IsManager;
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public void IsManager_WhenNoUser_ReturnsFalse()
+    {
+        _httpContextAccessor.HttpContext.Returns((HttpContext?)null);
+        var sut = new SkillForgeUser(_httpContextAccessor);
+
+        var result = sut.IsManager;
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
     public void Teams_WhenUserHasTeamClaims_ReturnsTeamIds()
     {
         var claims = new List<Claim>
