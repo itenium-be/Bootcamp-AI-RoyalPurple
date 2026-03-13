@@ -398,7 +398,7 @@ public static class SeedData
             // .NET: ASP.NET Core requires C# and .NET framework knowledge
             new SkillPrerequisiteEntity { SkillId = 26, PrerequisiteSkillId = 23 }, // ASP.NET Core → C#
             new SkillPrerequisiteEntity { SkillId = 26, PrerequisiteSkillId = 24 }, // ASP.NET Core → .NET
-            // .NET: Dependency Injection requires .NET basics
+                                                                                    // .NET: Dependency Injection requires .NET basics
             new SkillPrerequisiteEntity { SkillId = 25, PrerequisiteSkillId = 24 }  // DI → .NET
         );
 
@@ -504,5 +504,73 @@ public static class SeedData
                 await userManager.AddClaimAsync(user, new Claim("team", "1")); // Java team
             }
         }
+
+        await SeedDemoGoals(app, userManager);
+    }
+
+    private static async Task SeedDemoGoals(WebApplication app, UserManager<ForgeUser> userManager)
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        if (await db.Goals.AnyAsync())
+            return;
+
+        var learner = await userManager.FindByEmailAsync("learner@test.local");
+        var coach = await userManager.FindByEmailAsync("java@test.local");
+        if (learner == null || coach == null)
+            return;
+
+        // Skill IDs from seed data: 27=Java & JVM, 28=Spring Boot (approx - Java CC skills)
+        // Use first 3 Java CC skills (category 5, team 1)
+        var javaSkills = await db.Skills
+            .Where(s => s.Category.TeamId == 1)
+            .OrderBy(s => s.Id)
+            .Take(3)
+            .ToListAsync();
+
+        if (javaSkills.Count < 1)
+            return;
+
+        db.Goals.AddRange(
+            new GoalEntity
+            {
+                ConsultantId = learner.Id,
+                CoachId = coach.Id,
+                SkillId = javaSkills[0].Id,
+                CurrentLevel = 1,
+                TargetLevel = 3,
+                Deadline = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc),
+                Resources =
+                [
+                    new GoalResourceEntity { Title = "Effective Java", Url = "https://www.oreilly.com/library/view/effective-java/9780134686097/", Type = "book" },
+                    new GoalResourceEntity { Title = "Java Collections Deep Dive", Url = "https://www.baeldung.com/java-collections", Type = "article" },
+                ],
+            },
+            new GoalEntity
+            {
+                ConsultantId = learner.Id,
+                CoachId = coach.Id,
+                SkillId = javaSkills.Count > 1 ? javaSkills[1].Id : javaSkills[0].Id,
+                CurrentLevel = 0,
+                TargetLevel = 2,
+                Deadline = new DateTime(2026, 4, 15, 0, 0, 0, DateTimeKind.Utc),
+                Resources =
+                [
+                    new GoalResourceEntity { Title = "Spring Boot in Action", Url = "https://www.manning.com/books/spring-boot-in-action", Type = "book" },
+                ],
+            },
+            new GoalEntity
+            {
+                ConsultantId = learner.Id,
+                CoachId = coach.Id,
+                SkillId = javaSkills.Count > 2 ? javaSkills[2].Id : javaSkills[0].Id,
+                CurrentLevel = 1,
+                TargetLevel = 2,
+                Deadline = new DateTime(2026, 5, 1, 0, 0, 0, DateTimeKind.Utc),
+                Resources = [],
+            });
+
+        await db.SaveChangesAsync();
     }
 }
