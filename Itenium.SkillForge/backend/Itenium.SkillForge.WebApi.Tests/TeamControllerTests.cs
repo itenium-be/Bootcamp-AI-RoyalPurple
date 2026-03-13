@@ -1,6 +1,7 @@
 using Itenium.SkillForge.Entities;
 using Itenium.SkillForge.Services;
 using Itenium.SkillForge.WebApi.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 
 namespace Itenium.SkillForge.WebApi.Tests;
@@ -87,5 +88,150 @@ public class TeamControllerTests : DatabaseTestBase
         var teams = result.Value!;
         Assert.That(teams, Has.Count.EqualTo(1));
         Assert.That(teams.Select(t => t.Name), Contains.Item("Java"));
+    }
+
+    [Test]
+    public async Task CreateTeam_WhenBackOffice_CreatesAndReturnsCreated()
+    {
+        _user.IsBackOffice.Returns(true);
+        var request = new CreateTeamRequest("Java");
+
+        var result = await _sut.CreateTeam(request);
+
+        var createdResult = result.Result as CreatedAtActionResult;
+        Assert.That(createdResult, Is.Not.Null);
+        var team = createdResult!.Value as TeamEntity;
+        Assert.That(team!.Name, Is.EqualTo("Java"));
+
+        var savedTeam = await Db.Teams.FindAsync(team.Id);
+        Assert.That(savedTeam, Is.Not.Null);
+    }
+
+    [Test]
+    public async Task CreateTeam_WhenNotBackOffice_ReturnsForbidden()
+    {
+        _user.IsBackOffice.Returns(false);
+        var request = new CreateTeamRequest("Java");
+
+        var result = await _sut.CreateTeam(request);
+
+        Assert.That(result.Result, Is.TypeOf<ForbidResult>());
+    }
+
+    [Test]
+    public async Task UpdateTeam_WhenBackOffice_CanUpdateAnyTeam()
+    {
+        var team = new TeamEntity { Name = "Java" };
+        Db.Teams.Add(team);
+        await Db.SaveChangesAsync();
+        _user.IsBackOffice.Returns(true);
+        var request = new UpdateTeamRequest("Java Champions");
+
+        var result = await _sut.UpdateTeam(team.Id, request);
+
+        var okResult = result.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        var updated = okResult!.Value as TeamEntity;
+        Assert.That(updated!.Name, Is.EqualTo("Java Champions"));
+    }
+
+    [Test]
+    public async Task UpdateTeam_WhenManagerOfTeam_CanUpdateOwnTeam()
+    {
+        var team = new TeamEntity { Name = "Java" };
+        Db.Teams.Add(team);
+        await Db.SaveChangesAsync();
+        _user.IsBackOffice.Returns(false);
+        _user.IsManager.Returns(true);
+        _user.Teams.Returns(new[] { team.Id });
+        var request = new UpdateTeamRequest("Java Champions");
+
+        var result = await _sut.UpdateTeam(team.Id, request);
+
+        var okResult = result.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        var updated = okResult!.Value as TeamEntity;
+        Assert.That(updated!.Name, Is.EqualTo("Java Champions"));
+    }
+
+    [Test]
+    public async Task UpdateTeam_WhenManagerOfOtherTeam_ReturnsForbidden()
+    {
+        var team = new TeamEntity { Name = "Java" };
+        Db.Teams.Add(team);
+        await Db.SaveChangesAsync();
+        _user.IsBackOffice.Returns(false);
+        _user.IsManager.Returns(true);
+        _user.Teams.Returns(Array.Empty<int>());
+        var request = new UpdateTeamRequest("Java Champions");
+
+        var result = await _sut.UpdateTeam(team.Id, request);
+
+        Assert.That(result.Result, Is.TypeOf<ForbidResult>());
+    }
+
+    [Test]
+    public async Task UpdateTeam_WhenLearner_ReturnsForbidden()
+    {
+        var team = new TeamEntity { Name = "Java" };
+        Db.Teams.Add(team);
+        await Db.SaveChangesAsync();
+        _user.IsBackOffice.Returns(false);
+        _user.IsManager.Returns(false);
+        _user.Teams.Returns(new[] { team.Id });
+        var request = new UpdateTeamRequest("Java Champions");
+
+        var result = await _sut.UpdateTeam(team.Id, request);
+
+        Assert.That(result.Result, Is.TypeOf<ForbidResult>());
+    }
+
+    [Test]
+    public async Task UpdateTeam_WhenNotFound_ReturnsNotFound()
+    {
+        _user.IsBackOffice.Returns(true);
+        var request = new UpdateTeamRequest("Name");
+
+        var result = await _sut.UpdateTeam(999, request);
+
+        Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task DeleteTeam_WhenBackOffice_DeletesAndReturnsNoContent()
+    {
+        var team = new TeamEntity { Name = "Java" };
+        Db.Teams.Add(team);
+        await Db.SaveChangesAsync();
+        _user.IsBackOffice.Returns(true);
+
+        var result = await _sut.DeleteTeam(team.Id);
+
+        Assert.That(result, Is.TypeOf<NoContentResult>());
+        var deletedTeam = await Db.Teams.FindAsync(team.Id);
+        Assert.That(deletedTeam, Is.Null);
+    }
+
+    [Test]
+    public async Task DeleteTeam_WhenNotBackOffice_ReturnsForbidden()
+    {
+        var team = new TeamEntity { Name = "Java" };
+        Db.Teams.Add(team);
+        await Db.SaveChangesAsync();
+        _user.IsBackOffice.Returns(false);
+
+        var result = await _sut.DeleteTeam(team.Id);
+
+        Assert.That(result, Is.TypeOf<ForbidResult>());
+    }
+
+    [Test]
+    public async Task DeleteTeam_WhenNotFound_ReturnsNotFound()
+    {
+        _user.IsBackOffice.Returns(true);
+
+        var result = await _sut.DeleteTeam(999);
+
+        Assert.That(result, Is.TypeOf<NotFoundResult>());
     }
 }
