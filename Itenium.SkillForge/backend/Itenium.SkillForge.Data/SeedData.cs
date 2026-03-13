@@ -392,6 +392,17 @@ public static class SeedData
         );
 
         await db.SaveChangesAsync();
+
+        // Skill prerequisites
+        db.SkillPrerequisites.AddRange(
+            // .NET: ASP.NET Core requires C# and .NET framework knowledge
+            new SkillPrerequisiteEntity { SkillId = 26, PrerequisiteSkillId = 23 }, // ASP.NET Core → C#
+            new SkillPrerequisiteEntity { SkillId = 26, PrerequisiteSkillId = 24 }, // ASP.NET Core → .NET
+            // .NET: Dependency Injection requires .NET basics
+            new SkillPrerequisiteEntity { SkillId = 25, PrerequisiteSkillId = 24 }  // DI → .NET
+        );
+
+        await db.SaveChangesAsync();
     }
 
     private static async Task SeedTestUsers(this WebApplication app)

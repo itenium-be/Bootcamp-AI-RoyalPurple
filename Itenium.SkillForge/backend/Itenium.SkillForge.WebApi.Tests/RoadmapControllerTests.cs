@@ -124,6 +124,45 @@ public class RoadmapControllerTests : DatabaseTestBase
     }
 
     [Test]
+    public async Task GetRoadmap_SkillWithPrerequisites_ReturnsPrerequisiteNames()
+    {
+        var basic = new SkillEntity { Name = "Java Basics", Tier = 1, CategoryId = _javaCategory.Id };
+        var advanced = new SkillEntity { Name = "Spring Boot", Tier = 2, CategoryId = _javaCategory.Id };
+        Db.Skills.AddRange(basic, advanced);
+        await Db.SaveChangesAsync();
+
+        Db.SkillPrerequisites.Add(new SkillPrerequisiteEntity
+        {
+            SkillId = advanced.Id,
+            PrerequisiteSkillId = basic.Id,
+        });
+        await Db.SaveChangesAsync();
+
+        _user.IsBackOffice.Returns(false);
+        _user.Teams.Returns(new[] { _javaCategory.TeamId!.Value });
+
+        var result = await _sut.GetRoadmap(showAll: true);
+
+        var skills = (result.Result as OkObjectResult)!.Value as List<SkillDto>;
+        var springBoot = skills!.Single(s => s.Name == "Spring Boot");
+        Assert.That(springBoot.Prerequisites, Contains.Item("Java Basics"));
+    }
+
+    [Test]
+    public async Task GetRoadmap_SkillWithoutPrerequisites_ReturnsEmptyList()
+    {
+        Db.Skills.Add(new SkillEntity { Name = "Java Basics", Tier = 1, CategoryId = _javaCategory.Id });
+        await Db.SaveChangesAsync();
+        _user.IsBackOffice.Returns(false);
+        _user.Teams.Returns(new[] { _javaCategory.TeamId!.Value });
+
+        var result = await _sut.GetRoadmap();
+
+        var skills = (result.Result as OkObjectResult)!.Value as List<SkillDto>;
+        Assert.That(skills![0].Prerequisites, Is.Empty);
+    }
+
+    [Test]
     public async Task GetRoadmap_SkillsOrderedByTierThenName()
     {
         Db.Skills.AddRange(

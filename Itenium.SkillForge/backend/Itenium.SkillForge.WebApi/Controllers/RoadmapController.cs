@@ -31,6 +31,8 @@ public class RoadmapController : ControllerBase
         var teams = _user.Teams;
         var query = _db.Skills
             .Include(s => s.Category)
+            .Include(s => s.Prerequisites)
+                .ThenInclude(p => p.PrerequisiteSkill)
             .Where(s => s.Category.TeamId != null && teams.Contains(s.Category.TeamId.Value));
 
         if (!showAll)
@@ -39,9 +41,18 @@ public class RoadmapController : ControllerBase
         var skills = await query
             .OrderBy(s => s.Tier)
             .ThenBy(s => s.Name)
-            .Select(s => new SkillDto(s.Id, s.Name, s.Description, s.Tier, s.Category.TeamId ?? 0))
             .ToListAsync();
 
-        return Ok(skills);
+        var dtos = skills
+            .Select(s => new SkillDto(
+                s.Id,
+                s.Name,
+                s.Description,
+                s.Tier,
+                s.Category.TeamId ?? 0,
+                s.Prerequisites.Select(p => p.PrerequisiteSkill.Name).ToList()))
+            .ToList();
+
+        return Ok(dtos);
     }
 }

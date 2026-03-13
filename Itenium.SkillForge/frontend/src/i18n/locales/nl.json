@@ -139,7 +139,8 @@
     "tier3": "Gevorderd",
     "tier4": "Expert",
     "showAll": "Alles tonen",
-    "noRoadmap": "Geen roadmap beschikbaar voor jouw profiel"
+    "noRoadmap": "Geen roadmap beschikbaar voor jouw profiel",
+    "prerequisites": "Vereisten"
   },
   "errors": {
     "sessionExpired": "Sessie verlopen!",
