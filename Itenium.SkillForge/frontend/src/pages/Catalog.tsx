@@ -68,6 +68,11 @@ const RESOURCE_ICONS: Record<CourseResourceType, React.ReactNode> = {
   Other: <HelpCircle className="size-4" />,
 };
 
+// ─── Supported values ─────────────────────────────────────────────────────────
+
+const COURSE_CATEGORIES = ['Development', 'Architecture', 'Management', 'Quality'] as const;
+const COURSE_LEVELS = ['Beginner', 'Intermediate', 'Advanced'] as const;
+
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const courseSchema = z.object({
@@ -186,7 +191,18 @@ function CourseSheet({
                 <FormItem>
                   <FormLabel>{t('courses.category')}</FormLabel>
                   <FormControl>
-                    <Input {...field} value={field.value ?? ''} />
+                    <select
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value || null)}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="">{t('catalog.selectCategory')}</option>
+                      {COURSE_CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -199,7 +215,18 @@ function CourseSheet({
                 <FormItem>
                   <FormLabel>{t('courses.level')}</FormLabel>
                   <FormControl>
-                    <Input {...field} value={field.value ?? ''} />
+                    <select
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value || null)}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="">{t('catalog.selectLevel')}</option>
+                      {COURSE_LEVELS.map((lvl) => (
+                        <option key={lvl} value={lvl}>
+                          {lvl}
+                        </option>
+                      ))}
+                    </select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
