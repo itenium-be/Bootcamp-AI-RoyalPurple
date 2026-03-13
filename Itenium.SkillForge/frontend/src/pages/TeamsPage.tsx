@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod/v4';
@@ -55,11 +56,14 @@ interface Team {
 
 // ─── Team name schema ─────────────────────────────────────────────────────────
 
-const teamSchema = z.object({
-  name: z.string().min(1, 'Required'),
-});
+const createTeamSchema = (t: TFunction) =>
+  z.object({
+    name: z.string().min(1, t('validation.required')),
+  });
 
-type TeamFormValues = z.infer<typeof teamSchema>;
+interface TeamFormValues {
+  name: string;
+}
 
 // ─── Create team sheet ────────────────────────────────────────────────────────
 
@@ -68,7 +72,7 @@ function CreateTeamSheet({ open, onOpenChange }: { open: boolean; onOpenChange: 
   const queryClient = useQueryClient();
 
   const form = useForm<TeamFormValues>({
-    resolver: zodResolver(teamSchema),
+    resolver: zodResolver(createTeamSchema(t)),
     defaultValues: { name: '' },
   });
 
@@ -131,7 +135,7 @@ function RenameTeamSheet({ team, onOpenChange }: { team: Team; onOpenChange: (v:
   const queryClient = useQueryClient();
 
   const form = useForm<TeamFormValues>({
-    resolver: zodResolver(teamSchema),
+    resolver: zodResolver(createTeamSchema(t)),
     defaultValues: { name: team.name },
   });
 
@@ -294,7 +298,9 @@ function AdminView() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">{t('teams.title', 'Teams')}</h1>
-            <p className="text-sm text-muted-foreground">{isLoading ? '…' : `${teams.length} teams`}</p>
+            <p className="text-sm text-muted-foreground">
+              {isLoading ? '…' : t('teams.teamsCount', { count: teams.length })}
+            </p>
           </div>
         </div>
         <Button onClick={() => setCreateOpen(true)}>
@@ -345,7 +351,9 @@ function ManagerView() {
         </div>
         <div>
           <h1 className="text-2xl font-bold">{t('teams.myTeams', 'My Teams')}</h1>
-          <p className="text-sm text-muted-foreground">{isLoading ? '…' : `${teams.length} teams`}</p>
+          <p className="text-sm text-muted-foreground">
+            {isLoading ? '…' : t('teams.teamsCount', { count: teams.length })}
+          </p>
         </div>
       </div>
 

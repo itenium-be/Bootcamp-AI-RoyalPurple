@@ -101,11 +101,9 @@ export function SignIn() {
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              <i>
-                "Empower your team with continuous learning. Track progress, manage courses, and build skills together."
-              </i>
+              <i>"{t('auth.quote')}"</i>
             </p>
-            <footer className="text-sm text-sidebar-foreground/70">Steven Robijns</footer>
+            <footer className="text-sm text-sidebar-foreground/70">{t('auth.quoteAuthor')}</footer>
           </blockquote>
         </div>
       </div>
@@ -163,7 +161,7 @@ export function SignIn() {
           </CardContent>
 
           <CardFooter className="flex flex-col gap-2 text-center text-xs text-muted-foreground">
-            <div>Test users:</div>
+            <div>{t('auth.testUsers')}</div>
             <div className="flex flex-wrap justify-center gap-2">
               {testUsers.map((user) => (
                 <button
@@ -176,7 +174,7 @@ export function SignIn() {
                 </button>
               ))}
             </div>
-            <div>Passwords: AdminPassword123! (backoffice) / UserPassword123! (others)</div>
+            <div>{t('auth.testPasswords')}</div>
           </CardFooter>
         </Card>
       </div>

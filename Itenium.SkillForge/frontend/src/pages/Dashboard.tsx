@@ -2,12 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { BookOpen, Users, ClipboardList } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@itenium-forge/ui';
 import { useQuery } from '@tanstack/react-query';
-import { useTeamStore } from '@/stores';
+import { useTeamStore, useSkinStore } from '@/stores';
 import { fetchDashboardStats } from '@/api/client';
 
 export function Dashboard() {
   const { t } = useTranslation();
   const { mode, selectedTeam } = useTeamStore();
+  const { skin } = useSkinStore();
 
   const { data: stats } = useQuery({
     queryKey: ['dashboard-stats'],
@@ -58,6 +59,8 @@ export function Dashboard() {
           </Card>
         </div>
       )}
+
+      {skin === 'wouter' && <img src="/memew.png" alt="Wouter" className="mx-auto mt-6 max-w-full" />}
     </div>
   );
 }
