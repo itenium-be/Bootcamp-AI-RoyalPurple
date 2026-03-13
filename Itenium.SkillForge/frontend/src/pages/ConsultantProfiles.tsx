@@ -63,7 +63,9 @@ export function ConsultantProfiles() {
           <tbody>
             {consultants?.map((consultant) => (
               <tr key={consultant.userId} className="border-b">
-                <td className="p-3">{consultant.firstName} {consultant.lastName}</td>
+                <td className="p-3">
+                  {consultant.firstName} {consultant.lastName}
+                </td>
                 <td className="p-3">
                   {consultant.teamName ?? <span className="text-muted-foreground">{t('profile.noProfile')}</span>}
                 </td>
