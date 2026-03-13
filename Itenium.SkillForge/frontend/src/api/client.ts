@@ -150,7 +150,3 @@ export async function fetchCoachDashboard(): Promise<ConsultantSummary[]> {
   const response = await api.get<ConsultantSummary[]>('/api/dashboard');
   return response.data;
 }
-
-export async function recordActivity(): Promise<void> {
-  await api.post('/api/dashboard/activity');
-}
