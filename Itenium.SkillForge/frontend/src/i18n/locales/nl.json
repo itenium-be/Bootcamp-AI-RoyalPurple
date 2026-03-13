@@ -218,6 +218,18 @@
     "created": "Feedback ingediend",
     "createError": "Kon feedback niet indienen"
   },
+  "progress": {
+    "title": "Mijn Voortgang",
+    "enrolledAt": "Ingeschreven",
+    "noEnrollments": "Je bent nog niet ingeschreven voor cursussen",
+    "enrolled": "Ingeschreven",
+    "enroll": "Inschrijven",
+    "unenroll": "Uitschrijven",
+    "enrollSuccess": "Succesvol ingeschreven",
+    "enrollError": "Kon niet inschrijven",
+    "unenrollSuccess": "Succesvol uitgeschreven",
+    "unenrollError": "Kon niet uitschrijven"
+  },
   "errors": {
     "sessionExpired": "Sessie verlopen!",
     "internalServerError": "Interne serverfout!"

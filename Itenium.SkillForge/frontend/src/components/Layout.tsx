@@ -229,7 +229,7 @@ export function Layout() {
   const myLearningNavItems = [
     { path: '/my-profile', icon: Award, label: t('nav.myProfile') },
     { path: '/my-courses', icon: BookOpen, label: t('nav.myCourses') },
-    { path: '/my-progress', icon: TrendingUp, label: t('nav.myProgress') },
+    { path: '/progress', icon: TrendingUp, label: t('nav.myProgress') },
     { path: '/my-certificates', icon: GraduationCap, label: t('nav.myCertificates') },
     { path: '/roadmap', icon: TrendingUp, label: t('nav.myRoadmap') },
     { path: '/feedback', icon: MessageSquare, label: t('nav.feedback') },
