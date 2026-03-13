@@ -2,6 +2,7 @@ using Itenium.SkillForge.Services;
 using Itenium.SkillForge.WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using NSubstitute.Core.Arguments;
 
 namespace Itenium.SkillForge.WebApi.Tests;
 
@@ -48,7 +49,7 @@ public class UserControllerTests
         IList<UserDto> teamMembers = [Alice, Bob];
         _currentUser.IsBackOffice.Returns(false);
         _currentUser.Teams.Returns(TeamIds12);
-        _userService.GetTeamMembersAsync(TeamIds12).Returns(teamMembers);
+        _userService.GetTeamMembersAsync(Arg.Is<int[]>(a => a.SequenceEqual(TeamIds12))).Returns(teamMembers);
 
         var result = await _sut.GetUsers();
 
@@ -80,7 +81,7 @@ public class UserControllerTests
         IList<UserDto> teamMembers = [Alice];
         _currentUser.IsBackOffice.Returns(false);
         _currentUser.Teams.Returns(TeamIds1);
-        _userService.GetTeamMembersAsync(TeamIds1).Returns(teamMembers);
+        _userService.GetTeamMembersAsync(Arg.Is<int[]>(a => a.SequenceEqual(TeamIds1))).Returns(teamMembers);
 
         var result = await _sut.GetUsers();
 
@@ -121,7 +122,7 @@ public class UserControllerTests
     {
         IList<UserDto> coaches = [Bob];
         _currentUser.Teams.Returns(TeamIds1);
-        _userService.GetCoachesForTeamsAsync(TeamIds1).Returns(coaches);
+        _userService.GetCoachesForTeamsAsync(Arg.Is<int[]>(a => a.SequenceEqual(TeamIds1))).Returns(coaches);
 
         var result = await _sut.GetCoaches();
 
@@ -221,7 +222,7 @@ public class UserControllerTests
     [Test]
     public async Task AssignTeams_WhenSucceeds_ReturnsNoContent()
     {
-        _userService.AssignTeamsAsync("id1", [1, 2]).Returns(true);
+        _userService.AssignTeamsAsync("id1", Arg.Is<int[]>(a => a.SequenceEqual(new[] { 1, 2 }))).Returns(true);
 
         var result = await _sut.AssignTeams("id1", new AssignTeamsRequest([1, 2]));
 
