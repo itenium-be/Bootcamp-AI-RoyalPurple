@@ -17,6 +17,11 @@ import {
   Label,
   FormItem,
   FormMessage,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@itenium-forge/ui';
 import {
   fetchAssignments,
@@ -74,7 +79,6 @@ export function Assignments() {
   });
 
   const selectedTeamId = watch('teamId');
-
   const teamMembers = consultants?.filter((c) => c.teamId === selectedTeamId) ?? [];
 
   const createMutation = useMutation({
@@ -191,18 +195,18 @@ export function Assignments() {
                 control={control}
                 name="courseId"
                 render={({ field }) => (
-                  <select
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    className="w-full rounded-md border px-3 py-2 text-sm"
-                  >
-                    <option value={0}>{t('assignments.selectCourse')}</option>
-                    {courses?.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={String(field.value || '')} onValueChange={(v) => field.onChange(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('assignments.selectCourse')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {courses?.map((c) => (
+                        <SelectItem key={c.id} value={String(c.id)}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
               />
               {errors.courseId && <FormMessage>{errors.courseId.message}</FormMessage>}
@@ -214,18 +218,18 @@ export function Assignments() {
                 control={control}
                 name="teamId"
                 render={({ field }) => (
-                  <select
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    className="w-full rounded-md border px-3 py-2 text-sm"
-                  >
-                    <option value={0}>{t('assignments.selectTeam')}</option>
-                    {teams?.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={String(field.value || '')} onValueChange={(v) => field.onChange(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('assignments.selectTeam')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teams?.map((team) => (
+                        <SelectItem key={team.id} value={String(team.id)}>
+                          {team.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
               />
               {errors.teamId && <FormMessage>{errors.teamId.message}</FormMessage>}
@@ -238,18 +242,19 @@ export function Assignments() {
                   control={control}
                   name="userId"
                   render={({ field }) => (
-                    <select
-                      value={field.value ?? ''}
-                      onChange={(e) => field.onChange(e.target.value || null)}
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                    >
-                      <option value="">{t('assignments.wholeTeam')}</option>
-                      {teamMembers.map((c) => (
-                        <option key={c.userId} value={c.userId}>
-                          {c.firstName} {c.lastName}
-                        </option>
-                      ))}
-                    </select>
+                    <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v || null)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('assignments.wholeTeam')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">{t('assignments.wholeTeam')}</SelectItem>
+                        {teamMembers.map((c) => (
+                          <SelectItem key={c.userId} value={c.userId}>
+                            {c.firstName} {c.lastName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
                 />
               </FormItem>
@@ -261,14 +266,18 @@ export function Assignments() {
                 control={control}
                 name="isRequired"
                 render={({ field }) => (
-                  <select
+                  <Select
                     value={field.value ? 'true' : 'false'}
-                    onChange={(e) => field.onChange(e.target.value === 'true')}
-                    className="w-full rounded-md border px-3 py-2 text-sm"
+                    onValueChange={(v) => field.onChange(v === 'true')}
                   >
-                    <option value="true">{t('assignments.mandatory')}</option>
-                    <option value="false">{t('assignments.optional')}</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">{t('assignments.mandatory')}</SelectItem>
+                      <SelectItem value="false">{t('assignments.optional')}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 )}
               />
             </FormItem>
