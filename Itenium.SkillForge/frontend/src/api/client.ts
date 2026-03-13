@@ -263,6 +263,7 @@ export async function fetchCourseResources(courseId: number): Promise<CourseReso
   return response.data;
 }
 
+/** @public */
 export interface CourseRequest {
   name: string;
   description: string | null;
@@ -284,6 +285,7 @@ export async function deleteCourse(id: number): Promise<void> {
   await api.delete(`/api/course/${id}`);
 }
 
+/** @public */
 export interface CourseResourceRequest {
   title: string;
   url: string | null;
