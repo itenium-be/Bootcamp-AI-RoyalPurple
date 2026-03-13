@@ -24,6 +24,8 @@ public class CourseEntity
     [MaxLength(50)]
     public string? Level { get; set; }
 
+    public CourseStatus Status { get; set; } = CourseStatus.Draft;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>

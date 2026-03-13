@@ -1,19 +1,24 @@
 using Itenium.SkillForge.Entities;
+using Itenium.SkillForge.Services;
 using Itenium.SkillForge.WebApi.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSubstitute;
 
 namespace Itenium.SkillForge.WebApi.Tests;
 
 [TestFixture]
 public class CourseControllerTests : DatabaseTestBase
 {
+    private ISkillForgeUser _user = null!;
     private CourseController _sut = null!;
 
     [SetUp]
     public void Setup()
     {
-        _sut = new CourseController(Db);
+        _user = Substitute.For<ISkillForgeUser>();
+        _user.IsManager.Returns(true); // existing tests assume manager sees all
+        _sut = new CourseController(Db, _user);
     }
 
     [Test]

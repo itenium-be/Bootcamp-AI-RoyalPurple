@@ -53,7 +53,10 @@ import {
   fetchMyEnrollments,
   enrollCourse,
   unenrollCourse,
+  setCourseStatus,
+  type Course,
   type CourseRequest,
+  type CourseStatus,
   type CourseResource,
   type CourseResourceRequest,
   type CourseResourceType,
@@ -105,15 +108,15 @@ const resourceSchema = z.object({
 
 type ResourceFormValues = z.infer<typeof resourceSchema>;
 
-// ─── Course sheet (create / edit) ─────────────────────────────────────────────
+// ─── Status helpers ────────────────────────────────────────────────────────────
 
-interface Course {
-  id: number;
-  name: string;
-  description: string | null;
-  category: string | null;
-  level: string | null;
-}
+const STATUS_BADGE_CLASSES: Record<CourseStatus, string> = {
+  Draft: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
+  Published: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  Archived: 'bg-muted text-muted-foreground',
+};
+
+// ─── Course sheet (create / edit) ─────────────────────────────────────────────
 
 function CourseSheet({
   course,
@@ -579,6 +582,12 @@ function CourseCard({
     onError: () => toast.error(t('progress.unenrollError')),
   });
 
+  const statusMutation = useMutation({
+    mutationFn: (status: CourseStatus) => setCourseStatus(course.id, status),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['catalog-courses'] }),
+    onError: () => toast.error(t('catalog.statusUpdateError')),
+  });
+
   return (
     <div className="rounded-lg border bg-card">
       <div className="p-4">
@@ -591,6 +600,9 @@ function CourseCard({
           </div>
           <div className="flex shrink-0 items-start gap-2">
             <div className="flex flex-col items-end gap-1">
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASSES[course.status]}`}>
+                {t(`catalog.status_${course.status.toLowerCase()}`)}
+              </span>
               {course.category && (
                 <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                   {course.category}
@@ -633,6 +645,22 @@ function CourseCard({
                     {t('common.edit')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  {course.status !== 'Published' && (
+                    <DropdownMenuItem onClick={() => statusMutation.mutate('Published')}>
+                      {t('catalog.publish')}
+                    </DropdownMenuItem>
+                  )}
+                  {course.status !== 'Draft' && (
+                    <DropdownMenuItem onClick={() => statusMutation.mutate('Draft')}>
+                      {t('catalog.setDraft')}
+                    </DropdownMenuItem>
+                  )}
+                  {course.status !== 'Archived' && (
+                    <DropdownMenuItem onClick={() => statusMutation.mutate('Archived')}>
+                      {t('catalog.archive')}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-destructive focus:text-destructive"
                     onClick={() => window.confirm(`Delete course "${course.name}"?`) && deleteMutation.mutate()}
@@ -674,13 +702,15 @@ export function Catalog() {
   const { user } = useAuthStore();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<CourseStatus | ''>('');
   const [addCourseOpen, setAddCourseOpen] = useState(false);
 
   const canEdit = user?.isBackOffice || user?.role === 'manager';
+  const isManager = canEdit;
 
   const { data: courses = [], isLoading } = useQuery({
-    queryKey: ['catalog-courses'],
-    queryFn: () => fetchCourses(),
+    queryKey: ['catalog-courses', statusFilter || undefined],
+    queryFn: () => fetchCourses(undefined, statusFilter || undefined),
   });
 
   const { data: enrollments = [] } = useQuery({
@@ -739,6 +769,18 @@ export function Catalog() {
             </option>
           ))}
         </select>
+        {isManager && (
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as CourseStatus | '')}
+            className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="">{t('catalog.allStatuses')}</option>
+            <option value="Draft">{t('catalog.status_draft')}</option>
+            <option value="Published">{t('catalog.status_published')}</option>
+            <option value="Archived">{t('catalog.status_archived')}</option>
+          </select>
+        )}
       </div>
 
       {filtered.length === 0 ? (

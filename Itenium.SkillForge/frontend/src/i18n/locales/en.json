@@ -190,7 +190,15 @@
     "resourceUpdated": "Resource updated",
     "resourceUpdateError": "Failed to update resource",
     "resourceDeleted": "Resource deleted",
-    "resourceDeleteError": "Failed to delete resource"
+    "resourceDeleteError": "Failed to delete resource",
+    "allStatuses": "All statuses",
+    "status_draft": "Draft",
+    "status_published": "Published",
+    "status_archived": "Archived",
+    "publish": "Publish",
+    "setDraft": "Set to Draft",
+    "archive": "Archive",
+    "statusUpdateError": "Failed to update status"
   },
   "feedback": {
     "title": "Feedback",

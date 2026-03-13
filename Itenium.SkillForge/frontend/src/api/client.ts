@@ -74,18 +74,28 @@ export async function deleteTeam(id: number): Promise<void> {
   await api.delete(`/api/team/${id}`);
 }
 
-interface Course {
+export type CourseStatus = 'Draft' | 'Published' | 'Archived';
+
+export interface Course {
   id: number;
   name: string;
   description: string | null;
   category: string | null;
   level: string | null;
   teamId: number | null;
+  status: CourseStatus;
 }
 
-export async function fetchCourses(teamId?: number): Promise<Course[]> {
-  const params = teamId !== undefined ? { teamId } : {};
+export async function fetchCourses(teamId?: number, status?: CourseStatus): Promise<Course[]> {
+  const params: Record<string, unknown> = {};
+  if (teamId !== undefined) params.teamId = teamId;
+  if (status !== undefined) params.status = status;
   const response = await api.get<Course[]>('/api/course', { params });
+  return response.data;
+}
+
+export async function setCourseStatus(id: number, status: CourseStatus): Promise<Course> {
+  const response = await api.put<Course>(`/api/course/${id}/status`, { status });
   return response.data;
 }
 
@@ -263,7 +273,7 @@ export async function fetchCourseResources(courseId: number): Promise<CourseReso
   return response.data;
 }
 
-interface CourseRequest {
+export interface CourseRequest {
   name: string;
   description: string | null;
   category: string | null;
@@ -284,7 +294,7 @@ export async function deleteCourse(id: number): Promise<void> {
   await api.delete(`/api/course/${id}`);
 }
 
-interface CourseResourceRequest {
+export interface CourseResourceRequest {
   title: string;
   url: string | null;
   type: CourseResourceType;

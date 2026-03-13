@@ -190,7 +190,15 @@
     "resourceUpdated": "Leermateriaal bijgewerkt",
     "resourceUpdateError": "Kon leermateriaal niet bijwerken",
     "resourceDeleted": "Leermateriaal verwijderd",
-    "resourceDeleteError": "Kon leermateriaal niet verwijderen"
+    "resourceDeleteError": "Kon leermateriaal niet verwijderen",
+    "allStatuses": "Alle statussen",
+    "status_draft": "Concept",
+    "status_published": "Gepubliceerd",
+    "status_archived": "Gearchiveerd",
+    "publish": "Publiceren",
+    "setDraft": "Terug naar concept",
+    "archive": "Archiveren",
+    "statusUpdateError": "Status bijwerken mislukt"
   },
   "feedback": {
     "title": "Feedback",
