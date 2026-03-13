@@ -36,7 +36,9 @@
     "completion": "Completion",
     "feedback": "Feedback",
     "settingsSection": "Settings",
-    "certificateTemplates": "Certificate Templates"
+    "certificateTemplates": "Certificate Templates",
+    "mySuggestions": "My Suggestions",
+    "suggestions": "Suggestions"
   },
   "auth": {
     "signIn": "Sign In",
@@ -131,7 +133,8 @@
     "active": "Active",
     "user": "User",
     "required": "This field is required",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "all": "All"
   },
   "enrollment": {
     "title": "My Courses",
@@ -226,6 +229,44 @@
     "entireTeam": "Entire team",
     "assignToMember": "Assign to member",
     "selectMember": "Select a member"
+  },
+  "suggestions": {
+    "teamTitle": "Course Suggestions",
+    "newSuggestion": "Suggest a Course",
+    "submit": "Submit Suggestion",
+    "submitted": "Suggestion submitted!",
+    "deleted": "Suggestion deleted.",
+    "reviewed": "Suggestion reviewed.",
+    "noSuggestions": "No suggestions yet.",
+    "pendingCount": "pending suggestion(s) to review",
+    "titlePlaceholder": "Course title (e.g. Docker, Kubernetes, React...)",
+    "descriptionPlaceholder": "Description (optional)",
+    "reasonPlaceholder": "Why is this useful for the team? (optional)",
+    "reason": "Reason",
+    "reviewNote": "Review note",
+    "reviewTitle": "Review",
+    "reviewNotePlaceholder": "Add a note (optional)",
+    "approve": "Approve",
+    "reject": "Reject",
+    "review": "Review",
+    "deleteConfirm": "Delete suggestion \"{{title}}\"?",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "progress": {
+    "totalCourses": "Total Courses",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "completionRate": "Completion Rate",
+    "noCourses": "You have not enrolled in any courses yet."
+  },
+  "certificates": {
+    "earned": "certificate(s) earned",
+    "completedOn": "Completed on",
+    "noCertificates": "No certificates yet. Complete a course to earn one!"
   },
   "errors": {
     "sessionExpired": "Session expired!",

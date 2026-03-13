@@ -49,6 +49,7 @@ import {
   ClipboardList,
   MessageSquare,
   CheckCircle,
+  Lightbulb,
 } from 'lucide-react';
 import { useAuthStore, useTeamStore, useThemeStore, type Team } from '@/stores';
 import { fetchUserTeams } from '@/api/client';
@@ -232,6 +233,7 @@ export function Layout() {
     { path: '/my-feedback', icon: MessageSquare, label: t('nav.feedback') },
     { path: '/my-progress', icon: TrendingUp, label: t('nav.myProgress') },
     { path: '/my-certificates', icon: Award, label: t('nav.myCertificates') },
+    { path: '/my-suggestions', icon: Lightbulb, label: t('nav.mySuggestions') },
   ];
 
   // Catalog - shown for all users
@@ -242,6 +244,7 @@ export function Layout() {
     { path: '/team/members', icon: Users, label: t('nav.teamMembers') },
     { path: '/team/progress', icon: BarChart3, label: t('nav.teamProgress') },
     { path: '/team/assignments', icon: ClipboardList, label: t('nav.assignments') },
+    { path: '/team/suggestions', icon: Lightbulb, label: t('nav.suggestions') },
   ];
 
   // Courses management - shown for managers

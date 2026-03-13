@@ -36,7 +36,9 @@
     "completion": "Voltooiing",
     "feedback": "Feedback",
     "settingsSection": "Instellingen",
-    "certificateTemplates": "Certificaat Sjablonen"
+    "certificateTemplates": "Certificaat Sjablonen",
+    "mySuggestions": "Mijn Suggesties",
+    "suggestions": "Suggesties"
   },
   "auth": {
     "signIn": "Inloggen",
@@ -131,7 +133,8 @@
     "active": "Actief",
     "user": "Gebruiker",
     "required": "Dit veld is verplicht",
-    "comingSoon": "Binnenkort beschikbaar"
+    "comingSoon": "Binnenkort beschikbaar",
+    "all": "Alles"
   },
   "enrollment": {
     "title": "Mijn Cursussen",
@@ -226,6 +229,44 @@
     "entireTeam": "Volledig team",
     "assignToMember": "Toewijzen aan lid",
     "selectMember": "Selecteer een lid"
+  },
+  "suggestions": {
+    "teamTitle": "Cursussuggesties",
+    "newSuggestion": "Cursus Voorstellen",
+    "submit": "Suggestie Indienen",
+    "submitted": "Suggestie ingediend!",
+    "deleted": "Suggestie verwijderd.",
+    "reviewed": "Suggestie beoordeeld.",
+    "noSuggestions": "Nog geen suggesties.",
+    "pendingCount": "openstaande suggestie(s) om te beoordelen",
+    "titlePlaceholder": "Cursustitel (bv. Docker, Kubernetes, React...)",
+    "descriptionPlaceholder": "Beschrijving (optioneel)",
+    "reasonPlaceholder": "Waarom is dit nuttig voor het team? (optioneel)",
+    "reason": "Reden",
+    "reviewNote": "Beoordelingsnotitie",
+    "reviewTitle": "Beoordeling",
+    "reviewNotePlaceholder": "Voeg een notitie toe (optioneel)",
+    "approve": "Goedkeuren",
+    "reject": "Afwijzen",
+    "review": "Beoordelen",
+    "deleteConfirm": "Suggestie \"{{title}}\" verwijderen?",
+    "status": {
+      "pending": "In behandeling",
+      "approved": "Goedgekeurd",
+      "rejected": "Afgewezen"
+    }
+  },
+  "progress": {
+    "totalCourses": "Totaal Cursussen",
+    "inProgress": "Bezig",
+    "completed": "Voltooid",
+    "completionRate": "Voltooiingspercentage",
+    "noCourses": "Je bent nog niet ingeschreven voor cursussen."
+  },
+  "certificates": {
+    "earned": "certificaat/certificaten behaald",
+    "completedOn": "Voltooid op",
+    "noCertificates": "Nog geen certificaten. Voltooi een cursus om er een te verdienen!"
   },
   "errors": {
     "sessionExpired": "Sessie verlopen!",

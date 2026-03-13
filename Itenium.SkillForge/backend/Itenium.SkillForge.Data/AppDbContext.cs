@@ -23,6 +23,8 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<TeamAssignmentEntity> TeamAssignments => Set<TeamAssignmentEntity>();
 
+    public DbSet<CourseSuggestionEntity> CourseSuggestions => Set<CourseSuggestionEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

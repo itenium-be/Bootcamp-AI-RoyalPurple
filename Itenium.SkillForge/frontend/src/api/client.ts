@@ -296,6 +296,47 @@ export async function unassignCourse(teamId: number, courseId: number, userId?: 
   await api.delete(`/api/team/${teamId}/assignments/${courseId}${params}`);
 }
 
+export type SuggestionStatus = 'Pending' | 'Approved' | 'Rejected';
+
+export interface CourseSuggestion {
+  id: number;
+  userId: string;
+  title: string;
+  description: string | null;
+  reason: string | null;
+  status: SuggestionStatus;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+  reviewNote: string | null;
+  submittedAt: string;
+}
+
+export async function fetchSuggestions(): Promise<CourseSuggestion[]> {
+  const response = await api.get<CourseSuggestion[]>('/api/suggestion');
+  return response.data;
+}
+
+export async function submitSuggestion(data: {
+  title: string;
+  description?: string | null;
+  reason?: string | null;
+}): Promise<CourseSuggestion> {
+  const response = await api.post<CourseSuggestion>('/api/suggestion', data);
+  return response.data;
+}
+
+export async function reviewSuggestion(
+  id: number,
+  status: SuggestionStatus,
+  reviewNote?: string | null,
+): Promise<void> {
+  await api.put(`/api/suggestion/${id}/review`, { status, reviewNote: reviewNote ?? null });
+}
+
+export async function deleteSuggestion(id: number): Promise<void> {
+  await api.delete(`/api/suggestion/${id}`);
+}
+
 export async function updateAssignment(
   teamId: number,
   courseId: number,

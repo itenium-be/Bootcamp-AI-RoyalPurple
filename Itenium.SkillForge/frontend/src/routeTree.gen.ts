@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedMySuggestionsRouteImport } from './routes/_authenticated/my-suggestions'
 import { Route as AuthenticatedMyProgressRouteImport } from './routes/_authenticated/my-progress'
 import { Route as AuthenticatedMyFeedbackRouteImport } from './routes/_authenticated/my-feedback'
 import { Route as AuthenticatedMyCoursesRouteImport } from './routes/_authenticated/my-courses'
@@ -19,6 +20,7 @@ import { Route as AuthenticatedMyCertificatesRouteImport } from './routes/_authe
 import { Route as AuthenticatedCoursesRouteImport } from './routes/_authenticated/courses'
 import { Route as AuthenticatedCatalogRouteImport } from './routes/_authenticated/catalog'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
+import { Route as AuthenticatedTeamSuggestionsRouteImport } from './routes/_authenticated/team/suggestions'
 import { Route as AuthenticatedTeamProgressRouteImport } from './routes/_authenticated/team/progress'
 import { Route as AuthenticatedTeamMembersRouteImport } from './routes/_authenticated/team/members'
 import { Route as AuthenticatedTeamAssignmentsRouteImport } from './routes/_authenticated/team/assignments'
@@ -41,6 +43,12 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMySuggestionsRoute =
+  AuthenticatedMySuggestionsRouteImport.update({
+    id: '/my-suggestions',
+    path: '/my-suggestions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMyProgressRoute = AuthenticatedMyProgressRouteImport.update({
   id: '/my-progress',
   path: '/my-progress',
@@ -77,6 +85,12 @@ const authSignInRoute = authSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTeamSuggestionsRoute =
+  AuthenticatedTeamSuggestionsRouteImport.update({
+    id: '/team/suggestions',
+    path: '/team/suggestions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTeamProgressRoute =
   AuthenticatedTeamProgressRouteImport.update({
     id: '/team/progress',
@@ -126,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/my-courses': typeof AuthenticatedMyCoursesRoute
   '/my-feedback': typeof AuthenticatedMyFeedbackRoute
   '/my-progress': typeof AuthenticatedMyProgressRoute
+  '/my-suggestions': typeof AuthenticatedMySuggestionsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRouteWithChildren
@@ -133,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/team/assignments': typeof AuthenticatedTeamAssignmentsRoute
   '/team/members': typeof AuthenticatedTeamMembersRoute
   '/team/progress': typeof AuthenticatedTeamProgressRoute
+  '/team/suggestions': typeof AuthenticatedTeamSuggestionsRoute
   '/admin/teams/': typeof AuthenticatedAdminTeamsIndexRoute
   '/admin/teams/$teamId/members': typeof AuthenticatedAdminTeamsTeamIdMembersRoute
 }
@@ -144,12 +160,14 @@ export interface FileRoutesByTo {
   '/my-courses': typeof AuthenticatedMyCoursesRoute
   '/my-feedback': typeof AuthenticatedMyFeedbackRoute
   '/my-progress': typeof AuthenticatedMyProgressRoute
+  '/my-suggestions': typeof AuthenticatedMySuggestionsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/team/assignments': typeof AuthenticatedTeamAssignmentsRoute
   '/team/members': typeof AuthenticatedTeamMembersRoute
   '/team/progress': typeof AuthenticatedTeamProgressRoute
+  '/team/suggestions': typeof AuthenticatedTeamSuggestionsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsIndexRoute
   '/admin/teams/$teamId/members': typeof AuthenticatedAdminTeamsTeamIdMembersRoute
 }
@@ -163,6 +181,7 @@ export interface FileRoutesById {
   '/_authenticated/my-courses': typeof AuthenticatedMyCoursesRoute
   '/_authenticated/my-feedback': typeof AuthenticatedMyFeedbackRoute
   '/_authenticated/my-progress': typeof AuthenticatedMyProgressRoute
+  '/_authenticated/my-suggestions': typeof AuthenticatedMySuggestionsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRouteWithChildren
@@ -170,6 +189,7 @@ export interface FileRoutesById {
   '/_authenticated/team/assignments': typeof AuthenticatedTeamAssignmentsRoute
   '/_authenticated/team/members': typeof AuthenticatedTeamMembersRoute
   '/_authenticated/team/progress': typeof AuthenticatedTeamProgressRoute
+  '/_authenticated/team/suggestions': typeof AuthenticatedTeamSuggestionsRoute
   '/_authenticated/admin/teams/': typeof AuthenticatedAdminTeamsIndexRoute
   '/_authenticated/admin/teams/$teamId/members': typeof AuthenticatedAdminTeamsTeamIdMembersRoute
 }
@@ -183,6 +203,7 @@ export interface FileRouteTypes {
     | '/my-courses'
     | '/my-feedback'
     | '/my-progress'
+    | '/my-suggestions'
     | '/settings'
     | '/'
     | '/admin/teams'
@@ -190,6 +211,7 @@ export interface FileRouteTypes {
     | '/team/assignments'
     | '/team/members'
     | '/team/progress'
+    | '/team/suggestions'
     | '/admin/teams/'
     | '/admin/teams/$teamId/members'
   fileRoutesByTo: FileRoutesByTo
@@ -201,12 +223,14 @@ export interface FileRouteTypes {
     | '/my-courses'
     | '/my-feedback'
     | '/my-progress'
+    | '/my-suggestions'
     | '/settings'
     | '/'
     | '/admin/users'
     | '/team/assignments'
     | '/team/members'
     | '/team/progress'
+    | '/team/suggestions'
     | '/admin/teams'
     | '/admin/teams/$teamId/members'
   id:
@@ -219,6 +243,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-courses'
     | '/_authenticated/my-feedback'
     | '/_authenticated/my-progress'
+    | '/_authenticated/my-suggestions'
     | '/_authenticated/settings'
     | '/_authenticated/'
     | '/_authenticated/admin/teams'
@@ -226,6 +251,7 @@ export interface FileRouteTypes {
     | '/_authenticated/team/assignments'
     | '/_authenticated/team/members'
     | '/_authenticated/team/progress'
+    | '/_authenticated/team/suggestions'
     | '/_authenticated/admin/teams/'
     | '/_authenticated/admin/teams/$teamId/members'
   fileRoutesById: FileRoutesById
@@ -256,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-suggestions': {
+      id: '/_authenticated/my-suggestions'
+      path: '/my-suggestions'
+      fullPath: '/my-suggestions'
+      preLoaderRoute: typeof AuthenticatedMySuggestionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/my-progress': {
@@ -306,6 +339,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sign-in'
       preLoaderRoute: typeof authSignInRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/team/suggestions': {
+      id: '/_authenticated/team/suggestions'
+      path: '/team/suggestions'
+      fullPath: '/team/suggestions'
+      preLoaderRoute: typeof AuthenticatedTeamSuggestionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/team/progress': {
       id: '/_authenticated/team/progress'
@@ -383,6 +423,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyCoursesRoute: typeof AuthenticatedMyCoursesRoute
   AuthenticatedMyFeedbackRoute: typeof AuthenticatedMyFeedbackRoute
   AuthenticatedMyProgressRoute: typeof AuthenticatedMyProgressRoute
+  AuthenticatedMySuggestionsRoute: typeof AuthenticatedMySuggestionsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRouteWithChildren
@@ -390,6 +431,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTeamAssignmentsRoute: typeof AuthenticatedTeamAssignmentsRoute
   AuthenticatedTeamMembersRoute: typeof AuthenticatedTeamMembersRoute
   AuthenticatedTeamProgressRoute: typeof AuthenticatedTeamProgressRoute
+  AuthenticatedTeamSuggestionsRoute: typeof AuthenticatedTeamSuggestionsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -399,6 +441,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyCoursesRoute: AuthenticatedMyCoursesRoute,
   AuthenticatedMyFeedbackRoute: AuthenticatedMyFeedbackRoute,
   AuthenticatedMyProgressRoute: AuthenticatedMyProgressRoute,
+  AuthenticatedMySuggestionsRoute: AuthenticatedMySuggestionsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRouteWithChildren,
@@ -406,6 +449,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTeamAssignmentsRoute: AuthenticatedTeamAssignmentsRoute,
   AuthenticatedTeamMembersRoute: AuthenticatedTeamMembersRoute,
   AuthenticatedTeamProgressRoute: AuthenticatedTeamProgressRoute,
+  AuthenticatedTeamSuggestionsRoute: AuthenticatedTeamSuggestionsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
