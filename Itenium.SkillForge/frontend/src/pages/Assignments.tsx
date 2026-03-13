@@ -86,6 +86,7 @@ export function Assignments() {
     onSuccess: () => {
       toast.success(t('assignments.created'));
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
       setSheetOpen(false);
       reset();
     },
@@ -97,6 +98,7 @@ export function Assignments() {
     onSuccess: () => {
       toast.success(t('assignments.deleted'));
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
     },
     onError: () => toast.error(t('assignments.deleteError')),
   });
