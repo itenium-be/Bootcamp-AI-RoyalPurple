@@ -89,7 +89,7 @@ export async function fetchCourses(teamId?: number): Promise<Course[]> {
   return response.data;
 }
 
-export interface ConsultantProfile {
+interface ConsultantProfile {
   userId: string;
   teamId: number | null;
   teamName: string | null;
