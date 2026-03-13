@@ -232,4 +232,62 @@ public class AssignmentControllerTests : DatabaseTestBase
 
         Assert.That(result, Is.TypeOf<ForbidResult>());
     }
+
+    // Admin (backoffice) access
+
+    [Test]
+    public async Task GetAssignments_WhenAdmin_ReturnsAllAssignments()
+    {
+        var otherTeam = new TeamEntity { Name = "Java" };
+        Db.Teams.Add(otherTeam);
+        await Db.SaveChangesAsync();
+
+        Db.CourseAssignments.AddRange(
+            new CourseAssignmentEntity { CourseId = _course.Id, TeamId = _team.Id, IsRequired = true, AssignedById = "admin" },
+            new CourseAssignmentEntity { CourseId = _course.Id, TeamId = otherTeam.Id, IsRequired = false, AssignedById = "admin" });
+        await Db.SaveChangesAsync();
+
+        _user.IsBackOffice.Returns(true);
+        _user.Teams.Returns([]); // admin has no team claims
+
+        var result = await _sut.GetAssignments();
+
+        var ok = result.Result as OkObjectResult;
+        var assignments = ok!.Value as List<AssignmentDto>;
+        Assert.That(assignments, Has.Count.EqualTo(2));
+    }
+
+    [Test]
+    public async Task AssignCourse_WhenAdmin_CanAssignToAnyTeam()
+    {
+        _user.UserId.Returns("admin-1");
+        _user.IsBackOffice.Returns(true);
+        _user.Teams.Returns([]); // admin has no team claims
+
+        var request = new AssignCourseRequest(_course.Id, _team.Id, null, true);
+        var result = await _sut.AssignCourse(request);
+
+        Assert.That(result.Result, Is.TypeOf<CreatedAtActionResult>());
+    }
+
+    [Test]
+    public async Task RemoveAssignment_WhenAdmin_CanDeleteAnyAssignment()
+    {
+        _user.IsBackOffice.Returns(true);
+        _user.Teams.Returns([]); // admin has no team claims
+
+        var assignment = new CourseAssignmentEntity
+        {
+            CourseId = _course.Id,
+            TeamId = _team.Id,
+            IsRequired = true,
+            AssignedById = "coach-1",
+        };
+        Db.CourseAssignments.Add(assignment);
+        await Db.SaveChangesAsync();
+
+        var result = await _sut.RemoveAssignment(assignment.Id);
+
+        Assert.That(result, Is.TypeOf<NoContentResult>());
+    }
 }
