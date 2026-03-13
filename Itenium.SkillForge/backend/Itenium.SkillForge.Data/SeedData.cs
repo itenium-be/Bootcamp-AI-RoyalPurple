@@ -19,6 +19,7 @@ public static class SeedData
         await SeedCourses(db);
         await SeedSkillCatalogue(db);
         await app.SeedTestUsers();
+        await SeedConsultantProfiles(db);
     }
 
     public static async Task SeedDevelopmentData_ForTest(AppDbContext db)
@@ -46,9 +47,11 @@ public static class SeedData
         {
             db.Courses.AddRange(
                 new CourseEntity { Id = 1, Name = "Introduction to Programming", Description = "Learn the basics of programming", Category = "Development", Level = "Beginner" },
-                new CourseEntity { Id = 2, Name = "Advanced C#", Description = "Master C# programming language", Category = "Development", Level = "Advanced" },
-                new CourseEntity { Id = 3, Name = "Cloud Architecture", Description = "Design scalable cloud solutions", Category = "Architecture", Level = "Intermediate" },
-                new CourseEntity { Id = 4, Name = "Agile Project Management", Description = "Learn agile methodologies", Category = "Management", Level = "Beginner" });
+                new CourseEntity { Id = 2, Name = "Advanced C#", Description = "Master C# programming language", Category = "Development", Level = "Advanced", TeamId = 2 },        // .NET
+                new CourseEntity { Id = 3, Name = "Cloud Architecture", Description = "Design scalable cloud solutions", Category = "Architecture", Level = "Intermediate", TeamId = 2 }, // .NET
+                new CourseEntity { Id = 4, Name = "Agile Project Management", Description = "Learn agile methodologies", Category = "Management", Level = "Beginner", TeamId = 3 },        // PO & Analysis
+                new CourseEntity { Id = 5, Name = "Spring Boot Fundamentals", Description = "Build Java applications with Spring Boot", Category = "Development", Level = "Intermediate", TeamId = 1 }, // Java
+                new CourseEntity { Id = 6, Name = "Test Automation", Description = "Automate tests with Selenium and Playwright", Category = "Quality", Level = "Intermediate", TeamId = 4 });           // QA
             await db.SaveChangesAsync();
         }
     }
@@ -491,6 +494,24 @@ public static class SeedData
             {
                 await userManager.AddToRoleAsync(user, "learner");
                 await userManager.AddClaimAsync(user, new Claim("team", "1")); // Java team
+            }
+        }
+    }
+
+    private static async Task SeedConsultantProfiles(AppDbContext db)
+    {
+        if (!await db.ConsultantProfiles.AnyAsync())
+        {
+            // Assign learner@test.local to the .NET profile (TeamId = 2)
+            var learner = db.Users.FirstOrDefault(u => u.Email == "learner@test.local");
+            if (learner != null)
+            {
+                db.ConsultantProfiles.Add(new ConsultantProfileEntity
+                {
+                    UserId = learner.Id,
+                    TeamId = 2, // .NET
+                });
+                await db.SaveChangesAsync();
             }
         }
     }

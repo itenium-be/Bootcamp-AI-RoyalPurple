@@ -38,7 +38,9 @@
     "completion": "Completion",
     "feedback": "Feedback",
     "settingsSection": "Settings",
-    "certificateTemplates": "Certificate Templates"
+    "certificateTemplates": "Certificate Templates",
+    "skillProfiles": "Skill Profiles",
+    "myProfile": "My Profile"
   },
   "auth": {
     "signIn": "Sign In",
@@ -97,6 +99,20 @@
     "dark": "Dark",
     "system": "System",
     "save": "Save"
+  },
+  "profile": {
+    "title": "Skill Profiles",
+    "consultant": "Consultant",
+    "assignedProfile": "Assigned Profile",
+    "assignProfile": "Assign Profile",
+    "removeProfile": "Remove Profile",
+    "noProfile": "No profile assigned",
+    "noConsultants": "No profile assignments found",
+    "assignSuccess": "Profile assigned successfully",
+    "removeSuccess": "Profile removed successfully",
+    "myProfileTitle": "My Skill Profile",
+    "myProfileDescription": "Your assigned competence centre profile determines which skills and courses are included in your roadmap.",
+    "notAssigned": "You have not been assigned to a competence centre profile yet. Please contact your coach."
   },
   "common": {
     "loading": "Loading...",

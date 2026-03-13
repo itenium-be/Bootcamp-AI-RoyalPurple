@@ -38,7 +38,9 @@
     "completion": "Voltooiing",
     "feedback": "Feedback",
     "settingsSection": "Instellingen",
-    "certificateTemplates": "Certificaat Sjablonen"
+    "certificateTemplates": "Certificaat Sjablonen",
+    "skillProfiles": "Vaardigheidsprofielen",
+    "myProfile": "Mijn Profiel"
   },
   "auth": {
     "signIn": "Inloggen",
@@ -97,6 +99,20 @@
     "dark": "Donker",
     "system": "Systeem",
     "save": "Opslaan"
+  },
+  "profile": {
+    "title": "Vaardigheidsprofielen",
+    "consultant": "Consultant",
+    "assignedProfile": "Toegewezen Profiel",
+    "assignProfile": "Profiel Toewijzen",
+    "removeProfile": "Profiel Verwijderen",
+    "noProfile": "Geen profiel toegewezen",
+    "noConsultants": "Geen profieltoewijzingen gevonden",
+    "assignSuccess": "Profiel succesvol toegewezen",
+    "removeSuccess": "Profiel succesvol verwijderd",
+    "myProfileTitle": "Mijn Vaardigheidsprofiel",
+    "myProfileDescription": "Uw toegewezen competentieprofiel bepaalt welke vaardigheden en cursussen in uw roadmap worden opgenomen.",
+    "notAssigned": "U bent nog niet toegewezen aan een competentieprofiel. Neem contact op met uw coach."
   },
   "common": {
     "loading": "Laden...",
