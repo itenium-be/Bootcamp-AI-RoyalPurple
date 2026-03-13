@@ -4,7 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod/v4';
-import { Component, Plus, MoreHorizontal, Pencil, Trash2, Briefcase } from 'lucide-react';
+import {
+  Component,
+  Plus,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Briefcase,
+  Users,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -33,7 +43,8 @@ import {
 } from '@itenium-forge/ui';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores';
-import { fetchUserTeams, createTeam, updateTeam, deleteTeam } from '@/api/client';
+import { fetchUserTeams, fetchUsers, createTeam, updateTeam, deleteTeam } from '@/api/client';
+import type { UserDto } from '@/api/client';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -177,10 +188,11 @@ function RenameTeamSheet({ team, onOpenChange }: { team: Team; onOpenChange: (v:
 
 // ─── Team row ─────────────────────────────────────────────────────────────────
 
-function TeamRow({ team, canDelete }: { team: Team; canDelete: boolean }) {
+function TeamRow({ team, members, canDelete }: { team: Team; members: UserDto[]; canDelete: boolean }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [renameOpen, setRenameOpen] = useState(false);
+  const [membersOpen, setMembersOpen] = useState(false);
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteTeam(team.id),
@@ -195,36 +207,68 @@ function TeamRow({ team, canDelete }: { team: Team; canDelete: boolean }) {
 
   return (
     <>
-      <div className="flex items-center gap-4 py-3 border-b last:border-0">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 shrink-0">
-          <Component className="size-4" />
-        </div>
-        <p className="flex-1 text-sm font-medium">{team.name}</p>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="size-8 p-0">
-              <MoreHorizontal className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{t('common.actions', 'Actions')}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setRenameOpen(true)}>
-              <Pencil className="size-4 mr-2" />
-              {t('teams.rename', 'Rename')}
-            </DropdownMenuItem>
-            {canDelete && (
-              <DropdownMenuItem
-                onClick={() => deleteMutation.mutate()}
-                disabled={deleteMutation.isPending}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="size-4 mr-2" />
-                {t('common.delete', 'Delete')}
+      <div className="border-b last:border-0">
+        <div className="flex items-center gap-4 py-3">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 shrink-0">
+            <Component className="size-4" />
+          </div>
+          <p className="flex-1 text-sm font-medium">{team.name}</p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 text-xs text-muted-foreground"
+            onClick={() => setMembersOpen((v) => !v)}
+            aria-label={t('teams.members', 'Members')}
+          >
+            <Users className="size-3.5" />
+            {t('teams.members', 'Members')}
+            <span className="font-semibold">{members.length}</span>
+            {membersOpen ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="size-8 p-0">
+                <MoreHorizontal className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>{t('common.actions', 'Actions')}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setRenameOpen(true)}>
+                <Pencil className="size-4 mr-2" />
+                {t('teams.rename', 'Rename')}
               </DropdownMenuItem>
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={() => deleteMutation.mutate()}
+                  disabled={deleteMutation.isPending}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="size-4 mr-2" />
+                  {t('common.delete', 'Delete')}
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {membersOpen && (
+          <div className="pb-3 pl-12 pr-2">
+            {members.length === 0 ? (
+              <p className="text-xs text-muted-foreground">{t('teams.noMembers', 'No members yet')}</p>
+            ) : (
+              <ul className="space-y-1">
+                {members.map((m) => (
+                  <li key={m.id} className="flex items-center gap-2 text-sm">
+                    <span className="text-muted-foreground">
+                      {m.firstName} {m.lastName}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </div>
+        )}
       </div>
 
       {renameOpen && <RenameTeamSheet team={team} onOpenChange={setRenameOpen} />}
@@ -239,6 +283,7 @@ function AdminView() {
   const [createOpen, setCreateOpen] = useState(false);
 
   const { data: teams = [], isLoading } = useQuery({ queryKey: ['teams'], queryFn: fetchUserTeams });
+  const { data: users = [] } = useQuery({ queryKey: ['users'], queryFn: fetchUsers });
 
   return (
     <div className="space-y-6">
@@ -272,7 +317,9 @@ function AdminView() {
           ) : teams.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">{t('teams.noTeams', 'No teams yet')}</p>
           ) : (
-            teams.map((team) => <TeamRow key={team.id} team={team} canDelete />)
+            teams.map((team) => (
+              <TeamRow key={team.id} team={team} members={users.filter((u) => u.teams.includes(team.id))} canDelete />
+            ))
           )}
         </CardContent>
       </Card>
@@ -288,6 +335,7 @@ function ManagerView() {
   const { t } = useTranslation();
 
   const { data: teams = [], isLoading } = useQuery({ queryKey: ['teams'], queryFn: fetchUserTeams });
+  const { data: users = [] } = useQuery({ queryKey: ['users'], queryFn: fetchUsers });
 
   return (
     <div className="space-y-6">
@@ -315,7 +363,14 @@ function ManagerView() {
           ) : teams.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">{t('teams.noTeams', 'No teams yet')}</p>
           ) : (
-            teams.map((team) => <TeamRow key={team.id} team={team} canDelete={false} />)
+            teams.map((team) => (
+              <TeamRow
+                key={team.id}
+                team={team}
+                members={users.filter((u) => u.teams.includes(team.id))}
+                canDelete={false}
+              />
+            ))
           )}
         </CardContent>
       </Card>
