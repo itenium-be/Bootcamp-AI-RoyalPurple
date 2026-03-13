@@ -150,6 +150,7 @@ describe('Layout', () => {
       render(<Layout />);
 
       expect(screen.getByText('nav.myLearning')).toBeInTheDocument();
+      expect(screen.getByText('nav.myProfile')).toBeInTheDocument();
       expect(screen.getByText('nav.myCourses')).toBeInTheDocument();
       expect(screen.getByText('nav.myProgress')).toBeInTheDocument();
       expect(screen.getByText('nav.myCertificates')).toBeInTheDocument();
@@ -201,6 +202,7 @@ describe('Layout', () => {
       expect(screen.getByText('nav.teamMembers')).toBeInTheDocument();
       expect(screen.getByText('nav.teamProgress')).toBeInTheDocument();
       expect(screen.getByText('nav.assignments')).toBeInTheDocument();
+      expect(screen.getByText('nav.skillProfiles')).toBeInTheDocument();
 
       expect(screen.getByText('nav.coursesSection')).toBeInTheDocument();
       expect(screen.getByText('nav.courses')).toBeInTheDocument();

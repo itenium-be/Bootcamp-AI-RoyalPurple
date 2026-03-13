@@ -19,13 +19,18 @@ public class CourseController : ControllerBase
     }
 
     /// <summary>
-    /// Get all courses.
+    /// Get all courses, optionally filtered by competence centre profile.
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<List<CourseEntity>>> GetCourses()
+    public async Task<ActionResult<List<CourseEntity>>> GetCourses([FromQuery] int? teamId = null)
     {
-        var courses = await _db.Courses.ToListAsync();
-        return Ok(courses);
+        var query = _db.Courses.AsQueryable();
+        if (teamId.HasValue)
+        {
+            query = query.Where(c => c.TeamId == teamId.Value);
+        }
+
+        return Ok(await query.ToListAsync());
     }
 
     /// <summary>

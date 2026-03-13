@@ -132,4 +132,45 @@ public class CourseControllerTests : DatabaseTestBase
         var result = await _sut.DeleteCourse(999);
         Assert.That(result, Is.TypeOf<NotFoundResult>());
     }
+
+    [Test]
+    public async Task GetCourses_WithTeamIdFilter_ReturnsOnlyTeamCourses()
+    {
+        var team = new TeamEntity { Name = ".NET" };
+        Db.Teams.Add(team);
+        await Db.SaveChangesAsync();
+
+        Db.Courses.AddRange(
+            new CourseEntity { Name = "Advanced C#", TeamId = team.Id },
+            new CourseEntity { Name = "General Course" });
+        await Db.SaveChangesAsync();
+
+        var result = await _sut.GetCourses(team.Id);
+
+        var okResult = result.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        var courses = okResult!.Value as List<CourseEntity>;
+        Assert.That(courses, Has.Count.EqualTo(1));
+        Assert.That(courses![0].Name, Is.EqualTo("Advanced C#"));
+    }
+
+    [Test]
+    public async Task GetCourses_WithNoTeamIdFilter_ReturnsAllCourses()
+    {
+        var team = new TeamEntity { Name = ".NET" };
+        Db.Teams.Add(team);
+        await Db.SaveChangesAsync();
+
+        Db.Courses.AddRange(
+            new CourseEntity { Name = "Advanced C#", TeamId = team.Id },
+            new CourseEntity { Name = "General Course" });
+        await Db.SaveChangesAsync();
+
+        var result = await _sut.GetCourses(null);
+
+        var okResult = result.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        var courses = okResult!.Value as List<CourseEntity>;
+        Assert.That(courses, Has.Count.EqualTo(2));
+    }
 }
