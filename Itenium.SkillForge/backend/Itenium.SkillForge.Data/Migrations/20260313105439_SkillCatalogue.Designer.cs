@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Itenium.SkillForge.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260313095655_SkillCatalogue")]
+    [Migration("20260313105439_SkillCatalogue")]
     partial class SkillCatalogue
     {
         /// <inheritdoc />
@@ -173,6 +173,9 @@ namespace Itenium.SkillForge.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Tier")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

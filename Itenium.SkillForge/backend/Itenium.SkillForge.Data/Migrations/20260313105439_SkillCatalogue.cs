@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -11,6 +11,25 @@ namespace Itenium.SkillForge.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Skills_Teams_TeamId",
+                table: "Skills");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Skills_TeamId",
+                table: "Skills");
+
+            migrationBuilder.DropColumn(
+                name: "TeamId",
+                table: "Skills");
+
+            migrationBuilder.AddColumn<int>(
+                name: "LevelCount",
+                table: "Skills",
+                type: "integer",
+                nullable: false,
+                defaultValue: 1);
+
             migrationBuilder.CreateTable(
                 name: "SkillCategories",
                 columns: table => new
@@ -30,27 +49,12 @@ namespace Itenium.SkillForge.Data.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Skills",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
-                    LevelCount = table.Column<int>(type: "integer", nullable: false),
-                    CategoryId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Skills", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Skills_SkillCategories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "SkillCategories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+            migrationBuilder.AddColumn<int>(
+                name: "CategoryId",
+                table: "Skills",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
 
             migrationBuilder.CreateTable(
                 name: "SkillLevels",
@@ -98,6 +102,11 @@ namespace Itenium.SkillForge.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Skills_CategoryId",
+                table: "Skills",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SkillCategories_TeamId",
                 table: "SkillCategories",
                 column: "TeamId");
@@ -112,26 +121,62 @@ namespace Itenium.SkillForge.Data.Migrations
                 table: "SkillPrerequisites",
                 column: "PrerequisiteSkillId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Skills_CategoryId",
+            migrationBuilder.AddForeignKey(
+                name: "FK_Skills_SkillCategories_CategoryId",
                 table: "Skills",
-                column: "CategoryId");
+                column: "CategoryId",
+                principalTable: "SkillCategories",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "SkillLevels");
+            migrationBuilder.DropForeignKey(
+                name: "FK_Skills_SkillCategories_CategoryId",
+                table: "Skills");
 
             migrationBuilder.DropTable(
                 name: "SkillPrerequisites");
 
             migrationBuilder.DropTable(
-                name: "Skills");
+                name: "SkillLevels");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Skills_CategoryId",
+                table: "Skills");
+
+            migrationBuilder.DropColumn(
+                name: "CategoryId",
+                table: "Skills");
+
+            migrationBuilder.DropColumn(
+                name: "LevelCount",
+                table: "Skills");
 
             migrationBuilder.DropTable(
                 name: "SkillCategories");
+
+            migrationBuilder.AddColumn<int>(
+                name: "TeamId",
+                table: "Skills",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Skills_TeamId",
+                table: "Skills",
+                column: "TeamId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Skills_Teams_TeamId",
+                table: "Skills",
+                column: "TeamId",
+                principalTable: "Teams",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
     }
 }

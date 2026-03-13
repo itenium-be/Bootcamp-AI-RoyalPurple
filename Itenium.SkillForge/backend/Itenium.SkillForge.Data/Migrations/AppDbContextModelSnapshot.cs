@@ -125,6 +125,29 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.ToTable("Courses");
                 });
 
+            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("SkillCategories");
+                });
+
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -133,26 +156,70 @@ namespace Itenium.SkillForge.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("LevelCount")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int>("TeamId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Tier")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TeamId");
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Skills");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillLevelEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descriptor")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("SkillLevels");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillPrerequisiteEntity", b =>
+                {
+                    b.Property<int>("SkillId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PrerequisiteSkillId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("SkillId", "PrerequisiteSkillId");
+
+                    b.HasIndex("PrerequisiteSkillId");
+
+                    b.ToTable("SkillPrerequisites");
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.TeamEntity", b =>
@@ -513,15 +580,54 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillEntity", b =>
+            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
                 {
                     b.HasOne("Itenium.SkillForge.Entities.TeamEntity", "Team")
                         .WithMany()
-                        .HasForeignKey("TeamId")
+                        .HasForeignKey("TeamId");
+
+                    b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillEntity", b =>
+                {
+                    b.HasOne("Itenium.SkillForge.Entities.SkillCategoryEntity", "Category")
+                        .WithMany("Skills")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Team");
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillLevelEntity", b =>
+                {
+                    b.HasOne("Itenium.SkillForge.Entities.SkillEntity", "Skill")
+                        .WithMany("Levels")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Skill");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillPrerequisiteEntity", b =>
+                {
+                    b.HasOne("Itenium.SkillForge.Entities.SkillEntity", "PrerequisiteSkill")
+                        .WithMany()
+                        .HasForeignKey("PrerequisiteSkillId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Itenium.SkillForge.Entities.SkillEntity", "Skill")
+                        .WithMany("Prerequisites")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PrerequisiteSkill");
+
+                    b.Navigation("Skill");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -597,6 +703,18 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.Navigation("Application");
 
                     b.Navigation("Authorization");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillCategoryEntity", b =>
+                {
+                    b.Navigation("Skills");
+                });
+
+            modelBuilder.Entity("Itenium.SkillForge.Entities.SkillEntity", b =>
+                {
+                    b.Navigation("Levels");
+
+                    b.Navigation("Prerequisites");
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication", b =>
