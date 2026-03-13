@@ -9,10 +9,12 @@ namespace Itenium.SkillForge.WebApi;
 public class UserService : IUserService
 {
     private readonly UserManager<ForgeUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
-    public UserService(UserManager<ForgeUser> userManager)
+    public UserService(UserManager<ForgeUser> userManager, RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
+        _roleManager = roleManager;
     }
 
     public async Task<IList<UserDto>> GetAllUsersAsync()
@@ -130,10 +132,15 @@ public class UserService : IUserService
             return false;
         }
 
+        if (!await _roleManager.RoleExistsAsync(role))
+        {
+            await _roleManager.CreateAsync(new IdentityRole(role));
+        }
+
         var currentRoles = await _userManager.GetRolesAsync(user);
         await _userManager.RemoveFromRolesAsync(user, currentRoles);
-        await _userManager.AddToRoleAsync(user, role);
-        return true;
+        var result = await _userManager.AddToRoleAsync(user, role);
+        return result.Succeeded;
     }
 
     public async Task<bool> AssignTeamsAsync(string userId, ICollection<int> teamIds)
