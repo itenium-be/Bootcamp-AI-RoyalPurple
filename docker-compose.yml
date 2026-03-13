@@ -28,6 +28,7 @@ services:
       - "5000:8080"
     environment:
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=skillforge;Username=skillforge;Password=skillforge
+      ASPNETCORE_ENVIRONMENT: Development
     depends_on:
       postgres:
         condition: service_healthy
@@ -47,3 +48,9 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "1280"

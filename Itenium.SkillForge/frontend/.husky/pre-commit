@@ -1,7 +1,6 @@
-cd Itenium.SkillForge/frontend && bunx lint-staged && bun run knip
+(cd Itenium.SkillForge/frontend && bunx lint-staged) && (cd Itenium.SkillForge/frontend && bunx knip)
 
 # Backend: check formatting on staged .cs files
 if git diff --cached --name-only | grep -q '\.cs$'; then
-  cd "$OLDPWD"
-  cd Itenium.SkillForge/backend && dotnet format --verify-no-changes --no-restore
+  (cd Itenium.SkillForge/backend && dotnet format --verify-no-changes --no-restore)
 fi

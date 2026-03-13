@@ -15,6 +15,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticated/roadmap'
 import { Route as AuthenticatedMyProfileRouteImport } from './routes/_authenticated/my-profile'
 import { Route as AuthenticatedFeedbackRouteImport } from './routes/_authenticated/feedback'
+import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
 import { Route as AuthenticatedCoursesRouteImport } from './routes/_authenticated/courses'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedCatalogRouteImport } from './routes/_authenticated/catalog'
@@ -51,6 +52,11 @@ const AuthenticatedMyProfileRoute = AuthenticatedMyProfileRouteImport.update({
 const AuthenticatedFeedbackRoute = AuthenticatedFeedbackRouteImport.update({
   id: '/feedback',
   path: '/feedback',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
+  id: '/goals',
+  path: '/goals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCoursesRoute = AuthenticatedCoursesRouteImport.update({
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/coach': typeof AuthenticatedCoachRoute
   '/courses': typeof AuthenticatedCoursesRoute
   '/feedback': typeof AuthenticatedFeedbackRoute
+  '/goals': typeof AuthenticatedGoalsRoute
   '/my-profile': typeof AuthenticatedMyProfileRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/coach': typeof AuthenticatedCoachRoute
   '/courses': typeof AuthenticatedCoursesRoute
   '/feedback': typeof AuthenticatedFeedbackRoute
+  '/goals': typeof AuthenticatedGoalsRoute
   '/my-profile': typeof AuthenticatedMyProfileRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/courses': typeof AuthenticatedCoursesRoute
   '/_authenticated/feedback': typeof AuthenticatedFeedbackRoute
+  '/_authenticated/goals': typeof AuthenticatedGoalsRoute
   '/_authenticated/my-profile': typeof AuthenticatedMyProfileRoute
   '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/coach'
     | '/courses'
     | '/feedback'
+    | '/goals'
     | '/my-profile'
     | '/roadmap'
     | '/settings'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/coach'
     | '/courses'
     | '/feedback'
+    | '/goals'
     | '/my-profile'
     | '/roadmap'
     | '/settings'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coach'
     | '/_authenticated/courses'
     | '/_authenticated/feedback'
+    | '/_authenticated/goals'
     | '/_authenticated/my-profile'
     | '/_authenticated/roadmap'
     | '/_authenticated/settings'
@@ -239,6 +251,13 @@ declare module '@tanstack/react-router' {
       path: '/feedback'
       fullPath: '/feedback'
       preLoaderRoute: typeof AuthenticatedFeedbackRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/goals': {
+      id: '/_authenticated/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof AuthenticatedGoalsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/courses': {
@@ -305,6 +324,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedCoursesRoute: typeof AuthenticatedCoursesRoute
   AuthenticatedFeedbackRoute: typeof AuthenticatedFeedbackRoute
+  AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
   AuthenticatedMyProfileRoute: typeof AuthenticatedMyProfileRoute
   AuthenticatedRoadmapRoute: typeof AuthenticatedRoadmapRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -320,6 +340,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedCoursesRoute: AuthenticatedCoursesRoute,
   AuthenticatedFeedbackRoute: AuthenticatedFeedbackRoute,
+  AuthenticatedGoalsRoute: AuthenticatedGoalsRoute,
   AuthenticatedMyProfileRoute: AuthenticatedMyProfileRoute,
   AuthenticatedRoadmapRoute: AuthenticatedRoadmapRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,

@@ -46,7 +46,7 @@ try
     app.UseForgeSecurity();
 
     app.UseForgeControllers();
-    if (app.Environment.IsDevelopment())
+    if (!app.Environment.IsProduction())
     {
         app.UseForgeSwagger();
     }

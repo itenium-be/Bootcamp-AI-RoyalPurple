@@ -49,6 +49,7 @@ import {
   ClipboardList,
   MessageSquare,
   CheckCircle,
+  Target,
 } from 'lucide-react';
 import { useAuthStore, useTeamStore, useThemeStore, useSkinStore, type Team } from '@/stores';
 import { fetchUserTeams } from '@/api/client';
@@ -249,7 +250,10 @@ export function Layout() {
   ];
 
   // Courses management - shown for managers
-  const coursesNavItems = [{ path: '/courses', icon: BookOpen, label: t('nav.courses') }];
+  const coursesNavItems = [
+    { path: '/courses', icon: BookOpen, label: t('nav.courses') },
+    { path: '/goals', icon: Target, label: t('nav.goals') },
+  ];
 
   // Administration - shown for backoffice
   const adminNavItems = [

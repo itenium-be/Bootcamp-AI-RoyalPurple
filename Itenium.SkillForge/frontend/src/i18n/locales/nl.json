@@ -40,7 +40,8 @@
     "settingsSection": "Instellingen",
     "certificateTemplates": "Certificaat Sjablonen",
     "skillProfiles": "Vaardigheidsprofielen",
-    "myProfile": "Mijn Profiel"
+    "myProfile": "Mijn Profiel",
+    "goals": "Doelen"
   },
   "auth": {
     "signIn": "Inloggen",
@@ -66,7 +67,9 @@
     "teamOverview": "Teamoverzicht",
     "noConsultants": "Geen consultants in uw team",
     "inactive": "Inactief",
-    "goals": "Doelen"
+    "goals": "Doelen",
+    "activeGoals": "Actieve Doelen",
+    "activeGoalsSubtitle": "Doelen in uitvoering"
   },
   "courses": {
     "title": "Cursussen",
@@ -217,6 +220,20 @@
     "contentPlaceholder": "Schrijf je feedback…",
     "created": "Feedback ingediend",
     "createError": "Kon feedback niet indienen"
+  },
+  "goals": {
+    "title": "Doelen",
+    "assignGoal": "Doel Toewijzen",
+    "noGoals": "Geen doelen gevonden",
+    "skillName": "Vaardigheid",
+    "consultantUserId": "Consultant",
+    "consultant": "Consultant",
+    "currentNiveau": "Huidig Niveau",
+    "targetNiveau": "Doelniveau",
+    "niveau": "Niveau",
+    "deadline": "Deadline",
+    "linkedResources": "Gekoppelde Bronnen",
+    "status": "Status"
   },
   "errors": {
     "sessionExpired": "Sessie verlopen!",

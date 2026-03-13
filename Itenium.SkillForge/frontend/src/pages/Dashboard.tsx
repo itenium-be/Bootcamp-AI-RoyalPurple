@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next';
-import { BookOpen, Users, Award } from 'lucide-react';
+import { BookOpen, Users, Target } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@itenium-forge/ui';
-import { useTeamStore } from '@/stores';
+import { useTeamStore, useGoalStore } from '@/stores';
 
 export function Dashboard() {
   const { t } = useTranslation();
   const { mode, selectedTeam } = useTeamStore();
+  const activeGoalsCount = useGoalStore((state) => state.goals.filter((g) => g.isActive).length);
 
   return (
     <div className="space-y-6">
@@ -42,12 +43,12 @@ export function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('dashboard.completedCourses')}</CardTitle>
-            <Award className="size-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">{t('dashboard.activeGoals')}</CardTitle>
+            <Target className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89</div>
-            <p className="text-xs text-muted-foreground">Certificates issued</p>
+            <div className="text-2xl font-bold">{activeGoalsCount}</div>
+            <p className="text-xs text-muted-foreground">{t('dashboard.activeGoalsSubtitle')}</p>
           </CardContent>
         </Card>
       </div>
