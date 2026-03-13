@@ -25,6 +25,10 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<SkillPrerequisiteEntity> SkillPrerequisites => Set<SkillPrerequisiteEntity>();
 
+    public DbSet<FeedbackEntity> Feedbacks => Set<FeedbackEntity>();
+
+    public DbSet<FeedbackCommentEntity> FeedbackComments => Set<FeedbackCommentEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
