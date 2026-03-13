@@ -343,24 +343,34 @@ function FeedbackListItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left p-3 rounded-lg border transition-colors hover:bg-accent ${selected ? 'bg-accent border-primary' : 'border-transparent'}`}
+      className={`w-full text-left p-3 rounded-lg border transition-colors hover:bg-accent ${selected ? 'bg-accent border-primary text-accent-foreground' : 'border-transparent'}`}
     >
       <div className="flex items-center gap-2 mb-1">
         <Badge variant={isAuthor ? 'default' : 'secondary'} className="text-xs">
           {isAuthor ? t('feedback.sent', 'Sent') : t('feedback.received', 'Received')}
         </Badge>
-        <span className="text-xs text-muted-foreground truncate">
+        <span className={`text-xs truncate ${selected ? 'text-accent-foreground/80' : 'text-muted-foreground'}`}>
           {isAuthor ? (item.recipientName ?? item.recipientId) : (item.authorName ?? item.authorId)}
         </span>
         {item.courseId != null && (
           <>
-            <BookOpen className="size-3 text-muted-foreground shrink-0" />
-            <span className="text-xs text-muted-foreground truncate">{item.courseName ?? `#${item.courseId}`}</span>
+            <BookOpen
+              className={`size-3 shrink-0 ${selected ? 'text-accent-foreground/80' : 'text-muted-foreground'}`}
+            />
+            <span className={`text-xs truncate ${selected ? 'text-accent-foreground/80' : 'text-muted-foreground'}`}>
+              {item.courseName ?? `#${item.courseId}`}
+            </span>
           </>
         )}
-        <span className="ml-auto text-xs text-muted-foreground shrink-0">{formatDate(item.createdAt)}</span>
+        <span
+          className={`ml-auto text-xs shrink-0 ${selected ? 'text-accent-foreground/80' : 'text-muted-foreground'}`}
+        >
+          {formatDate(item.createdAt)}
+        </span>
       </div>
-      <p className="text-sm line-clamp-2 text-muted-foreground">{item.content}</p>
+      <p className={`text-sm line-clamp-2 ${selected ? 'text-accent-foreground/80' : 'text-muted-foreground'}`}>
+        {item.content}
+      </p>
     </button>
   );
 }
