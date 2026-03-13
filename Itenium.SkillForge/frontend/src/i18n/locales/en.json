@@ -158,6 +158,14 @@
     "noRoadmap": "No roadmap available for your profile",
     "prerequisites": "Prerequisites"
   },
+  "catalog": {
+    "subtitle": "Browse all available courses and their resources",
+    "allCategories": "All categories",
+    "showResources": "Show resources",
+    "hideResources": "Hide resources",
+    "noResources": "No resources for this course yet",
+    "minutes": "min"
+  },
   "errors": {
     "sessionExpired": "Session expired!",
     "internalServerError": "Internal Server Error!"

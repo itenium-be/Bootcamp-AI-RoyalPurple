@@ -158,6 +158,14 @@
     "noRoadmap": "Geen roadmap beschikbaar voor jouw profiel",
     "prerequisites": "Vereisten"
   },
+  "catalog": {
+    "subtitle": "Bekijk alle beschikbare cursussen en hun leermaterialen",
+    "allCategories": "Alle categorieën",
+    "showResources": "Leermaterialen tonen",
+    "hideResources": "Leermaterialen verbergen",
+    "noResources": "Nog geen leermaterialen voor deze cursus",
+    "minutes": "min"
+  },
   "errors": {
     "sessionExpired": "Sessie verlopen!",
     "internalServerError": "Interne serverfout!"

@@ -193,3 +193,23 @@ export async function fetchCoachDashboard(): Promise<ConsultantSummary[]> {
   const response = await api.get<ConsultantSummary[]>('/api/dashboard');
   return response.data;
 }
+
+export type CourseResourceType = 'Video' | 'Article' | 'Exercise' | 'Book' | 'Link' | 'Other';
+
+export interface CourseResource {
+  id: number;
+  courseId: number;
+  title: string;
+  url: string | null;
+  type: CourseResourceType;
+  description: string | null;
+  durationMinutes: number | null;
+  order: number;
+  skillId: number | null;
+  toLevel: number | null;
+}
+
+export async function fetchCourseResources(courseId: number): Promise<CourseResource[]> {
+  const response = await api.get<CourseResource[]>(`/api/course/${courseId}/resource`);
+  return response.data;
+}
