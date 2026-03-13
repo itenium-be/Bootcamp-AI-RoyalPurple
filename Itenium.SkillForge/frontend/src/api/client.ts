@@ -203,6 +203,9 @@ export interface FeedbackItem {
   authorId: string;
   recipientId: string;
   courseId: number | null;
+  authorName: string | null;
+  recipientName: string | null;
+  courseName: string | null;
   content: string;
   createdAt: string;
 }
@@ -210,6 +213,7 @@ export interface FeedbackItem {
 export interface FeedbackComment {
   id: number;
   authorId: string;
+  authorName: string | null;
   content: string;
   createdAt: string;
 }
