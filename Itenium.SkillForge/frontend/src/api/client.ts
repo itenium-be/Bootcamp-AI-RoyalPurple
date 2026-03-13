@@ -312,3 +312,68 @@ export async function updateCourseResource(
 export async function deleteCourseResource(courseId: number, resourceId: number): Promise<void> {
   await api.delete(`/api/course/${courseId}/resource/${resourceId}`);
 }
+
+interface Goal {
+  id: number;
+  skillName: string;
+  consultantUserId: string;
+  createdByCoachId: string;
+  currentNiveau: number;
+  targetNiveau: number;
+  deadline: string;
+  isActive: boolean;
+  readinessFlagRaisedAt: string | null;
+  linkedResources: string | null;
+  createdAt: string;
+}
+
+export interface CreateGoalRequest {
+  consultantUserId: string;
+  skillName: string;
+  currentNiveau: number;
+  targetNiveau: number;
+  deadline: string;
+  linkedResources?: string | null;
+}
+
+/** @public */
+export interface UpdateGoalRequest {
+  skillName: string;
+  currentNiveau: number;
+  targetNiveau: number;
+  deadline: string;
+  linkedResources?: string | null;
+}
+
+export async function fetchGoals(): Promise<Goal[]> {
+  const response = await api.get<Goal[]>('/api/goal');
+  return response.data;
+}
+
+export async function createGoal(request: CreateGoalRequest): Promise<Goal> {
+  const response = await api.post<Goal>('/api/goal', request);
+  return response.data;
+}
+
+/** @public */
+export async function updateGoal(id: number, request: UpdateGoalRequest): Promise<Goal> {
+  const response = await api.put<Goal>(`/api/goal/${id}`, request);
+  return response.data;
+}
+
+/** @public */
+export async function deleteGoal(id: number): Promise<void> {
+  await api.delete(`/api/goal/${id}`);
+}
+
+/** @public */
+export async function raiseReadinessFlag(goalId: number): Promise<Goal> {
+  const response = await api.post<Goal>(`/api/goal/${goalId}/readiness`);
+  return response.data;
+}
+
+/** @public */
+export async function clearReadinessFlag(goalId: number): Promise<Goal> {
+  const response = await api.delete<Goal>(`/api/goal/${goalId}/readiness`);
+  return response.data;
+}
