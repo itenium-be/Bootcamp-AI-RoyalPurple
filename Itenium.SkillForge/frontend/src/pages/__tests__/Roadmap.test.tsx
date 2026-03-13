@@ -2,7 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import type { RoadmapNode } from '@/api/client';
-
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,

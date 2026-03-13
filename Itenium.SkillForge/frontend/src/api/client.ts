@@ -81,7 +81,7 @@ export interface RoadmapNode {
   teamId: number;
 }
 
-export async function fetchRoadmap(showAll: boolean = false): Promise<RoadmapNode[]> {
+export async function fetchRoadmap(showAll = false): Promise<RoadmapNode[]> {
   const response = await api.get<RoadmapNode[]>(`/api/roadmap?showAll=${showAll}`);
   return response.data;
 }
